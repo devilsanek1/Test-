@@ -596,3 +596,150 @@ maps (21 files). Deterministic: a second paint and a second bake give the same m
   the paper.
 - R2's 3-value squint threshold (~35 L*) cuts through T3's quay ramp, so any texture there makes islands: the
   recalibration ORGANIC §6 step 4 anticipated.
+
+## v8: scene 1 again, feeling first (iteration, 2026-10-31; `docs/process/PLAN.md` step 10, the proof)
+**The ask.** The owner on v7: "we lost the feeling and I feel like the scene now is about a dark alley whete nothing
+happens but the life and action is rather on the background"; "focus on achieving feelings with our tools rather than
+filling checkboxes". The beat: "She quit Google." She steps out of the big tech office's lit door onto the canal-side
+street at dusk. The feeling: the quiet thrill and nerve of stepping out on her own, the evening opening up in front of
+her, a little surprising, alive; her moment in front, the city's evening going on around her. Keep v7's tools (painted
+surfaces and brushwork, one story light, one colour key, the paper, her in the people overhaul); everything else free.
+An ITERATION: one agent, a still, no panels, judged by eye at phone width first.
+
+| File | What |
+|---|---|
+| `paint_still_v8.png` (= `deliverables/tests/painted_scene1_still_v8.png`) | v8: scene 1 at 1.0 s, captions on |
+| `compare_v8.jpg` | v7 and v8 at full size, then both at phone width (390 px), each under "the feeling it gives" |
+| `v8_card.md` | the frame card, filled in before building (FRAME_CARD.md: feeling first) |
+
+**The feeling it gives** (v8, at phone width): a warm golden evening opening up by the water; a young woman striding out
+of a glass office into the light, the wind in her hair. Free, a little brave, alive. (v7: a dark, empty quay at dusk, a
+small figure in a lit doorway far across the water; still and lonely.)
+
+### The card in short (`v8_card.md`)
+- **Why this feeling here:** frame 0's hook turns on "quitting should set you free", and the next line takes that away
+  ("her contract bans criticizing it, for life"). So this frame sells the freedom: open, warm, moving. A lonely dark
+  street says the opposite, which is what v7 said.
+- **The idea, "out of the glass, into the gold":** behind her the office (a tall cool glass wall, its warm lobby, the
+  door open); ahead of her the canal running to the low sun, the light finding her as she steps out, the wind off the
+  water in her hair and coat. The city is out enjoying its evening (a cafe under an autumn tree, a narrowboat, the far
+  bank's lit windows, birds toward the sun); she is about to join it.
+- **The eye:** her first (her dark coat against the bright water and sky, the sun's gold rim on her profile and hair, her
+  stride), the sun second (where she looks and goes), then the caption, the glowing door behind her, the life.
+- **Light and value, and why:** golden hour, the low sun at the canal's end is the key and the story light, backlighting
+  her; the lobby a warm step under it; the sky's rose-lilac is the shade family. A luminous middle key: the sky, the
+  water and the damp street bright, the darks few and serving the eye (her coat, her shadow, the door's jambs). Why: the
+  feeling is opening and hope.
+
+### What I chose, and why
+- **The camera** stands on the canal-side street at the eye height of someone sitting at that cafe (1.15 m: v2's own
+  "seated eye level" note for S1), a few metres from her, looking along the canal to the sun. She stands up into the big
+  evening sky; the vanishing point and the sun sit just right of her head, so everything runs to where she looks.
+- **Her** is ~600 px tall (about 31 % of the frame's height), in front, mid-stride, mirrored to walk toward the light
+  (the overhaul draws figures facing left; flipped, its own modelling keys from the sun's side), her chin lifted a
+  little, open eyes on the light. The wind is laid on the drawing (her hair swept back, her coat's hem flaring) because
+  the hair v4 rig ignores the breeze in profile (v7's finding). Lit live: the sun's rim (uneven: her profile, her hair's
+  top, the coat's front), a soft rose-lilac backlit shade, a low wrap and lobby rim, the paper.
+- **The office** is a glass wedge cut by the left edge (it goes up out of the frame: big), so the caption keeps open sky:
+  the lobby's glass reflects the sky above the door's head and shows its warm interior (wood slats, a cove light) below;
+  the door is an open sliding door, the warmest opening on the left, its light pooling on the stones toward her.
+- **The near ground carries her instead of being empty:** a damp street after a shower (the craft of the owner's model
+  ref 03's wet sand, not its mood): it mirrors the bright sky, so it glows gold to lilac; her two long shadow streaks
+  run from her feet toward us (a leading line back to her); a puddle under her holds her reflection; the lobby's light
+  and a few leaves in the gust. Her feet sit at y ~1565, so the near field is small.
+- **The world opened up:** the first thumbnail (a narrower canal, a continuous far bank, our side walled by buildings,
+  near lamp posts and bollards) read as a corridor with an empty floor; reworked once before building: a 24 m canal, a
+  low far bank of warehouses and trees, our side opening into a plaza with a cafe, no near furniture, her closer and
+  lower.
+- **The colour key** is the sunset's family at the source (the set's materials and the painter's palette: gold, peach,
+  coral-rose, lilac); the glass is the one cool field; the hot accent is the sun's gold on her.
+- **Life, small and soft:** four cafe people (the overhaul, ~100-150 px, backlit, thin rims), Pip on the cafe's bench
+  (tone-on-tone in its shade), a narrowboat on the canal, three moored boats with lit portholes, the far bank's lit
+  windows, a flock toward the sun, eight leaves in the gust.
+
+### How it is built (with v7's tools; nothing in `src/look/v7_s1`, `src/lib`, `src/v2r` or `scripts/` was edited)
+Code: `src/look/v8_s1/` (composition `V8S1`, entry `entry.tsx`; looks `v8` and `flat`; `V8Her` is her pose sheet).
+- `scene.json`: the one camera, the sun and her placement, shared by the engine and the bake.
+- `bake/set_v8.py`: the set as faces in metres through the camera (materials in the key, normals, kinds), by depth plane
+  (`farcity`, `water`, `far`, `boat`, `mid`, `street`, `building`), each plane's ground band first; rasterized to the
+  flat design and a label map per plane (glass films recorded apart, so what is behind the glass keeps its label).
+- `bake/paint_v8.py`: the painter: the sky from the recipe book (`scripts/look/paint/recipes/sky_clouds.py`: the designed
+  gradient, its soft passes and the 03 hatch, the sun's warmth, cloud masses designed then painted, streaks, a flock,
+  the calm disc) in a golden-hour palette; every other plane through MyPaint (`oc_lib`, peinten, the CC0 brushes:
+  colour moving inside each face, marks along each face's perspective clipped to its material, lost edges, the dose by
+  plane); the street's flags, broken joints and wet map; leaf dabs on the crowns.
+- `bake/light_v8.py`: the one rig, per plane (the sun by facing with cast shadows; the sky's fill by facing; the lobby's
+  pool with her soft shadow; emitters), the glass mirroring the picture ahead, the canal and the wet street mirroring
+  the lit world (her reflection and her shadows by backward maps from her parts render), the air on the far planes,
+  bloom at sources only, the paper (`light_s1/bake/texture.py`), then each plane's maps solved against the composite of
+  the pieces (`light_s1/bake/solve.py`).
+- Movers live (`V8Scene.tsx`, `her_v8.tsx`, `people_v8.tsx`, `particles_v8.tsx`, `rig.ts`): her, the cafe, Pip, the leaves.
+- End to end: `bash src/look/v8_s1/bake/run.sh <scratch>` (paint ~36 s, the movers' parts, light ~48 s, stills; ~2 min;
+  seeded); `--from=parts|light|stills` to resume. One still:
+  `GL=angle node scripts/render-frames.mjs V8S1 <dir> 1.0 --entry=src/look/v8_s1/entry.tsx --props='{"look":"v8"}'`.
+  The sheet: `python3 -B src/look/v8_s1/bake/sheet_v8.py <still> compare_v8.jpg --v7-line ... --v8-line ...`.
+
+### The frame loop's record (judged at phone width first)
+1. **Thumbnail 1** (flat values): "a person walking down a long empty sidewalk in a corridor; the sunset a slit": NOT
+   THERE (the corridor and the empty floor, v7's disease). Reworked once, at thumbnail cost (above).
+2. **Thumbnail 2 and the first build (painted, unlit):** "a pleasant sunset stroll on a canal promenade": ALMOST. Held
+   back by a busy crosshatch street, hard puddles, a pale blank lobby and a door leaf reading as a grey board, a thin
+   rim, a toy-bright Pip, a muddy tree.
+3. **Adjust 1:** the street calmed (fewer, longer, softer marks along the perspective; quieter flags and joints; four
+   puddles by intent, soft-edged); the sun's share on the ground raised (the painter's exaggeration, so her streaks
+   read); the umbrellas glow (backlit canvas), the crowns glow warm; her rim stronger; Pip smaller and shaded; leaves.
+4. **Adjust 2:** the swinging door replaced by an open sliding door; her shadows and reflection by backward maps (the
+   forward splat left a ladder at the bottom); the lobby glass split at the door's head.
+5. **Mistake fixes** (no new idea): the caption crowded by the building's edge (the corner moved in: ~40 px clear); a
+   bug that let no glass take a reflection (see-through faces now recorded apart) and a last unglazed pane, which is why
+   the door did not read; an even pale outline round her head (the wrap and lobby rim lowered: DIRECTION rule 5).
+**Verdict: THERE** on the feeling, with the polish notes below.
+
+### Checks (mistakes only) and, for the record, a few measures (examples, never targets)
+- The caption band: calm (L* 79.9, spread 0.8 L* with the captions off), the ink at ~68 L* contrast; `check_banding.py`
+  PASS on the band and on the cloud-free sky; its FAIL on the whole sky is the mid cloud bank's edge, and a WARN in the
+  upper sky is the recipe's deliberate hatch (isolated steps, no staircase). A master encode is the gate before a film.
+- The app's zones: nothing that must read under the right rail (the canal and the far bank there) or the top bar; her
+  feet sit just inside the bottom zone (y ~1565), her body and head well above it.
+- For the record: median L* ~80 (v7 ~44), ~7 % of the frame under L* 40 (v7 43 %), p2-p98 17-93: the scene's mood set
+  them, nothing aimed at them.
+
+### What is still off (honest)
+- **The near street** is calm and luminous but plain at the bottom (a peach field with her two streaks); the puddle under
+  her reads as a pale blob at phone width and her reflection in it is faint.
+- **The office** reads as a glass building with a warm open door, but the door is small at phone width, the lobby's
+  interior is simplified (slats and a cove light, nobody inside) and the upper glass shows the painter's light dashes,
+  which read as scratches at 1:1.
+- **The autumn tree** behind her is the second-strongest call (big, saturated): it frames her, and competes a little.
+- **Her:** the "nerve" is carried by the lifted chin, the stride and the gust, not by a gesture (the pose library has a
+  walk, not a deep breath or a hand on a strap); her coat is one flat near-black mass by design; the wind in her hair is
+  a sweep laid on the drawing (in motion it needs the rig's breeze); at phone width her face is a small profile.
+- **Pip** (the cafe's bench) is findable at once at 1:1; at phone width it is a small lilac shape among the cafe's people.
+- **The far bank** is simple boxes under the far dose; the canal mirrors them a deep red-brown; the sun's glitter on the
+  water is weak. The leaves read as specks at phone width.
+- **A still's light:** her shadow, her lobby shadow and her reflection are baked from her parts render, the maps are one
+  state; in motion they must be live or per state (v7's same limit). Nothing is checked in motion.
+
+### Flags for the orchestrator (found here, not edited)
+- **Her size** is the one call to put to the owner: ~600 px, in front, where his earlier human-scale note read "about
+  this size" as ~150 px (`refs_human_scale/README.md`), before his v7 note asked for her moment in front. The world
+  still gives the scale (the big sky, the canal to the sun, the building out of frame).
+- The caption's x is a global (`src/lib/theme.ts` `skyCaption.cx`): v8 kept the band clear by moving its building, not
+  the words. A film that puts a mass beside the band needs a per-shot seat.
+- The glass-film pattern (`set_v8.py` `rasterize(film_out=...)`): a see-through face keeps the label of what is behind
+  it and records its coverage apart, so the light can reflect in it; worth carrying into any glass a film draws.
+- The hair v4 rig's breeze in profile is still the people lane's; `her_v8.tsx` sweeps the drawing as a stop-gap.
+- MyPaint's job files run to ~230 MB per full paint in the scratch; `run.sh` deletes them.
+
+## The owner on v8 (2026-10-31)
+"I think the feeling is more promising yes", then: "Did you use any composition shot from the library?"
+-> Honest answer: not by name. v8's card (`v8_card.md` §4-5) reached classic devices on its own (the canal edge, the
+kerb and the glass lines running to the low sun: leading lines B1 to a vanishing point B2; the office's glass wall as a
+near layer at the left edge, C2; her on the right third, walking into the light), but the brief only pointed at
+DESIGN_LANGUAGE, and the card never asked for the library. Fixed: FRAME_CARD §4 now asks which library devices carry
+the feeling, the owner's reel ideas first, by code and why.
+- Then the owner: "Would you put agents more in the box if we as this?" -> yes, as first worded (pick devices from the
+  library, by code, before inventing the frame: the device comes first and the frame becomes its template, the same
+  trap as the numbers, and the library still holds placements and numbers until PLAN step 7 reframes it). Reworded:
+  imagine the frame first, then check it against the library as a vocabulary (what it already uses, what would make
+  the feeling stronger, what was missed).

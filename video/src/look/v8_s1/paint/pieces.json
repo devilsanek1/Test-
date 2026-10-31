@@ -1,0 +1,137 @@
+{
+ "boat": {
+  "box": [
+   796,
+   1144,
+   232,
+   107
+  ],
+  "file": "boat.v8piece.png",
+  "seconds": 1.78,
+  "stats": {
+   "lost": 5,
+   "mypaint_s": 0.31,
+   "strokes": {
+    "edge": 5,
+    "face": 45
+   }
+  }
+ },
+ "building": {
+  "box": [
+   0,
+   0,
+   206,
+   1435
+  ],
+  "file": "building.v8piece.png",
+  "seconds": 2.57,
+  "stats": {
+   "lost": 67,
+   "mypaint_s": 0.74,
+   "strokes": {
+    "edge": 67,
+    "face": 149
+   }
+  }
+ },
+ "far": {
+  "box": [
+   0,
+   881,
+   1080,
+   320
+  ],
+  "file": "far.v8piece.png",
+  "seconds": 7.65,
+  "stats": {
+   "lost": 44,
+   "mypaint_s": 0.75,
+   "strokes": {
+    "edge": 44,
+    "face": 199,
+    "leaf": 372
+   }
+  }
+ },
+ "farcity": {
+  "box": [
+   327,
+   1001,
+   753,
+   187
+  ],
+  "file": "farcity.v8piece.png",
+  "seconds": 4.03,
+  "stats": {
+   "lost": 18,
+   "mypaint_s": 0.34,
+   "strokes": {
+    "edge": 18,
+    "face": 82
+   }
+  }
+ },
+ "mid": {
+  "box": [
+   0,
+   755,
+   824,
+   580
+  ],
+  "file": "mid.v8piece.png",
+  "seconds": 6.69,
+  "stats": {
+   "lost": 22,
+   "mypaint_s": 0.85,
+   "strokes": {
+    "edge": 22,
+    "face": 178,
+    "leaf": 900
+   }
+  }
+ },
+ "sky": {
+  "box": [
+   0,
+   0,
+   1080,
+   1200
+  ],
+  "file": "sky.v8piece.png",
+  "seconds": 12.83,
+  "stats": {}
+ },
+ "street": {
+  "box": [
+   0,
+   1297,
+   1080,
+   623
+  ],
+  "file": "street.v8piece.png",
+  "seconds": 5.76,
+  "stats": {
+   "mypaint_s": 2.61,
+   "strokes": {
+    "street": 170
+   }
+  }
+ },
+ "water": {
+  "box": [
+   558,
+   1148,
+   522,
+   564
+  ],
+  "file": "water.v8piece.png",
+  "seconds": 1.95,
+  "stats": {
+   "mypaint_s": 0.81,
+   "strokes": {
+    "ripple": 420
+   }
+  }
+ }
+}

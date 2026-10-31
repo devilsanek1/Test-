@@ -24,6 +24,10 @@ are in `DESIGN_LANGUAGE.md`. A card that leaves an answer blank leaves a piece f
 - Where does the eye land first, then second, then third? What leads it there (light, contrast, a line, a colour accent,
   a figure, motion)?
 - Is there one place to look, and is everything else quieter than it?
+- **After the frame is imagined, check it against the composition library** (`COMPOSITION_SHOTS.md`, the owner's own
+  reel ideas first) as a vocabulary, never a menu to pick from first: which devices is the frame already using, and is
+  there one that would make THIS feeling stronger or that you missed? Name any you use, and why. Imagine first, then
+  consult: a device chosen before the idea becomes a template.
 
 ## 5. Space and scale
 - Where does the camera stand (a person's viewpoint, high, low)? How far are we from her, from the world?
