@@ -9,18 +9,16 @@ import p_bridge_flat from './paint/bridge_flat.t01piece.png';
 import p_boat_flat from './paint/boat_flat.t01piece.png';
 import p_rail_flat from './paint/rail_flat.t01piece.png';
 import p_glow_flat from './paint/glow_flat.t01piece.png';
-import p_trees_flat from './paint/trees_flat.t01piece.png';
 import p_near_flat from './paint/near_flat.t01piece.png';
 
 export const FLAT_T01: PieceSet = {
   sky: {src: p_sky_flat, box: [0, 0, 1080, 1240]},
   twin: {src: p_twin_flat, box: [0, 1151, 1080, 769]},
   water: {src: p_water_flat, box: [0, 1150, 1080, 770]},
-  far: {src: p_far_flat, box: [0, 449, 1080, 774]},
+  far: {src: p_far_flat, box: [0, 432, 1080, 791]},
   bridge: {src: p_bridge_flat, box: [0, 875, 1080, 375]},
   boat: {src: p_boat_flat, box: [879, 912, 201, 388]},
   rail: {src: p_rail_flat, box: [0, 632, 1080, 436]},
-  glow: {src: p_glow_flat, box: [433, 1071, 173, 190]},
-  trees: {src: p_trees_flat, box: [0, 0, 45, 98]},
-  near: {src: p_near_flat, box: [159, 1697, 827, 223]},
+  glow: {src: p_glow_flat, box: [411, 1040, 212, 225]},
+  near: {src: p_near_flat, box: [197, 1702, 728, 218]},
 };

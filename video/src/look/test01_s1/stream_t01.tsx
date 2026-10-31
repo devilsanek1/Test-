@@ -67,14 +67,16 @@ function loop(c: P, r: number, rot: number, turns: number): string {
   return 'M' + pts.map((p) => `${p[0].toFixed(2)} ${p[1].toFixed(2)}`).join('L');
 }
 
-/** The loops along the stream: (t along it, side offset px, size px, rotation, turns, opacity). */
+/** The loops along the stream: (t along it, side offset px, size px, rotation, turns, opacity): a few words of the
+ *  old hand coming loose and drifting off the light as it climbs (cursive curls, never letters). */
 const LOOPS: [number, number, number, number, number, number][] = [
-  [0.14, -20, 9, -0.5, 2.0, 0.75],
-  [0.26, 18, 11, 0.6, 1.5, 0.8],
-  [0.4, -17, 8, -0.9, 2.0, 0.7],
-  [0.52, 15, 9, 0.3, 1.5, 0.65],
-  [0.66, -13, 7, -0.3, 2.0, 0.55],
-  [0.78, 12, 6, 0.8, 1.5, 0.45],
+  [0.1, -24, 7.5, -0.25, 3.0, 0.75],
+  [0.21, 22, 8.5, 0.35, 2.5, 0.8],
+  [0.34, -21, 7.0, -0.5, 3.0, 0.72],
+  [0.47, 19, 7.5, 0.2, 2.5, 0.66],
+  [0.6, -17, 6.0, -0.2, 3.0, 0.56],
+  [0.73, 15, 5.5, 0.45, 2.5, 0.46],
+  [0.85, -12, 4.5, -0.3, 2.0, 0.34],
 ];
 
 export const Stream: React.FC<{phone: P}> = ({phone}) => {
@@ -91,30 +93,31 @@ export const Stream: React.FC<{phone: P}> = ({phone}) => {
     const n = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
     return [-(b[1] - a[1]) / n, (b[0] - a[0]) / n];
   };
-  const halo = ribbon(c, (t) => 30 - 16 * t);
-  const glow = ribbon(c, (t) => 12 - 6 * t);
+  // widest and softest where it gathers off the pages, narrowing as it reaches her hand
+  const halo = ribbon(c, (t) => 48 - 24 * t);
+  const glow = ribbon(c, (t) => 17 - 8 * t);
   const core = ribbon(c, (t) => 4.2 - 2.4 * t);
   return (
     <g>
       <defs>
         <filter id={`${id}b14`} x="-50%" y="-20%" width="200%" height="140%">
-          <feGaussianBlur stdDeviation={11} />
+          <feGaussianBlur stdDeviation={13} />
         </filter>
         <filter id={`${id}b5`} x="-50%" y="-20%" width="200%" height="140%">
-          <feGaussianBlur stdDeviation={3.6} />
+          <feGaussianBlur stdDeviation={4.2} />
         </filter>
         <filter id={`${id}b1`} x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation={0.9} />
+          <feGaussianBlur stdDeviation={0.8} />
         </filter>
         <radialGradient id={`${id}ph`}>
-          <stop offset="0" stopColor={GOLD.hot} stopOpacity={0.95} />
-          <stop offset="0.35" stopColor={GOLD.gold} stopOpacity={0.5} />
+          <stop offset="0" stopColor={GOLD.hot} stopOpacity={0.9} />
+          <stop offset="0.35" stopColor={GOLD.gold} stopOpacity={0.45} />
           <stop offset="1" stopColor={GOLD.ember} stopOpacity={0} />
         </radialGradient>
       </defs>
       <g style={{mixBlendMode: 'screen'}}>
         <path d={halo} fill={GOLD.gold} opacity={0.42} filter={`url(#${id}b14)`} />
-        <path d={glow} fill={GOLD.hot} opacity={0.7} filter={`url(#${id}b5)`} />
+        <path d={glow} fill={GOLD.hot} opacity={0.68} filter={`url(#${id}b5)`} />
         {LOOPS.map(([t, off, r, rot, turns, op], i) => {
           const p = at(t);
           const n = norm(t);
@@ -122,13 +125,13 @@ export const Stream: React.FC<{phone: P}> = ({phone}) => {
           const d = loop(q, r, rot, turns);
           return (
             <g key={i} opacity={op}>
-              <path d={d} fill="none" stroke={GOLD.gold} strokeWidth={4.5} strokeLinecap="round" opacity={0.45} filter={`url(#${id}b5)`} />
-              <path d={d} fill="none" stroke={GOLD.hot} strokeWidth={1.7} strokeLinecap="round" filter={`url(#${id}b1)`} />
+              <path d={d} fill="none" stroke={GOLD.gold} strokeWidth={3.6} strokeLinecap="round" opacity={0.42} filter={`url(#${id}b5)`} />
+              <path d={d} fill="none" stroke={GOLD.hot} strokeWidth={1.3} strokeLinecap="round" filter={`url(#${id}b1)`} />
             </g>
           );
         })}
-        <path d={core} fill={GOLD.core} filter={`url(#${id}b1)`} />
-        <circle cx={phone[0]} cy={phone[1]} r={26} fill={`url(#${id}ph)`} />
+        <path d={core} fill="#FFEBC2" opacity={0.92} filter={`url(#${id}b1)`} />
+        <circle cx={phone[0]} cy={phone[1]} r={22} fill={`url(#${id}ph)`} />
       </g>
     </g>
   );
