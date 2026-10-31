@@ -5,7 +5,8 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 VIDEO="$(cd "$HERE/../../../.." && pwd)"
 cd "$HERE"
-python3 frames.py "$@" > /tmp/d_pages.txt
+LIST="$(mktemp)"
+python3 frames.py "$@" > "$LIST"
 mkdir -p out
 while read -r page; do
   id="$(basename "$page" .html)"
@@ -15,6 +16,6 @@ while read -r page; do
   cp "$tmp/${id}_phone.jpg" "out/${id}_phone.jpg"
   rm -rf "$tmp"
   echo "rendered $id"
-done < /tmp/d_pages.txt
-rm -f /tmp/d_pages.txt
+done < "$LIST"
+rm -f "$LIST"
 python3 sheet.py

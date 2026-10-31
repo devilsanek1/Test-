@@ -10,7 +10,7 @@ BEATS = [('B1', 'The snow wakes warm'), ('B2', 'A street of computers'), ('B3', 
          ('B4', 'Forty kettles inside'), ('B5', 'The teapot computer'), ('B6', 'Thrown into the night'),
          ('B7', 'The city reaches back'), ('B8', 'A plan in chalk'), ('B9', 'A door in the plan'),
          ('B10', 'Blue in, gold out'), ('B11', 'Warm under the snow'), ('B12', 'Your chat, her warm window')]
-ALTS = [('B1alt', 'The waterfront wakes'), ('B5alt', 'The tea cosy'), ('B7alt', 'The street opens a way'),
+ALTS = [('B1alt', 'From your balcony'), ('B5alt', 'The tea cosy'), ('B7alt', 'The street opens a way'),
         ('B11alt', 'The melt line')]
 
 

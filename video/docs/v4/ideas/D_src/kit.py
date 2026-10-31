@@ -115,7 +115,54 @@ FILTERS = '''
 <filter id="frostf" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="21" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="10" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="0.8"/></filter>
 <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="2" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.52  0 0 0 0.9 0"/></filter>
 <filter id="mottle" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="3" seed="9" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 1 0"/></filter>
+<filter id="vap" x="-60%" y="-60%" width="220%" height="220%"><feTurbulence type="fractalNoise" baseFrequency="0.007 0.012" numOctaves="3" seed="17" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="38" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="11"/></filter>
+<filter id="vapS" x="-60%" y="-60%" width="220%" height="220%"><feTurbulence type="fractalNoise" baseFrequency="0.02 0.03" numOctaves="2" seed="23" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="4"/></filter>
+<filter id="chalk" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="8" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="4" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="1" seed="12" result="gr"/><feColorMatrix in="gr" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 4.2 -1.55" result="m"/><feComposite in="d" in2="m" operator="in"/></filter>
+<filter id="fog" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="31" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.93  0 0 0 0 0.9  0 0 0 0 0.86  0 0 0 1.6 -0.35"/></filter>
 '''
+
+
+# ---------- the film's one vapour paint (board read, round 1: "white vapour, warm only at its root", never smoke)
+def vapour(seed, x, y, w, h, op=0.7, lean=0.0, n=12, col='#f3f6fa', root=HONEY, root_w=None, fade=1.7, wisps=3,
+           shimmer=False, flt='vap'):
+    """Warm moist air meeting the cold: bright and dense just above its mouth, thinning fast to nothing, soft wispy
+    edges, white (never grey); the heat's colour only AT the mouth (a small warm breath), never up the column.
+    (x, y) = the mouth; h = how far it rises before it is gone; lean = drift per px risen."""
+    rnd = random.Random(seed)
+    o = []
+    for i in range(n):
+        t = i / max(1, n - 1)
+        cy = y - 0.06 * h - t * h
+        cx = x + lean * t * h + rnd.uniform(-0.14, 0.14) * w * (0.25 + t)
+        rx = w * (0.16 + 0.48 * t) * rnd.uniform(0.85, 1.15)
+        ry = rx * rnd.uniform(0.42, 0.7)
+        a = op * (1 - t) ** fade * rnd.uniform(0.85, 1.08)
+        o.append(ell(cx, cy, rx, ry, col, opacity=f(max(0.02, a))))
+    body = grp(''.join(o), filter='url(#%s)' % flt)
+    # the wisps where it thins: a few loose strands drifting off the top
+    ws = ''
+    for k in range(wisps):
+        t0 = rnd.uniform(0.45, 0.7)
+        sx = x + lean * t0 * h + rnd.uniform(-0.25, 0.25) * w
+        sy = y - t0 * h
+        ex = sx + lean * 0.4 * h + rnd.uniform(-0.6, 0.6) * w
+        ey = sy - rnd.uniform(0.25, 0.45) * h
+        ws += path('M %s %s C %s %s %s %s %s %s' % (f(sx), f(sy), f(sx + rnd.uniform(-0.4, 0.4) * w), f(sy - 0.15 * h),
+                                                   f(ex + rnd.uniform(-0.3, 0.3) * w), f(ey + 0.1 * h), f(ex), f(ey)),
+                   'none', stroke=col, stroke_width=f(max(6, w * 0.16)), stroke_linecap='round', opacity=f(op * 0.16))
+    body += grp(ws, filter='url(#vap)')
+    if root:
+        rw = root_w or w * 0.3
+        body = (ell(x, y - rw * 0.2, rw, rw * 0.42, root, opacity='0.42', filter='url(#b8)') +
+                ell(x, y - rw * 0.3, rw * 0.5, rw * 0.2, HONEY_HI, opacity='0.5', filter='url(#b4)')) + body
+    if shimmer:
+        sh = ''
+        for k in range(3):
+            yy = y - 0.03 * h - k * 0.04 * h
+            pts_ = [(x - w * 0.35 + u * w / 14.0, yy + math.sin(u * 1.9 + k) * 3) for u in range(11)]
+            sh += pline(pts_, '#ffffff', 1.6, opacity='0.14')
+        body += grp(sh, filter='url(#b1)')
+    return body
 
 
 def page(body, defs='', caption=None, band=True, grain=0.07, title=''):
@@ -156,6 +203,24 @@ def caption_svg(cap):
     return out
 
 
+def smooth_closed(points, tension=1.0):
+    """A smooth closed path through the points (Catmull-Rom as cubic Beziers)."""
+    n = len(points)
+    d = 'M %s %s ' % (f(points[0][0]), f(points[0][1]))
+    for i in range(n):
+        p0, p1, p2, p3 = points[(i - 1) % n], points[i], points[(i + 1) % n], points[(i + 2) % n]
+        c1 = (p1[0] + (p2[0] - p0[0]) / 6 * tension, p1[1] + (p2[1] - p0[1]) / 6 * tension)
+        c2 = (p2[0] - (p3[0] - p1[0]) / 6 * tension, p2[1] - (p3[1] - p1[1]) / 6 * tension)
+        d += 'C %s %s %s %s %s %s ' % (f(c1[0]), f(c1[1]), f(c2[0]), f(c2[1]), f(p2[0]), f(p2[1]))
+    return d + 'Z'
+
+
+def blob(seed, cx, cy, rx, ry, n=24, jit=0.12):
+    rnd = random.Random(seed)
+    return [(cx + math.cos(2 * math.pi * k / n) * rx * rnd.uniform(1 - jit, 1 + jit),
+             cy + math.sin(2 * math.pi * k / n) * ry * rnd.uniform(1 - jit, 1 + jit)) for k in range(n)]
+
+
 # ---------- the world's pieces ----------
 def snow(seed, n, x0=0, y0=0, x1=W, y1=H, rmin=1.6, rmax=4.0, col='#f2f5fa', op=(0.35, 0.85), blur=None, band_half=True):
     rnd = random.Random(seed)
@@ -191,8 +256,9 @@ def steam(seed, x, y, w, h, col='#e9ecf2', op=0.55, n=9, root=None, root_op=0.8,
 
 
 def kettle(x, y, h, body='#4d5568', lit='#8a93a6', dark='#262c3a', face=1, light=True, steam_seed=None, steam_h=None,
-           steam_col='#eef0f4', steam_op=0.6):
-    """An electric kettle standing at (x, y) (its base centre), h px tall; face=1 spout right, -1 spout left."""
+           steam_col='#eef0f4', steam_op=0.6, bloom=1.0, boil=False):
+    """An electric kettle standing at (x, y) (its base centre), h px tall; face=1 spout right, -1 spout left.
+    bloom: how far its little warm light blooms; boil: boiling hard (the lid lifting on a puff, the spout jetting)."""
     s = h / 100.0
     k = face
     X = lambda u: x + k * u * s
@@ -209,9 +275,13 @@ def kettle(x, y, h, body='#4d5568', lit='#8a93a6', dark='#262c3a', face=1, light
               'none', stroke=lit, stroke_width=f(max(1.5, 5 * s)), stroke_linecap='round')
     o += rect(X(-30) if k > 0 else X(30), Y(10), 62 * s, 10 * s, dark, opacity='0.55', transform=None) if False else ''
     o += ell(x, y, 36 * s, 5 * s, dark, opacity='0.7')
-    # lid and knob
-    o += path('M %s %s Q %s %s %s %s Z' % (f(X(-24)), f(Y(84)), f(X(-1)), f(Y(97)), f(X(22)), f(Y(84))), body)
-    o += ell(X(-1), Y(96), 7 * s, 4.5 * s, dark)
+    # lid and knob (boiling hard: the lid lifted and tipped on a puff of steam)
+    lid = path('M %s %s Q %s %s %s %s Z' % (f(X(-24)), f(Y(84)), f(X(-1)), f(Y(97)), f(X(22)), f(Y(84))), body) + ell(X(-1), Y(96), 7 * s, 4.5 * s, dark)
+    if boil:
+        o += steam((steam_seed or 1) + 7, X(-1), Y(88), 60 * s, 46 * s, col=steam_col, op=0.8, n=4, flt='steamS')
+        o += '<g transform="translate(0 %s) rotate(%s %s %s)">%s</g>' % (f(-11 * s), f(-14 * k), f(X(22)), f(Y(84)), lid)
+    else:
+        o += lid
     # spout
     o += path('M %s %s L %s %s L %s %s L %s %s Z' % (f(X(28)), f(Y(58)), f(X(52)), f(Y(80)), f(X(56)), f(Y(76)), f(X(33)), f(Y(40))), body)
     # handle
@@ -220,11 +290,53 @@ def kettle(x, y, h, body='#4d5568', lit='#8a93a6', dark='#262c3a', face=1, light
     # the little warm "on" light
     if light:
         o += circ(X(10), Y(20), max(2.2, 5.5 * s), HONEY)
-        o += circ(X(10), Y(20), max(4, 12 * s), HONEY, opacity='0.35', filter='url(#b4)')
+        o += circ(X(10), Y(20), max(4, 12 * s * bloom), HONEY, opacity=f(min(0.6, 0.35 * bloom)), filter='url(#b4)' if bloom <= 1 else 'url(#b8)')
     if steam_seed is not None:
         sh = steam_h or 150 * s
-        o += steam(steam_seed, X(56), Y(80), 70 * s, sh, col=steam_col, op=steam_op, n=6, flt='steamS', lean=0.05 * k)
+        if boil:   # a hard jet out of the spout, then the cloud
+            o += steam(steam_seed, X(60), Y(84), 54 * s, sh * 0.5, col=steam_col, op=0.9, n=5, flt='steamS', lean=0.9 * k)
+            o += steam(steam_seed + 3, X(56) + k * sh * 0.4, Y(84) - sh * 0.35, 90 * s, sh * 0.9, col=steam_col, op=steam_op, n=6, flt='steamS', lean=0.15 * k)
+        else:
+            o += steam(steam_seed, X(56), Y(80), 70 * s, sh, col=steam_col, op=steam_op, n=6, flt='steamS', lean=0.05 * k)
     return o
+
+
+def fogged_window(uid, x, y, w, h, seed=3, fog=0.62, top_fog=None, drips=7, lights=34, avoid=None, frame=g(30), mull=True):
+    """A kitchen window at night, fogged by the steam: the night dark behind it, the city's lights blurred through the
+    fog, the fog lit by the room's lamp (warm, heavier at the top), streams of drops running down it, beads."""
+    rnd = random.Random(seed)
+    top_fog = fog if top_fog is None else top_fog
+    defs = '<clipPath id="fw%s"><rect x="%s" y="%s" width="%s" height="%s"/></clipPath>' % (uid, f(x), f(y), f(w), f(h))
+    defs += lin_grad('fwn%s' % uid, [(0, g(7)), (0.6, g(12)), (1, g(18))], x1=0, y1=y, x2=0, y2=y + h, units=True)
+    defs += lin_grad('fwf%s' % uid, [(0, '#efe5d6', top_fog), (0.55, '#e9e3da', (top_fog + fog) / 2), (1, '#e3e2e0', fog)],
+                     x1=0, y1=y, x2=0, y2=y + h, units=True)
+    o = rect(x, y, w, h, 'url(#fwn%s)' % uid)
+    hz = y + h * 0.66
+    o += rect(x, hz, w, h * 0.34, g(10))
+    lt = ''
+    for _ in range(lights):
+        lx, ly = rnd.uniform(x, x + w), rnd.uniform(hz - h * 0.12, hz + 4)
+        lt += circ(lx, ly, rnd.uniform(3, 6), HONEY if rnd.random() < 0.7 else HONEY_MID, opacity=f(rnd.uniform(0.6, 1)))
+    o += grp(lt, filter='url(#b4)')
+    o += rect(x, y, w, h, 'url(#fwf%s)' % uid)
+    o += rect(x, y, w, h, '#ffffff', filter='url(#fog)', opacity='0.18')
+    st = ''
+    for _ in range(drips):
+        for _try in range(8):
+            dx = rnd.uniform(x + 10, x + w - 10)
+            if not (avoid and avoid(dx)):
+                break
+        y0_ = rnd.uniform(y + h * 0.05, y + h * 0.45)
+        y1_ = rnd.uniform(y0_ + h * 0.25, y + h)
+        pts_ = [(dx + math.sin(v * 1.3 + dx) * 2.5, y0_ + v * (y1_ - y0_) / 6.0) for v in range(7)]
+        st += pline(pts_, g(18), rnd.uniform(2.2, 3.4), opacity='0.6') + circ(pts_[-1][0], pts_[-1][1] + 2, 3.2, '#f4f2ee', opacity='0.75')
+    beads = ''.join(circ(rnd.uniform(x, x + w), rnd.uniform(y + h * 0.55, y + h), rnd.uniform(1.2, 2.6), '#f6f4f0', opacity='0.6')
+                    for _ in range(int(w * h / 900)))
+    o += st + beads
+    o = '<g clip-path="url(#fw%s)">%s</g>' % (uid, o)
+    if mull:
+        o += line(x + w / 2, y, x + w / 2, y + h, frame, max(6, w * 0.025))
+    return defs, o
 
 
 def radiator(x, y, w, h, n=14, warm=0.0, base=None):
@@ -248,8 +360,9 @@ def radiator(x, y, w, h, n=14, warm=0.0, base=None):
     return ''.join(out)
 
 
-def frost(seed, x0, y0, x1, y1, n=26, col='#f3f6fb', op=0.75, avoid=None, edge_bias=1.0):
-    """Frost ferns on glass: branching strokes growing in from the edges and corners of the box."""
+def frost(seed, x0, y0, x1, y1, n=26, col='#f3f6fb', op=0.75, avoid=None, edge_bias=1.0, interior=0.0):
+    """Frost ferns on glass: branching strokes growing in from the edges and corners of the box (and, with interior > 0,
+    that share of them seeded across the glass: a pane frosted over)."""
     rnd = random.Random(seed)
     out = []
 
@@ -273,6 +386,9 @@ def frost(seed, x0, y0, x1, y1, n=26, col='#f3f6fb', op=0.75, avoid=None, edge_b
         fern(x2, y2, ang + rnd.uniform(-0.4, 0.4), length * 0.6, depth - 1, width * 0.8)
 
     for _ in range(n):
+        if interior and rnd.random() < interior:
+            fern(rnd.uniform(x0, x1), rnd.uniform(y0, y1), rnd.uniform(0, 2 * math.pi), rnd.uniform(50, 120) * edge_bias, 4, 2.2)
+            continue
         side = rnd.random()
         if side < 0.35:   # bottom edge, growing up
             x, y, ang = rnd.uniform(x0, x1), y1, -math.pi / 2 + rnd.uniform(-0.7, 0.7)
@@ -531,6 +647,102 @@ def her_profile_sitting(cx, cy, s=1.0, sip=False, sweater=None, hair=None, skin=
     if flip:
         body = '<g transform="scale(-1 1)">%s</g>' % body
     return _g(body, cx, cy, s)
+
+
+def her_profile_tucked(cx, cy, s=1.0, sweater=None, hair=None, skin=None, legs=None, socks='#e3d8c8', mug_col=None, rim=None,
+                       flip=False):
+    """Up on the table, in profile facing right, her knees pulled up to her chest and her socked feet on the table top
+    (off the floor of kettles), both hands holding the mug close under her chin, eyes wide open on the kettles.
+    (cx, cy) = where she sits on the table top; s = 1 for a head ~95 px tall."""
+    sweater = sweater or g(26); hair = hair or g(10); skin = skin or g(52); legs = legs or g(18)
+    mug_col = mug_col or g(16); rim = rim or g(66)
+    o = []
+    # the back (rounded, leaning a little forward over her knees)
+    o.append(path('M -70 0 C -84 -60 -86 -150 -66 -214 C -54 -250 -20 -266 14 -258 C 40 -250 52 -226 50 -196 '
+                  'C 44 -130 30 -60 26 0 Z', sweater))
+    o.append(path('M -70 0 C -84 -60 -86 -150 -66 -214', 'none', stroke=rim, stroke_width='6', opacity='0.45'))
+    # the thighs up to the knees, the shins down to the feet on the table, wool socks
+    o.append(path('M -40 -6 C 0 -40 50 -100 92 -150 C 104 -164 128 -160 132 -142 C 120 -96 70 -40 30 6 Z', legs))
+    o.append(path('M 98 -156 C 126 -150 140 -136 138 -112 C 136 -70 132 -36 130 -10 L 104 -8 C 104 -44 104 -84 98 -120 Z', legs))
+    o.append(path('M 100 -14 C 100 4 112 10 150 10 C 164 10 166 -4 156 -10 C 142 -16 134 -18 128 -24 Z', socks))
+    # the neck and head (profile to the right), the bob, the bun, the wide-open eye, a raised brow
+    o.append(path('M 6 -276 L 28 -276 L 28 -246 L 4 -246 Z', skin))
+    o.append(path('M -20 -340 C -20 -380 46 -386 54 -346 C 58 -336 60 -328 62 -324 L 71 -309 C 73 -305 67 -302 63 -302 '
+                  'L 64 -295 C 65 -291 62 -289 60 -288 C 61 -282 57 -276 49 -273 C 35 -269 19 -271 8 -275 C -14 -281 -22 -308 -20 -340 Z', skin))
+    o.append(path('M -26 -322 C -32 -380 34 -398 58 -354 C 46 -354 32 -350 24 -340 C 18 -320 16 -300 12 -280 C -2 -272 -22 -278 -30 -290 '
+                  'C -34 -304 -30 -316 -26 -322 Z', hair))
+    o.append(path('M 22 -342 C 34 -356 52 -354 60 -340 L 56 -334 C 46 -340 34 -340 22 -332 Z', hair))
+    o.append(path('M -24 -368 C -36 -392 -20 -416 4 -414 C 28 -412 34 -388 20 -372 C 8 -362 -14 -360 -24 -368 Z', hair))
+    o.append(ell(50, -323, 4.2, 5.4, g(10)) + path('M 42 -334 C 46 -338 54 -338 58 -334', 'none', stroke=g(14), stroke_width='2.5', stroke_linecap='round'))
+    # the arm round the knees, both hands holding the mug close under her chin; its warm steam
+    o.append(path('M 20 -238 C 50 -222 80 -200 96 -176 C 104 -164 100 -150 88 -150 C 74 -168 50 -190 24 -206 Z', sweater))
+    o.append(path('M 92 -170 C 96 -196 92 -222 80 -244 L 96 -252 C 110 -228 114 -196 108 -166 Z', sweater))
+    mx, my = 96, -248
+    o.append(rect(mx - 22, my - 40, 44, 50, mug_col, rx='7') + rect(mx - 19, my - 40, 38, 7, HONEY_DEEP))
+    o.append(path('M %d %d C %d %d %d %d %d %d' % (mx + 20, my - 30, mx + 36, my - 30, mx + 36, my - 6, mx + 20, my - 6), 'none',
+                  stroke=mug_col, stroke_width='6'))
+    o.append(ell(mx - 18, my - 8, 13, 11, skin) + ell(mx + 18, my - 4, 12, 10, skin))
+    o.append(steam(78, mx, my - 44, 26, 70, col=HONEY_HI, op=0.65, n=4, flt='steamS'))
+    body = ''.join(o)
+    if flip:
+        body = '<g transform="scale(-1 1)">%s</g>' % body
+    return _g(body, cx, cy, s)
+
+
+def open_hand(x, y, ang, size, skin, spread=1.0):
+    """An open hand, palm out, fingers spread (ang: the direction the fingers point, radians)."""
+    o = ell(x, y, size * 0.5, size * 0.42, skin, transform='rotate(%s %s %s)' % (f(math.degrees(ang)), f(x), f(y)))
+    for k, (da, L) in enumerate(((-0.62, 0.62), (-0.24, 0.8), (0.1, 0.84), (0.42, 0.74), (1.15, 0.56))):
+        a = ang + da * spread
+        bx, by = x + math.cos(a) * size * 0.3, y + math.sin(a) * size * 0.3
+        o += line(bx, by, bx + math.cos(a) * size * L, by + math.sin(a) * size * L, skin, size * (0.19 if k < 4 else 0.22))
+    return o
+
+
+def her_reach_back(sill_y, waist, shoulders, head, elbow, hand, rest, sweater=None, hair=None, skin=None, rim=None, warm=None,
+                   head_s=1.0, head_rot=-30):
+    """Close, from behind and a little above: she leans right out over the sill, her waist at the sill (`waist`, the
+    knit's big near mass below it), her shoulders and head out in the snow (`shoulders` = (left, right)), the head turned
+    up to her left in lost profile (a sliver of cheek, the ear, the bun), her left arm out and up through `elbow` to the
+    open `hand`, her right forearm resting on the outer sill at `rest`. warm: the light of the wisp of heat where it
+    meets her (the hand, the cheek, the sleeve's top)."""
+    sweater = sweater or g(20); hair = hair or g(8); skin = skin or g(40); rim = rim or g(52)
+    o = []
+    (lx, ly), (rx, ry) = shoulders
+    wx, wy = waist
+    # the right forearm on the outer sill (beyond it)
+    o.append(pline([(rx - 10, ry + 10), (rest[0] - 20, rest[1] - 6), rest], sweater, 46))
+    o.append(ell(rest[0] + 18, rest[1] - 2, 20, 15, skin))
+    # the upper back, out past the sill: foreshortened, wide at the shoulders
+    o.append(path('M %s %s C %s %s %s %s %s %s C %s %s %s %s %s %s L %s %s L %s %s Z' % (
+        f(lx - 10), f(ly + 24), f(lx - 4), f(ly - 18), f((lx + rx) / 2 - 60), f(min(ly, ry) - 34), f((lx + rx) / 2), f(min(ly, ry) - 30),
+        f((lx + rx) / 2 + 60), f(min(ly, ry) - 34), f(rx + 6), f(ry - 18), f(rx + 12), f(ry + 24),
+        f(wx + (rx - lx) * 0.42), f(sill_y + 4), f(wx - (rx - lx) * 0.42), f(sill_y + 4)), sweater))
+    o.append(path('M %s %s C %s %s %s %s %s %s' % (f((lx + rx) / 2 + 10), f(min(ly, ry) - 30), f((lx + rx) / 2 + 70), f(min(ly, ry) - 34),
+                                                 f(rx + 6), f(ry - 18), f(rx + 12), f(ry + 24)), 'none', stroke=rim, stroke_width='7', opacity='0.75'))
+    # the near mass below the sill: her waist and hips in the long knit, cut by the frame's bottom
+    o.append(path('M %s %s C %s %s %s %s %s 1940 L %s 1940 C %s %s %s %s %s %s Z' % (
+        f(wx - (rx - lx) * 0.47), f(sill_y), f(wx - (rx - lx) * 0.53), f(sill_y + 70), f(wx - (rx - lx) * 0.56), f(sill_y + 180), f(wx - (rx - lx) * 0.57),
+        f(wx + (rx - lx) * 0.57), f(wx + (rx - lx) * 0.56), f(sill_y + 180), f(wx + (rx - lx) * 0.53), f(sill_y + 70), f(wx + (rx - lx) * 0.47), f(sill_y)), g(17)))
+    o.append(path('M %s %s C %s %s %s %s %s %s' % (f(wx + (rx - lx) * 0.47), f(sill_y), f(wx + (rx - lx) * 0.53), f(sill_y + 70),
+                                                 f(wx + (rx - lx) * 0.56), f(sill_y + 180), f(wx + (rx - lx) * 0.57), f(1940)), 'none', stroke=rim, stroke_width='6', opacity='0.5'))
+    for k in (-0.5, -0.17, 0.17, 0.5):
+        o.append(line(wx + (rx - lx) * k * 0.85, sill_y + 20, wx + (rx - lx) * k * 1.0, 1930, g(22), 10, opacity='0.5'))
+    # the left arm, out and up into the night; the sleeve's top catching the warmth; the open hand
+    o.append(pline([(lx + 6, ly + 8), elbow, hand], sweater, 50))
+    o.append(path('M %s %s L %s %s L %s %s' % (f(lx + 2), f(ly - 16), f(elbow[0] - 4), f(elbow[1] - 22), f(hand[0] + 4), f(hand[1] - 20)), 'none',
+                  stroke=warm or rim, stroke_width='6', stroke_linecap='round', opacity='0.7'))
+    ang = math.atan2(hand[1] - elbow[1], hand[0] - elbow[0])
+    o.append(open_hand(hand[0] + math.cos(ang) * 20, hand[1] + math.sin(ang) * 20, ang, 56, skin))
+    if warm:
+        o.append(ell(hand[0] + math.cos(ang) * 36, hand[1] + math.sin(ang) * 36, 58, 48, warm, opacity='0.5', filter='url(#b8)'))
+    # the head, out beyond the shoulders, turned up to her left: the back of it, the bun, the ear, a sliver of cheek
+    hd = head_bun_back(rim=rim, hair=hair, skin=skin)
+    cheek = path('M -50 -70 C -62 -54 -62 -26 -48 -10 C -38 0 -26 4 -16 2 C -30 -12 -40 -40 -40 -66 Z', skin)
+    if warm:
+        cheek += path('M -50 -70 C -62 -54 -62 -26 -48 -10 C -44 -22 -46 -48 -50 -70 Z', warm, opacity='0.75')
+    o.append('<g transform="translate(%s %s) scale(%s) rotate(%s)">%s%s</g>' % (f(head[0]), f(head[1]), f(head_s), f(head_rot), cheek, hd))
+    return ''.join(o)
 
 
 def her_reaching_out(cx, cy, s=1.0, sweater=None, hair=None, skin=None, legs=None, rim=None):

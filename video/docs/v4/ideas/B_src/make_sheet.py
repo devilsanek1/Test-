@@ -19,15 +19,14 @@ BEATS = [
     ("B8", "The missing piece, drawn", "The city has a plan to use it, starting next year.", "hope, anticipation"),
     ("B9", "A drawn door opens", "So how would that work?", "leaning in"),
     ("B10", "Cool in, honey out", "...take the heat out of its computers with water in pipes.", "clarity, 'oh, that's how'"),
-    ("B11", "Under the snow, into a home", "Then pipes under the streets carry that heat into people's homes.", "cozy relief"),
+    ("B11", "Under the snow, home", "Then pipes under the streets carry that heat into people's homes.", "cozy relief"),
     ("B12", "Your chat, a warm window", "So your chatbot could soon heat an apartment in Helsinki.", "personal warmth, a wink"),
 ]
 ALTS = {
     "B5alt": ("One cup, close", "That's a lot of tea.", "a smile and a breath"),
-    "B7alt": ("The line runs out", "But Helsinki WANTS that heat.", "the turn, a spark of delight"),
-    "B9alt": ("A peephole in the frost", "So how would that work?", "leaning in"),
-    "B12alt": ("The cat on the radiator", "So your chatbot could soon heat an apartment in Helsinki.", "personal warmth, a wink"),
-    "B2alt": ("Not a cloud", "AI actually runs on giant computers, in buildings called data centers.", "a little awe"),
+    "B6alt": ("Everywhere, up it goes", "Normally, data centers just use big fans to blow that heat outside.", "a small pang"),
+    "B7alt": ("The city leans out", "But Helsinki WANTS that heat.", "the turn, a spark of delight"),
+    "B12alt": ("The cat on the warm sill", "So your chatbot could soon heat an apartment in Helsinki.", "personal warmth, a wink"),
 }
 
 def font(size, bold=False):
@@ -81,7 +80,11 @@ def main():
         sheet.paste(im, (x, y))
         d.rectangle([x - 1, y - 1, x + tw, y + th], outline=(70, 74, 86))
         d.text((x, y + th + 8), label, font=font(22, True), fill=(255, 210, 127))
-        d.text((x + d.textlength(label + "  ", font=font(22, True)), y + th + 11), title, font=font(16, True), fill=(236, 233, 226))
+        tx = x + d.textlength(label + "  ", font=font(22, True))
+        fs = 16
+        while fs > 11 and tx + d.textlength(title, font=font(fs, True)) > x + tw:
+            fs -= 1
+        d.text((tx, y + th + 11 + (16 - fs) // 2), title, font=font(fs, True), fill=(236, 233, 226))
         yy = y + th + 38
         for ln in wrap(d, words, font(14), tw)[:3]:
             d.text((x, yy), ln, font=font(14), fill=(196, 199, 207)); yy += 18

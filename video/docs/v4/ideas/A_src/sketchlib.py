@@ -214,27 +214,266 @@ def grain(f, op=0.10):
     f.add(f'<rect x="0" y="0" width="{W}" height="{H}" filter="url(#grain)" opacity="{op}"/>')
 
 
+# ---------- frost on glass (the film's device: every frosted pane drawn as frost, in every frame) ----------
+def bil(p, s, t):
+    """a point in a quad p = [TL, TR, BR, BL] by bilinear interpolation (s across, t down)"""
+    (x0, y0), (x1, y1), (x2, y2), (x3, y3) = p
+    xa, ya = x0 + (x1 - x0) * s, y0 + (y1 - y0) * s
+    xb, yb = x3 + (x2 - x3) * s, y3 + (y2 - y3) * s
+    return (xa + (xb - xa) * t, ya + (yb - ya) * t)
+
+
+def glint(f, x, y, s, L=99, op=0.95, halo=True):
+    """a sparkle: frost catching the light (a thin four-point star and a soft halo)"""
+    c = g(L)
+    a, b = s, s * 0.15
+    if halo:
+        f.add(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{s * 0.55:.1f}" fill="{c}" opacity="{op * 0.35:.2f}" filter="url(#soft1)"/>')
+    f.add(f'<path d="M{x - a:.1f},{y:.1f} L{x - b:.1f},{y - b:.1f} L{x:.1f},{y - a:.1f} L{x + b:.1f},{y - b:.1f} L{x + a:.1f},{y:.1f} '
+          f'L{x + b:.1f},{y + b:.1f} L{x:.1f},{y + a:.1f} L{x - b:.1f},{y + b:.1f}Z" fill="{c}" opacity="{op}"/>')
+
+
+def _fern_st(r, s0, t0, ang, ln, depth, out, lvl=0):
+    """a frost fern in a pane's own (s, t) space: segments (s, t, s', t', level)"""
+    segs = 4
+    s, t = s0, t0
+    for _ in range(segs):
+        ang += r.uniform(-0.25, 0.25)
+        ns = min(0.99, max(0.01, s + math.cos(ang) * ln / segs))
+        nt = min(0.99, max(0.01, t + math.sin(ang) * ln / segs))
+        out.append((s, t, ns, nt, lvl))
+        if depth > 1:
+            for side in (-1, 1):
+                if r.random() < 0.75:
+                    _fern_st(r, ns, nt, ang + side * r.uniform(0.7, 1.1), ln * r.uniform(0.25, 0.42), depth - 1, out, lvl + 1)
+        s, t = ns, nt
+
+
+FROST = {'glint_p': 0.45, 'glint_k': 0.34}  # how much a frame's frost glitters (a frame may set it, then reset it)
+
+
+def frost_quad(f, p, frost_L=60, seed=0, state='frost', glint_p=None, fern_L=97):
+    """a frosted pane in any quad p [TL, TR, BR, BL]: the frost thicker and paler toward the bottom and the rim, ferns of
+    ice growing in from the corners and the sill, sometimes a glint. state 'half': CLEARING, the warm light shows
+    through the middle while the frost still holds the rim."""
+    r = random.Random(seed)
+    xs = [q[0] for q in p]
+    ys = [q[1] for q in p]
+    size = min(max(xs) - min(xs), max(ys) - min(ys))
+    pts = ' '.join(f'{x:.1f},{y:.1f}' for x, y in p)
+    if state == 'half':
+        f.add(f'<polygon points="{pts}" fill="{f.radgrad([(0, HONEY_CORE, 1), (0.5, HONEY, 1), (1, AMBER, 1)])}"/>')
+        inner = [bil(p, 0.27, 0.22), bil(p, 0.73, 0.22), bil(p, 0.73, 0.66), bil(p, 0.27, 0.66)]
+        ring = ('M' + ' L'.join(f'{x:.1f},{y:.1f}' for x, y in p) + ' Z M' +
+                ' L'.join(f'{x:.1f},{y:.1f}' for x, y in inner[::-1]) + ' Z')
+        f.add(f'<path d="{ring}" fill="{g(frost_L + 10)}" fill-rule="evenodd" opacity="0.9" filter="url(#soft1)"/>')
+    else:
+        # the frost sheet: pale, thickest (whitest) along the sill, a faint glow of the room through its middle
+        fill = f.lingrad([(0, g(frost_L - 2), 1), (0.45, g(frost_L + 6), 1), (1, g(min(96, frost_L + 22)), 1)])
+        f.add(f'<polygon points="{pts}" fill="{fill}"/>')
+        if size > 20:
+            c = bil(p, 0.5, 0.42)
+            f.add(f'<ellipse cx="{c[0]:.1f}" cy="{c[1]:.1f}" rx="{size * 0.3:.1f}" ry="{size * 0.24:.1f}" fill="{g(frost_L - 10)}" '
+                  f'opacity="0.35" filter="url(#soft2)"/>')
+    if size > 9:
+        f.add(f'<polygon points="{pts}" fill="none" stroke="{g(min(97, frost_L + 28))}" stroke-width="{max(1.0, size * 0.09):.1f}" '
+              f'opacity="0.6" stroke-linejoin="round"/>')
+    if size > 13:
+        segs = []
+        starts = [(0.04, 0.97, -1.05), (0.96, 0.97, -2.1), (r.uniform(0.35, 0.65), 0.99, -1.57 + r.uniform(-0.4, 0.4))]
+        if size > 40:
+            starts += [(0.03, 0.05, 0.75), (0.97, 0.06, 2.4), (0.02, r.uniform(0.4, 0.6), r.uniform(-0.3, 0.3)),
+                       (0.98, r.uniform(0.4, 0.6), 3.14 + r.uniform(-0.3, 0.3))]
+        for (s0, t0, a0) in starts:
+            _fern_st(r, s0, t0, a0, r.uniform(0.38, 0.62) if state == 'frost' else r.uniform(0.2, 0.3),
+                     3 if size > 26 else 2, segs)
+        for lvl, wmul, op in ((0, 0.045, 0.85), (1, 0.03, 0.75), (2, 0.02, 0.65)):
+            d = ''
+            for (s0, t0, s1, t1, lv) in segs:
+                if lv == lvl:
+                    a, b = bil(p, s0, t0), bil(p, s1, t1)
+                    d += f'M{a[0]:.1f},{a[1]:.1f}L{b[0]:.1f},{b[1]:.1f}'
+            if d:
+                # feathery: a soft wide pass of rime under the crisp crystal line
+                if size > 22:
+                    f.add(f'<path d="{d}" stroke="{g(fern_L)}" stroke-width="{max(1.5, size * wmul * 3.2):.2f}" fill="none" '
+                          f'stroke-linecap="round" opacity="{op * 0.35:.2f}" filter="url(#soft1)"/>')
+                f.add(f'<path d="{d}" stroke="{g(fern_L)}" stroke-width="{max(0.7, size * wmul):.2f}" fill="none" '
+                      f'stroke-linecap="round" opacity="{op}"/>')
+    if size > 6 and r.random() < (FROST['glint_p'] if glint_p is None else glint_p):
+        s_, t_ = r.choice([(r.uniform(0.1, 0.35), r.uniform(0.1, 0.3)), (r.uniform(0.6, 0.9), r.uniform(0.1, 0.3)),
+                           (r.uniform(0.2, 0.8), r.uniform(0.7, 0.9))])
+        x, y = bil(p, s_, t_)
+        glint(f, x, y, min(24, max(5, size * FROST['glint_k'])))
+
+
+def wobble(pts, amp=3.0, seed=0, step=16):
+    """a hand's line: the polyline resampled every `step` px and jittered with a slow wander"""
+    r = random.Random(seed)
+    out = []
+    for (xa, ya), (xb, yb) in zip(pts[:-1], pts[1:]):
+        n = max(1, int(math.hypot(xb - xa, yb - ya) / step))
+        for i in range(n):
+            t = i / n
+            out.append((xa + (xb - xa) * t, ya + (yb - ya) * t))
+    out.append(pts[-1])
+    p1, p2 = r.uniform(0, 6.3), r.uniform(0, 6.3)
+    return [(x + amp * (0.65 * math.sin(i * 0.6 + p1) + r.uniform(-0.35, 0.35)),
+             y + amp * (0.65 * math.sin(i * 0.47 + p2) + r.uniform(-0.35, 0.35))) for i, (x, y) in enumerate(out)]
+
+
+def smooth_d(pts):
+    """a Catmull-Rom curve through pts, as one SVG path"""
+    if len(pts) < 3:
+        return 'M' + ' L'.join(f'{x:.1f},{y:.1f}' for x, y in pts)
+    d = f'M{pts[0][0]:.1f},{pts[0][1]:.1f}'
+    for i in range(len(pts) - 1):
+        p0 = pts[i - 1] if i > 0 else pts[i]
+        p1, p2 = pts[i], pts[i + 1]
+        p3 = pts[i + 2] if i + 2 < len(pts) else p2
+        c1 = (p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6)
+        c2 = (p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6)
+        d += f' C{c1[0]:.1f},{c1[1]:.1f} {c2[0]:.1f},{c2[1]:.1f} {p2[0]:.1f},{p2[1]:.1f}'
+    return d
+
+
+def hand_runs(pts, w, seed=0, amp=None, step=14, var=0.35):
+    """a finger's stroke as short overlapping runs, each with its own width (thick and thin, as a finger presses):
+    [(d, width)], plus the jittered points"""
+    r = random.Random(seed + 7)
+    wp = wobble(pts, amp=amp if amp is not None else max(1.5, w * 0.22), seed=seed, step=step)
+    runs = []
+    ph = r.uniform(0, 6.3)
+    for i in range(0, len(wp) - 1, 2):
+        seg = wp[max(0, i - 1):i + 4]
+        ww = w * (1 + var * math.sin(i * 0.33 + ph) + r.uniform(-0.12, 0.12))
+        runs.append((smooth_d(seg), max(1.0, ww)))
+    return runs, wp
+
+
+def frost_stroke(f, pts, w=10, seed=0, L=92, op=0.95, feathers=True, glints=2, glow=True):
+    """a line drawn IN frost on the dark glass (the plan's own lines): a finger's wobbly line, thick and thin, crumbly,
+    feathers of ice growing off it, a glint or two; pale and glittering, never a CAD line"""
+    r = random.Random(seed)
+    runs, wp = hand_runs(pts, w, seed=seed)
+    if glow:
+        f.add(f'<path d="{smooth_d(wp)}" stroke="{g(L)}" stroke-width="{w * 3.2:.1f}" fill="none" stroke-linecap="round" '
+              f'stroke-linejoin="round" opacity="{op * 0.13:.2f}" filter="url(#soft2)"/>')
+    body = ''.join(f'<path d="{d}" stroke-width="{ww:.1f}"/>' for d, ww in runs)
+    f.add(f'<g stroke="{g(L - 6)}" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="{op}" '
+          f'filter="url(#rough2)">{body}</g>')
+    f.add(f'<path d="{smooth_d(wp)}" stroke="{g(min(99, L + 6))}" stroke-width="{max(1.0, w * 0.32):.1f}" fill="none" '
+          f'stroke-linecap="round" opacity="{op * 0.8:.2f}"/>')
+    if feathers and len(wp) > 3:
+        d = ''
+        for i in range(1, len(wp) - 1, 2):
+            (xa, ya), (xb, yb) = wp[i - 1], wp[i + 1]
+            a = math.atan2(yb - ya, xb - xa)
+            for side in (-1, 1):
+                if r.random() < 0.55:
+                    aa = a + side * r.uniform(0.8, 1.2) + r.uniform(-0.2, 0.2)
+                    ln = w * r.uniform(0.9, 2.2)
+                    x, y = wp[i]
+                    d += f'M{x:.1f},{y:.1f}L{x + math.cos(aa) * ln:.1f},{y + math.sin(aa) * ln:.1f}'
+        f.add(f'<path d="{d}" stroke="{g(min(99, L + 4))}" stroke-width="{max(0.8, w * 0.22):.1f}" fill="none" '
+              f'stroke-linecap="round" opacity="{op * 0.7:.2f}"/>')
+    for _ in range(glints):
+        x, y = wp[r.randrange(len(wp))]
+        glint(f, x, y, max(6, w * r.uniform(1.3, 2.0)), op=op)
+    return wp
+
+
+def knit_hand(f, tip, L_knit=50, L_skin=68, mirror=False, lit=1.0, reach=1.0, rot=0):
+    """HER hand from the right (or the left, mirrored), the index finger out to `tip`, in the big soft knit sleeve she
+    wears at her window (B5): a bulky sleeve with a ribbed cuff and cable bumps, lit warm by the room's lamp.
+    rot: the arm turned about the fingertip (degrees)"""
+    if rot:
+        f.add(f'<g transform="rotate({rot} {tip[0]} {tip[1]})">')
+        knit_hand(f, tip, L_knit, L_skin, mirror=mirror, lit=lit, reach=reach, rot=0)
+        f.add('</g>')
+        return
+    if mirror:
+        f.add(f'<g transform="translate({W},0) scale(-1,1)">')
+        knit_hand(f, (W - tip[0], tip[1]), L_knit, L_skin, mirror=False, lit=lit, reach=reach)
+        f.add('</g>')
+        return
+    tx, ty = tip
+    k = reach
+    sk = warm(L_skin, 9, 70)
+    kn = g(L_knit)
+    # the sleeve: bulky, soft-edged, running off the right edge (a lumpy outline: the knit's cables)
+    top = [(tx + 640 * k, ty + 76 * k), (tx + 500 * k, ty + 56 * k), (tx + 390 * k, ty + 44 * k), (tx + 300 * k, ty + 40 * k), (tx + 232 * k, ty + 46 * k)]
+    bot = [(tx + 236 * k, ty + 190 * k), (tx + 320 * k, ty + 214 * k), (tx + 410 * k, ty + 254 * k), (tx + 510 * k, ty + 296 * k), (tx + 640 * k, ty + 336 * k)]
+    d = smooth_d(top) + ' L' + smooth_d(bot)[1:] + ' Z'
+    f.add(f'<path d="{d}" fill="{kn}" filter="url(#rough2)"/>')
+    # cable bumps along the sleeve (soft lighter ridges) and the ribbed cuff at the wrist
+    for j in range(3):
+        yy = ty + (82 + j * 46) * k
+        bumps = [(tx + 250 * k + i * 44, yy + (i % 2) * 6 + (i * 44) * 0.18 * j) for i in range(int(390 * k / 44) + 1)]
+        f.add(f'<path d="{smooth_d(bumps)}" stroke="{g(L_knit + 7)}" stroke-width="{11 * k:.1f}" fill="none" '
+              f'stroke-linecap="round" opacity="0.55" filter="url(#soft1)"/>')
+    cuff = f'M{tx + 214 * k},{ty + 52 * k} L{tx + 262 * k},{ty + 46 * k} L{tx + 268 * k},{ty + 200 * k} L{tx + 222 * k},{ty + 188 * k}Z'
+    f.add(f'<path d="{cuff}" fill="{g(L_knit + 4)}"/>')
+    for i in range(6):
+        xx = tx + (220 + i * 8) * k
+        f.add(f'<path d="M{xx:.1f},{ty + (52 - i) * k:.1f} L{xx + 4 * k:.1f},{ty + (190 + i * 2) * k:.1f}" stroke="{g(L_knit - 6)}" '
+              f'stroke-width="{3 * k:.1f}" opacity="0.6"/>')
+    # the lamp's warm light along the sleeve's top
+    f.add(f'<path d="{smooth_d(top[::-1])}" stroke="{HONEY}" stroke-width="{9 * k:.1f}" fill="none" opacity="{0.5 * lit:.2f}" '
+          f'filter="url(#soft1)"/>')
+    # the hand: the back of it, the curled fingers under it, the index finger out to the tip, the thumb along it
+    f.add(f'<path d="M{tx + 222 * k},{ty + 58 * k} C{tx + 170 * k},{ty + 44 * k} {tx + 112 * k},{ty + 26 * k} {tx + 70 * k},{ty + 18 * k} '
+          f'C{tx + 40 * k},{ty + 12 * k} {tx + 14 * k},{ty + 3 * k} {tx + 2 * k},{ty + 2 * k} C{tx - 9 * k},{ty + 2 * k} {tx - 10 * k},{ty + 17 * k} {tx + 2 * k},{ty + 21 * k} '
+          f'C{tx + 30 * k},{ty + 31 * k} {tx + 60 * k},{ty + 41 * k} {tx + 86 * k},{ty + 52 * k} C{tx + 80 * k},{ty + 72 * k} {tx + 84 * k},{ty + 98 * k} {tx + 102 * k},{ty + 114 * k} '
+          f'C{tx + 132 * k},{ty + 140 * k} {tx + 176 * k},{ty + 158 * k} {tx + 226 * k},{ty + 182 * k}Z" fill="{sk}"/>')
+    for i in range(3):
+        f.add(f'<path d="M{tx + (94 + i * 18) * k},{ty + (62 + i * 12) * k} c{-10 * k},{14 * k} {-5 * k},{33 * k} {11 * k},{40 * k}" '
+              f'stroke="{g(L_skin - 13)}" stroke-width="{4.5 * k:.1f}" fill="none" stroke-linecap="round"/>')
+    f.add(f'<path d="M{tx + 205 * k},{ty + 60 * k} C{tx + 150 * k},{ty + 44 * k} {tx + 80 * k},{ty + 22 * k} {tx + 6 * k},{ty + 5 * k}" '
+          f'stroke="{HONEY}" stroke-width="{5 * k:.1f}" fill="none" opacity="{0.6 * lit:.2f}" filter="url(#soft1)"/>')
+    f.add(f'<ellipse cx="{tx + 7 * k}" cy="{ty + 9 * k}" rx="{6 * k}" ry="{5 * k}" fill="{g(L_skin + 12)}" opacity="0.8"/>')
+
+
+def steam_cloud(f, cx, cy, w, h, seed=0, L=88, op=0.92, warm=0.0):
+    """one puffy cloud of steam (round tops, a flatter base): for comparing two clouds side by side"""
+    r = random.Random(seed)
+    s = ''
+    for i in range(13):
+        ex = cx + r.uniform(-0.36, 0.36) * w
+        ey = cy + r.uniform(-0.28, 0.22) * h + abs(ex - cx) / w * h * 0.35
+        rr = r.uniform(0.17, 0.27) * w
+        s += f'<circle cx="{ex:.0f}" cy="{ey:.0f}" r="{rr:.0f}"/>'
+    f.add(f'<g fill="{g(L)}" opacity="{op}" filter="url(#steam2)">{s}</g>')
+    if warm > 0:
+        f.add(f'<ellipse cx="{cx}" cy="{cy + h * 0.3}" rx="{w * 0.3}" ry="{h * 0.2}" fill="{HONEY}" opacity="{warm}" filter="url(#soft3)"/>')
+
+
 # ---------- the city ----------
 def win_shape(f, x, y, w, h, state, L_frame=None, glow=True, frost_L=70, warmth=1.0, mullion=True):
-    """one window: 'frost' (cold, pale), 'warm' (the heat arrived: honey), 'dark', 'cool' (a cold lamp), 'half'"""
+    """one window: 'frost' (cold: the pane drawn AS frost), 'warm' (the heat arrived: honey), 'dark', 'cool' (a cold
+    lamp), 'half' (clearing: warm through the middle, the frost holding the rim)"""
     r = f.rng
     if state == 'dark':
         f.rect(x, y, w, h, g(r.uniform(10, 16)))
     elif state == 'frost':
-        # a frosted pane: thicker, paler ice at the edges, a dim cold centre
-        fill = f.radgrad([(0, g(frost_L - 12), 1), (0.6, g(frost_L - 4), 1), (1, g(frost_L + 10), 1)])
-        f.rect(x, y, w, h, fill)
+        frost_quad(f, [(x, y), (x + w, y), (x + w, y + h), (x, y + h)], frost_L=frost_L, seed=int(x * 7 + y * 13))
     elif state == 'cool':
         f.rect(x, y, w, h, g(r.uniform(44, 52)))
+    elif state == 'deep':
+        if glow:
+            f.add(f'<rect x="{x - w * 0.3:.1f}" y="{y - h * 0.25:.1f}" width="{w * 1.6:.1f}" height="{h * 1.5:.1f}" '
+                  f'fill="{HONEY}" opacity="{0.1 * warmth:.2f}" filter="url(#glow)"/>')
+        f.rect(x, y, w, h, f.radgrad([(0, HONEY, 1), (0.6, AMBER, 1), (1, EMBER, 1)]))
     elif state in ('warm', 'half'):
         if glow and state == 'warm':
             f.add(f'<rect x="{x - w * 0.35:.1f}" y="{y - h * 0.3:.1f}" width="{w * 1.7:.1f}" height="{h * 1.6:.1f}" '
                   f'fill="{HONEY}" opacity="{0.22 * warmth:.2f}" filter="url(#glow)"/>')
         if state == 'half':
-            fill = f.lingrad([(0, g(frost_L), 1), (0.45, g(frost_L - 4), 1), (0.62, HONEY, 1), (1, AMBER, 1)])
+            frost_quad(f, [(x, y), (x + w, y), (x + w, y + h), (x, y + h)], frost_L=frost_L, seed=int(x * 7 + y * 13),
+                       state='half')
         else:
             fill = f.radgrad([(0, HONEY_CORE, 1), (0.55, HONEY, 1), (1, AMBER, 1)])
-        f.rect(x, y, w, h, fill)
+            f.rect(x, y, w, h, fill)
     if mullion and w > 9 and h > 12:
         lw = max(1.0, w * 0.07)
         col = g(14) if state in ('warm', 'half') else g(22)
@@ -307,7 +546,7 @@ def block(f, x0, x1, ytop, ybase, floors, cols, L=28, states=None, side=None, si
             crest = (st == 'crest')
             if crest:
                 st = 'warm'
-            if st == 'warm' and roll < 0.12 and not crest:
+            if st in ('warm', 'deep') and roll < 0.12 and not crest:
                 st = 'dark'
             elif st == 'frost' and roll < 0.10:
                 st = 'dark'
@@ -662,25 +901,43 @@ def ice_line(f, d, w=4, L=92, op=0.95):
 
 
 # ---------- Helsinki street walls, the computer, her at the window ----------
-def street_wall(f, quad, pieces, frost_L=58, seed=0, openings=None, states=None):
+def street_wall(f, quad, pieces, frost_L=58, seed=0, openings=None, states=None, ornate=False, doors=None, win_cb=None):
     """a street wall in perspective made of several buildings shoulder to shoulder: pieces = [(u0, u1, rise, floors,
-    cols, L)], rise lifts that building's roofline above the wall's top line (in wall heights); states(k, row, col, u)"""
+    cols, L)], rise lifts that building's roofline above the wall's top line (in wall heights); states(k, row, col, u).
+    ornate: the stucco blocks seen close (a moulded cornice, string courses between floors, window surrounds, a plinth);
+    doors(k) -> None / 'warm' / 'cold': a street door at that building's foot (returns its threshold point)"""
     m = homography(quad)
     rr = random.Random(seed)
     out = []
+    door_pts = []
     for k, (u0, u1, rise, floors, cols, L) in enumerate(pieces):
         q = [m(u0, -rise), m(u1, -rise), m(u1, 1.0), m(u0, 1.0)]
         mm = homography(q)
         f.poly(q, g(L), 'filter="url(#rough2)"')
+        near = max(0.35, 1 - (u0 + u1) / 2)
+        if ornate:
+            # the stucco seen close: a plinth, string courses between floors, a deep moulded cornice under the roof's snow
+            qpoly(f, mm, 0.0, 0.93, 1.0, 1.0, g(max(8, L - 7)), 'filter="url(#rough2)"')
+            for row in range(1, floors):
+                v = 0.06 + row * 0.86 / floors - 0.02
+                qpoly(f, mm, 0.0, v, 1.0, v + 0.014, g(L + 7), 'opacity="0.85"')
+                qpoly(f, mm, 0.0, v + 0.014, 1.0, v + 0.02, g(max(6, L - 8)), 'opacity="0.6"')
+            qpoly(f, mm, -0.01, 0.0, 1.01, 0.035, g(L + 10), 'filter="url(#rough2)"')
+            qpoly(f, mm, -0.01, 0.035, 1.01, 0.05, g(max(6, L - 9)), 'opacity="0.75"')
+            for i in range(int(14 * (u1 - u0) / 0.3) + 4):
+                uu = (i + 0.5) / (int(14 * (u1 - u0) / 0.3) + 4)
+                qpoly(f, mm, uu - 0.008, 0.036, uu + 0.008, 0.048, g(L + 9), 'opacity="0.7"')
         # its cornice and roof snow, a chimney or two
         a, b = q[0], q[1]
         f.add(f'<path d="M{a[0]:.0f},{a[1] - 3:.0f} L{b[0]:.0f},{b[1] - 3:.0f}" stroke="{g(74)}" stroke-width="{max(4, 10 * (1 - (u0 + u1) / 2)):.0f}" '
               f'stroke-linecap="round" filter="url(#rough2)"/>')
-        for t in (0.25, 0.7):
+        for t in ((0.2, 0.5, 0.78) if ornate else (0.25, 0.7)):
             if rr.random() < 0.8:
                 x, y = mm(t, 0)
-                sc = max(0.35, 1 - (u0 + u1) / 2)
+                sc = near * (1.3 if ornate else 1.0)
                 f.rect(x, y - 44 * sc, 18 * sc, 46 * sc, g(L - 5))
+                if ornate:
+                    f.rect(x - 2 * sc, y - 46 * sc, 22 * sc, 6 * sc, g(L + 4))
                 snowcap(f, x - 2, x + 18 * sc + 2, y - 44 * sc + 1, th=4, L=74)
         for row in range(floors):
             for c in range(cols):
@@ -694,22 +951,25 @@ def street_wall(f, quad, pieces, frost_L=58, seed=0, openings=None, states=None)
                 p = [mm(wu0, v0), mm(wu1, v0), mm(wu1, v1), mm(wu0, v1)]
                 bw = abs(p[1][0] - p[0][0])
                 bh = abs(p[3][1] - p[0][1])
+                if ornate:
+                    # the window's moulded surround and a small hood over it
+                    qpoly(f, mm, wu0 - 0.05, v0 - 0.04, wu1 + 0.05, v1 + 0.025, g(L + 8), 'opacity="0.9"')
+                    qpoly(f, mm, wu0 - 0.07, v0 - 0.06, wu1 + 0.07, v0 - 0.035, g(L + 12), 'opacity="0.9"')
                 f.poly([mm(wu0 - 0.02, v0 - 0.015), mm(wu1 + 0.02, v0 - 0.015), mm(wu1 + 0.02, v1 + 0.01), mm(wu0 - 0.02, v1 + 0.01)], g(max(6, L - 10)))
                 if st == 'warm':
                     f.add(f'<polygon points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in p)}" fill="{HONEY}" opacity="0.3" filter="url(#glow)"/>')
-                    fill = f.radgrad([(0, HONEY_CORE, 1), (0.6, HONEY, 1), (1, AMBER, 1)])
-                elif st == 'half':
-                    fill = f.lingrad([(0, g(frost_L + 4), 1), (0.45, g(frost_L - 2), 1), (0.62, HONEY, 1), (1, AMBER, 1)])
+                    f.poly(p, f.radgrad([(0, HONEY_CORE, 1), (0.6, HONEY, 1), (1, AMBER, 1)]))
                 elif st == 'dark':
-                    fill = g(11)
+                    f.poly(p, g(11))
                 else:
-                    fill = f.radgrad([(0, g(frost_L - 12), 1), (0.6, g(frost_L - 4), 1), (1, g(frost_L + 10), 1)])
-                f.poly(p, fill)
+                    frost_quad(f, p, frost_L=frost_L, seed=seed * 1000 + k * 100 + row * 10 + c, state=('half' if st == 'half' else 'frost'))
                 ma, mb = mm((wu0 + wu1) / 2, v0), mm((wu0 + wu1) / 2, v1)
                 f.add(f'<line x1="{ma[0]:.1f}" y1="{ma[1]:.1f}" x2="{mb[0]:.1f}" y2="{mb[1]:.1f}" stroke="{g(14)}" stroke-width="{max(1, bw * 0.06):.1f}" opacity="0.8"/>')
                 sa, sb = mm(wu0 - 0.03, v1 + 0.012), mm(wu1 + 0.03, v1 + 0.012)
                 f.add(f'<line x1="{sa[0]:.1f}" y1="{sa[1]:.1f}" x2="{sb[0]:.1f}" y2="{sb[1]:.1f}" stroke="{g(82 if st == "warm" else 70)}" '
                       f'stroke-width="{max(2, bh * 0.1):.1f}" stroke-linecap="round"/>')
+                if win_cb:
+                    win_cb(k, row, c, p, st)
                 kind = openings(k, row, c) if openings else None
                 if kind:
                     hinge_t, hinge_b = p[0], p[3]
@@ -721,7 +981,20 @@ def street_wall(f, quad, pieces, frost_L=58, seed=0, openings=None, states=None)
                     person(f, px, p[3][1] + bh * 0.05, bh * 1.35, L=9, pose='stand', facing=-1, coat=False,
                            arm_up=(kind == 'up'), mug=(kind == 'cup'))
                     breath(f, px - bh * 0.25, p[0][1] - bh * 0.1, s=max(0.4, bh / 90), op=0.5)
+        dk = doors(k) if doors else None
+        if dk:
+            # the street door at the building's foot: a dark doorway under a small hood, lit warm when the heat is in
+            du = 0.5 if cols % 2 else 0.5 + 0.5 / cols
+            p = [mm(du - 0.07, 0.8), mm(du + 0.07, 0.8), mm(du + 0.07, 1.0), mm(du - 0.07, 1.0)]
+            qpoly(f, mm, du - 0.1, 0.77, du + 0.1, 0.8, g(L + 9))
+            if dk == 'warm':
+                f.add(f'<polygon points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in p)}" fill="{HONEY}" opacity="0.45" filter="url(#glow)"/>')
+                f.poly(p, f.lingrad([(0, HONEY, 1), (1, AMBER, 1)]))
+            else:
+                f.poly(p, g(10))
+            door_pts.append((k, mm(du, 1.0), dk))
         out.append(mm)
+    f.last_doors = door_pts
     return m, out
 
 
