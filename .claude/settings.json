@@ -22,6 +22,17 @@
             "statusMessage": "Checking the brief starts from the feeling (owner rule)"
           }
         ]
+      },
+      {
+        "matcher": "Bash|WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/no_personal_data.py\"",
+            "timeout": 15,
+            "statusMessage": "Checking no personal data goes to a web service (owner's privacy)"
+          }
+        ]
       }
     ]
   }

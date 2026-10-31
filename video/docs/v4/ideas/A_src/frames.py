@@ -4,7 +4,7 @@ import math
 import random
 import sys
 
-from sketchlib import (W, H, Frame, g, HONEY, HONEY_CORE, AMBER, EMBER, INK, sky, cloud, band, snowfall, grain,
+from sketchlib import (W, H, Frame, g, HONEY, HONEY_CORE, AMBER, EMBER, INK, lab2rgb, hexc, sky, cloud, band, snowfall, grain,
                        street_wall, computer_cabinet,
                        win_shape, snowcap, block, far_city, person, breath, plume, curl, kettle, mug, rack,
                        frost_fern, frost_field, warm, homography, qpoly, facade, hand_phone, frost_line, ice_line,
@@ -25,9 +25,13 @@ def frame(name):
 BY = 1240  # the far shore road: the city's foot
 
 
-def blank_building(f, x1=322, steam=False, door_warm=False, fans=3):
+def blank_building(f, x1=322, steam=False, door_warm=False, fans=3, bold=False):
     """the one building in town with NO windows, at the harbour's edge: a smooth blank slab among the stucco blocks,
-    two thin rows of cold lights along its face, big roof fans; its door at the right end"""
+    two thin rows of cold lights along its face, big roof fans; its door at the right end.
+    bold (B1, round 2): the source made the second read: a smooth pale machine face unlike the stucco, big fans
+    breathing warm, the door wide open and blazing, its light pooled on the snow"""
+    if bold:
+        return blank_building_bold(f, x1=x1, fans=fans)
     x0, ytop, ybot = -10, 1094, 1250
     face = f.lingrad([(0, g(31), 1), (1, g(21), 1)])
     f.poly([(x0, ybot), (x0, ytop + 4), (x1 - 16, ytop), (x1, ytop + 12), (x1, ybot)], face)
@@ -60,14 +64,66 @@ def blank_building(f, x1=322, steam=False, door_warm=False, fans=3):
     return dx + 17, fx_list
 
 
+def blank_building_bold(f, x1=322, fans=3):
+    """B1's source, made the second read: the building with no windows as a machine among homes (a smooth cool face,
+    two long rows of cold lights like a server's, big round fans breathing warm air), its wide door blazing honey with
+    the machines' rows dark against the glow inside, the light pooled on the snow where the warm run leaves it"""
+    x0, ytop, ybot = -10, 1072, 1250
+    face = f.lingrad([(0, g(40, -9), 1), (0.5, g(33, -9), 1), (1, g(25, -8), 1)])
+    f.poly([(x0, ybot), (x0, ytop + 4), (x1 - 16, ytop), (x1, ytop + 12), (x1, ybot)], face)
+    f.poly([(x1 - 16, ytop), (x1 + 16, ytop + 12), (x1 + 16, ybot), (x1, ybot), (x1, ytop + 12)], g(17))
+    f.add(f'<path d="M{x0},{ytop + 5} L{x1 - 16},{ytop + 1}" stroke="{g(70, -8)}" stroke-width="4" opacity="0.9"/>')
+    snowcap(f, x0, x1 - 10, ytop + 2, th=7, L=60)
+    for yy, n in ((1124, 19), (1180, 19)):
+        f.add(f'<rect x="{x0 + 10}" y="{yy - 7}" width="{x1 - x0 - 34}" height="16" fill="{g(88, -12)}" opacity="0.22" filter="url(#soft2)"/>')
+        for k in range(n):
+            f.rect(x0 + 16 + k * (x1 - x0 - 112) / (n - 1), yy, 6, 4, g(97, -12))
+    # the big round fans on the roof, breathing warm air up into the night
+    fx_list = [x0 + 64 + k * ((x1 - x0 - 190) / max(1, fans - 1)) for k in range(fans)]
+    for i, fx in enumerate(fx_list):
+        roof_fan(f, fx, ytop - 12, r=40, tilt=0.5, warm_op=0.6)
+        drift(f, [(fx, ytop - 44), (fx + 6, ytop - 92), (fx + 18, ytop - 140)], [46, 58, 70],
+              [warm(84, 34, 80), warm(82, 22, 78), g(74)], [0.8, 0.62, 0.42], seed=170 + i, filt='steam2')
+    # the door: wide open, blazing, the machines' rows dark against the glow inside; its light on the snow
+    dw, dh = 58, 92
+    dx = x1 - 34 - dw
+    f.add(f'<rect x="{dx - 70}" y="{ybot - dh - 70}" width="{dw + 140}" height="{dh + 120}" fill="{HONEY}" opacity="0.55" filter="url(#glow2)"/>')
+    f.rect(dx - 5, ybot - dh - 6, dw + 10, dh + 6, g(12))
+    f.rect(dx, ybot - dh, dw, dh, f.radgrad([(0, HONEY_CORE, 1), (0.6, HONEY, 1), (1, AMBER, 1)], cx=0.5, cy=0.6, r=0.8))
+    for k in range(3):
+        xx = dx + 8 + k * 17
+        f.rect(xx, ybot - dh + 18, 9, dh - 18, g(30), 'opacity="0.55"')
+        for j in range(5):
+            f.rect(xx + 2, ybot - dh + 24 + j * 13, 5, 3, HONEY_CORE, 'opacity="0.8"')
+    f.add(f'<path d="M{dx - 4},{ybot} L{dx + dw + 4},{ybot} L{dx + dw + 60},{ybot + 24} L{dx - 60},{ybot + 24}Z" fill="{HONEY}" opacity="0.5" filter="url(#soft2)"/>')
+    return dx + dw / 2, fx_list
+
+
+SWEEP = [(0, 800), (140, 808), (277, 826), (400, 876), (556, 962), (700, 1060), (800, 1138), (884, 1200), (930, 1240)]
+
+
+def sweep_y(x):
+    """B1's front (round 2): the warm run along the shore rises up every facade it has passed, highest by the source
+    and still low far off, so the front is one long sweep down across all five facades to where the run has got to"""
+    if x >= SWEEP[-1][0]:
+        return BY + 60
+    for (xa, ya), (xb, yb) in zip(SWEEP[:-1], SWEEP[1:]):
+        if xa <= x <= xb:
+            return ya + (yb - ya) * (x - xa) / (xb - xa)
+    return SWEEP[0][1]
+
+
 def home_view(f, wave=0.5, all_warm=False, her_step=False, data_plume=False, her_inside=False, resident=True,
-              pulse=False, crest=False, plan_site=False, dim_city=0.0):
+              pulse=False, crest=False, plan_site=False, dim_city=0.0, sweep=False, walker=(780, 1556, 210),
+              plan_drawn=True, pulse_x=392, her_toast=False):
     """from the snowy near shore, across a narrow arm of frozen harbour: her block with the one window in the
     golden box, the city's blocks stepping up the hill behind, the blank building at the harbour's edge (left).
     wave: how far the warm wave has run (0 frosted city .. 1 across the whole hill); it runs from the blank building
     out along the shore and up the hill, one honey FRONT whose crest is the brightest honey, the frost ahead of it.
-    plan_site (B12): the plan's new building drawn in frost lines beside the blank one; dim_city: the city's warm
-    windows a step deeper so her window and your chat stay the two brightest honeys."""
+    sweep (B1, round 2): the front is SWEEP, a bold line across every facade fed by the run along the shore.
+    plan_site (B12): the plan's new building drawn in frost lines beside the blank one (plan_drawn=False lets it go);
+    dim_city: the city's warm windows a step deeper so her window and your chat stay the two brightest honeys;
+    her_toast (B12, round 2): she lifts her cup toward you in her window."""
     r = f.rng
     sky(f, [(0, 15), (0.3, 19), (0.55, 27), (0.72, 35), (0.86, 42), (1, 46)], 0, BY)
     cloud(f, 250, 150, 760, 230, 25, 0.95, seed=3)
@@ -83,6 +139,17 @@ def home_view(f, wave=0.5, all_warm=False, her_step=False, data_plume=False, her
     def state_at(x, y):
         if all_warm:
             return 'deep' if dim_city else 'warm'
+        if sweep:
+            dy = y - sweep_y(x)  # below the front = behind it, warm
+            if dy > 150:
+                return 'deep'
+            if dy > 40:
+                return 'warm'
+            if dy > -8:
+                return 'crest'
+            if dy > -30:
+                return 'half'
+            return 'frost'
         d = front_d(x, y)
         if d < -0.3:
             return 'deep'
@@ -95,6 +162,8 @@ def home_view(f, wave=0.5, all_warm=False, her_step=False, data_plume=False, her
         return 'frost'
 
     def warm_at(x, y):
+        if sweep and not all_warm:
+            return y > sweep_y(x)
         return all_warm or front_d(x, y) < 0
 
     shapes = []  # the city's silhouettes (the crest's light lies on facades only)
@@ -172,7 +241,20 @@ def home_view(f, wave=0.5, all_warm=False, her_step=False, data_plume=False, her
             f.rect(wx + 4, wy + 4, ww - 8, wh - 8, HONEY_CORE, 'opacity="0.85"')
     else:
         win_shape(f, wx, wy, ww, wh, 'frost', frost_L=62)
-    if her_inside:
+    if her_toast:
+        # her, close to the glass, facing out across the harbour, lifting her cup toward you (B5's toast returned)
+        c = g(13)
+        f.add(f'<path d="M{wx + 5},{wy + wh} C{wx + 6},{wy + wh - 18} {wx + 9},{wy + wh - 28} {wx + 15},{wy + wh - 31} '
+              f'L{wx + 33},{wy + wh - 31} C{wx + 39},{wy + wh - 28} {wx + 42},{wy + wh - 18} {wx + 43},{wy + wh}Z" fill="{c}"/>')
+        f.rect(wx + 20, wy + wh - 38, 8, 9, c)
+        f.ellipse(wx + 24, wy + wh - 46, 8, 10, c)
+        f.circle(wx + 25, wy + wh - 58, 5.5, c)
+        # the raised arm, the cup held up high, its curl of steam
+        f.add(f'<path d="M{wx + 33},{wy + wh - 30} L{wx + 39},{wy + wh - 33} L{wx + 48},{wy + 32} L{wx + 41},{wy + 30}Z" fill="{c}"/>')
+        f.add(f'<rect x="{wx + 38}" y="{wy + 17}" width="13" height="14" rx="2" fill="{c}"/>')
+        f.add(f'<path d="M{wx + 51},{wy + 20} q6,1 5,6 q-1,4 -5,4" stroke="{c}" stroke-width="2.5" fill="none"/>')
+        curl(f, wx + 44, wy + 15, h=11, L=97, op=0.95, sw=2.2)
+    elif her_inside:
         person(f, wx + ww * 0.36, wy + wh + 1, 50, L=10, pose='stand', facing=-1, coat=False)
     snowcap(f, wx - 9, wx + ww + 9, wy + wh + 7, th=6, L=88 if lit else 76)
     if lit:
@@ -183,7 +265,26 @@ def home_view(f, wave=0.5, all_warm=False, her_step=False, data_plume=False, her
     blk(968, 1110, 925, 6, 2, L=25, states=st_for(968, 925), chimneys=2, seed=35)
 
     # THE CREST: the wave's bright front lying across the facades, mid-building, from the shore up the whole hill
-    if crest and not all_warm:
+    if crest and sweep and not all_warm:
+        # (round 2) one bold front across all five facades: a sharp honey edge, the warm light trailing behind it,
+        # warm air rising off it, and the frost ahead glinting as the warmth reaches it
+        cid = f.uid('city')
+        f.defs.append(f'<clipPath id="{cid}">{"".join(shapes)}</clipPath>')
+
+        def off(dy):
+            return smooth_d([(x, y + dy) for x, y in SWEEP])
+        f.add(f'<path d="{off(-40)}" stroke="{HONEY}" stroke-width="150" fill="none" opacity="0.12" filter="url(#soft4)"/>')
+        f.add(f'<g clip-path="url(#{cid})">'
+              f'<path d="{off(95)}" stroke="{HONEY}" stroke-width="180" fill="none" opacity="0.22" filter="url(#soft4)"/>'
+              f'<path d="{off(26)}" stroke="{HONEY}" stroke-width="58" fill="none" opacity="0.5" filter="url(#soft3)"/>'
+              f'<path d="{off(8)}" stroke="{HONEY_CORE}" stroke-width="24" fill="none" opacity="0.55" filter="url(#soft2)"/></g>')
+        rg = random.Random(77)
+        for i in range(10):
+            x = 400 + i * 62 + rg.uniform(-16, 16)
+            if x > SWEEP[-1][0] - 10:
+                break
+            glint(f, x, sweep_y(x) - rg.uniform(14, 34), rg.uniform(8, 13), op=0.9)
+    elif crest and not all_warm:
         cid = f.uid('city')
         f.defs.append(f'<clipPath id="{cid}">{"".join(shapes)}</clipPath>')
         arc = []
@@ -199,7 +300,11 @@ def home_view(f, wave=0.5, all_warm=False, her_step=False, data_plume=False, her
               f'<path d="{d}" stroke="{HONEY_CORE}" stroke-width="30" fill="none" opacity="0.55" filter="url(#soft3)"/></g>')
 
     # the blank building at the harbour's edge (left): no windows, cold lights, roof fans
-    if plan_site:
+    if plan_site and not plan_drawn:
+        # (B12, round 2) the plan's frost-line building let go: the warm run leaves the empty site behind your phone
+        blank_building(f, x1=150, steam=False, door_warm=False, fans=2)
+        door_x = 284
+    elif plan_site:
         door_x, _ = blank_building(f, x1=150, steam=False, door_warm=False, fans=2)
         # beside it, on the empty snowy site: the plan's new building, still drawn in frost ("could soon"): the same
         # box, door and two fans she drew on her window, glittering at full size
@@ -215,6 +320,8 @@ def home_view(f, wave=0.5, all_warm=False, her_step=False, data_plume=False, her
         f.rect(bx0 + 82, by1 - 54, 32, 54, HONEY, 'opacity="0.9"')
         f.add(f'<rect x="{bx0 + 60}" y="{by1 - 76}" width="76" height="96" fill="{HONEY}" opacity="0.4" filter="url(#glow2)"/>')
         door_x = bx0 + 98
+    elif sweep:
+        door_x, _ = blank_building(f, x1=322, bold=True)
     else:
         door_x, _ = blank_building(f, x1=322, steam=crest or data_plume, door_warm=(wave > 0 or all_warm))
     if data_plume and not crest:
@@ -223,18 +330,36 @@ def home_view(f, wave=0.5, all_warm=False, her_step=False, data_plume=False, her
     # the far shore road and the warm run along it (the warm water under the snow)
     f.rect(0, BY, W, 18, g(40), 'filter="url(#rough2)"')
     run_from = door_x
-    if wave > 0 or all_warm:
+    if sweep and not all_warm:
+        # (round 2) the warm run leaving the blazing door: snow melted in a line over the pipe along the shore road, the
+        # honey glowing up through it, all the way to where the front rises off it (the brightest knot)
+        run_to, y_r = SWEEP[-1][0], BY + 9
+        # (drawn as rects: a level stroked line has a zero-height box and its blur filter would clip it away)
+        rl = run_to - run_from
+        f.rect(run_from - 10, y_r - 9, rl + 10, 18, g(13), 'rx="9" filter="url(#rough2)"')
+        f.rect(run_from, y_r - 30, rl, 60, HONEY, 'opacity="0.3" filter="url(#soft3)"')
+        f.rect(run_from, y_r - 7, rl, 14, AMBER, 'rx="7" opacity="0.95" filter="url(#soft1)"')
+        f.rect(run_from, y_r - 4, rl, 8, HONEY, 'rx="4" opacity="0.95" filter="url(#soft1)"')
+        f.rect(run_from, y_r - 2, rl, 3, HONEY_CORE, 'opacity="0.7"')
+        f.ellipse(run_to - 6, y_r - 6, 36, 17, HONEY_CORE, 'opacity="0.95" filter="url(#soft2)"')
+        f.ellipse(run_to - 6, y_r - 14, 96, 44, HONEY, 'opacity="0.45" filter="url(#soft3)"')
+    elif wave > 0 or all_warm:
         run_to = 1080 if all_warm else min(1080, 150 + fa * 0.985)
         sw = 8 if pulse else 6
-        f.add(f'<path d="M{run_from},{BY + 9} L{run_to},{BY + 8}" stroke="{HONEY}" stroke-width="{sw}" opacity="{0.75 if dim_city else 0.95}" '
-              f'stroke-linecap="round" filter="url(#soft1)"/>')
-        f.add(f'<path d="M{run_from},{BY + 9} L{run_to},{BY + 8}" stroke="{HONEY}" stroke-width="26" opacity="{0.12 if dim_city else 0.18}" filter="url(#soft3)"/>')
+        if pulse:
+            # (B12, round 2) the run drawn as rects so it shows (a level stroked line's blur clipped it to a hairline)
+            f.rect(run_from, BY + 9 - sw / 2, run_to - run_from, sw, HONEY, f'rx="{sw / 2}" opacity="{0.8 if dim_city else 0.95}" filter="url(#soft1)"')
+            f.rect(run_from, BY - 4, run_to - run_from, 26, HONEY, f'opacity="{0.14 if dim_city else 0.18}" filter="url(#soft3)"')
+        else:
+            f.add(f'<path d="M{run_from},{BY + 9} L{run_to},{BY + 8}" stroke="{HONEY}" stroke-width="{sw}" opacity="{0.75 if dim_city else 0.95}" '
+                  f'stroke-linecap="round" filter="url(#soft1)"/>')
+            f.add(f'<path d="M{run_from},{BY + 9} L{run_to},{BY + 8}" stroke="{HONEY}" stroke-width="26" opacity="{0.12 if dim_city else 0.18}" filter="url(#soft3)"/>')
         if crest and not all_warm:
             f.ellipse(run_to - 10, BY + 8, 46, 14, HONEY_CORE, 'opacity="0.85" filter="url(#soft2)"')
             f.ellipse(run_to - 10, BY + 8, 110, 30, HONEY, 'opacity="0.35" filter="url(#soft3)"')
         if pulse:
             # the pulse: one bright packet of warmth running along the shore from the plan's door to her block
-            px_ = 392
+            px_ = pulse_x
             f.ellipse(px_, BY + 8, 64, 15, HONEY_CORE, 'opacity="0.95" filter="url(#soft2)"')
             f.ellipse(px_, BY + 8, 150, 40, HONEY, 'opacity="0.45" filter="url(#soft3)"')
             f.add(f'<path d="M{px_ + 40},{BY + 4} L{px_ + 70},{BY + 4} M{px_ + 44},{BY + 13} L{px_ + 84},{BY + 13}" stroke="{HONEY_CORE}" stroke-width="3" opacity="0.6"/>')
@@ -267,15 +392,16 @@ def home_view(f, wave=0.5, all_warm=False, her_step=False, data_plume=False, her
         y = 1560 + k * 42
         f.add(f'<path d="M{r.uniform(-40, 200):.0f},{y} Q540,{y - 10 + r.uniform(-8, 8):.0f} {r.uniform(880, 1120):.0f},{y + r.uniform(-6, 6):.0f}" '
               f'stroke="{g(r.choice([22, 32, 36]))}" stroke-width="{r.uniform(3, 9):.0f}" fill="none" opacity="0.5" filter="url(#soft1)"/>')
+    wkx, wky, wkh = walker
     for k in range(16):
-        fx = 880 - k * 50 + r.uniform(-6, 6)
-        fy = 1560 + k * 9 + (10 if k % 2 else -10)
+        fx = wkx + 100 - k * 50 + r.uniform(-6, 6)
+        fy = wky + 4 + k * 9 + (10 if k % 2 else -10)
         f.ellipse(fx, fy, 8, 4, g(18), 'opacity="0.7"')
     f.rect(1010, 1420, 36, 130, g(10), 'filter="url(#rough2)"')
     snowcap(f, 1006, 1050, 1422, th=8, L=62)
     if resident:
-        person(f, 780, 1556, 210, L=9, pose='walk', facing=-1, rim=-1, bag=True, scarf=True)
-        breath(f, 744, 1372, s=1.0)
+        person(f, wkx, wky, wkh, L=9, pose='walk', facing=-1, rim=-1, bag=True, scarf=True)
+        breath(f, wkx - 36 * wkh / 210, wky - 184 * wkh / 210, s=wkh / 210)
     snowfall(f, 150, sizes=(2, 5), seed=12)
     snowfall(f, 28, region=(0, 1250, W, H), sizes=(6, 10), seed=13, op=(0.4, 0.75))
 
@@ -284,7 +410,7 @@ def home_view(f, wave=0.5, all_warm=False, her_step=False, data_plume=False, her
 def b1():
     f = Frame(101)
     FROST.update(glint_p=0.6, glint_k=0.5)
-    home_view(f, wave=0.77, crest=True)
+    home_view(f, wave=0.77, crest=True, sweep=True, walker=(790, 1494, 196))
     FROST.update(glint_p=0.45, glint_k=0.34)
     band(f, ['to heat', [('70,000', True), (' homes?', False)]], seat=530)
     grain(f)
@@ -564,7 +690,7 @@ def kettle2(f, x, y, s=1.0, kind='round', L=10):
     return (x + 28 * s, y - 23 * s)
 
 
-def kitchen(f, x, y, w, h, kind, seed, kettle_kind='round', kx=0.42):
+def kitchen(f, x, y, w, h, kind, seed, kettle_kind='round', kx=0.42, curl_w=None):
     """one kitchen window at night, each a little different: warm inside, its kettle boiling on the sill, a big white
     curl of steam out through the open top pane. Returns where its steam leaves the window."""
     r = random.Random(seed)
@@ -615,7 +741,7 @@ def kitchen(f, x, y, w, h, kind, seed, kettle_kind='round', kx=0.42):
             mx = x + w * (0.7 + 0.13 * i)
             f.rect(mx - 8, y + h - 22, 16, 18, g(12), 'rx="2"')
     sx, sy = kk
-    curl(f, sx, sy, h=(sy - y) * 0.95, L=95, op=0.95, sw=max(4, h * 0.075))
+    curl(f, sx, sy, h=(sy - y) * 0.95, L=95, op=0.95, sw=curl_w or max(4, h * 0.075))
     f.add(f'<path d="M{sx},{sy} C{sx + 14},{sy - h * 0.3} {sx - 10},{sy - h * 0.5} {sx + 4},{y + 2}" stroke="{g(95)}" stroke-width="{h * 0.16:.0f}" '
           f'fill="none" opacity="0.35" filter="url(#soft2)"/>')
     snowcap(f, x - 8, x + w + 8, y + h + 9, th=6, L=84, sag=0.4)
@@ -624,68 +750,97 @@ def kitchen(f, x, y, w, h, kind, seed, kettle_kind='round', kx=0.42):
 
 @frame('B4')
 def b4():
+    """(round 2) the computer stepped clear of the facade into its own space (the corner of a side street open to the
+    frozen harbour), the block of kitchens come closer (bigger kitchens, a shorter street), and the two clouds side by
+    side, the same size, with sky between them: one machine, one cloud; forty kitchens, one cloud"""
     f = Frame(404)
-    sky(f, [(0, 14), (0.4, 19), (0.75, 26), (1, 30)], 0, 1340)
+    sky(f, [(0, 14), (0.35, 19), (0.62, 25), (0.85, 31), (1, 36)], 0, 1200)
     cloud(f, 520, 120, 1000, 200, 22, 0.85, seed=31)
-    # the block of kitchens across the street, close: its facade runs past both edges; every kitchen boils a kettle
-    x0, x1, ytop, ybase = -60, 1140, 764, 1336
+    # the open view down the side street at the left: the far shore's frosted blocks, the frozen harbour, the quay
+    far_city(f, 1192, x0=-30, x1=430, L=29, heights=(34, 92), seed=4401, density=0.45, warm_frac=0.0, Lwin=52)
+    f.rect(0, 1192, 430, 170, f.lingrad([(0, g(50), 1), (1, g(42), 1)]))
+    rq = random.Random(4402)
+    for k in range(5):
+        yy = 1210 + k * 30 + rq.uniform(-5, 5)
+        f.rect(-10, yy, 450, rq.uniform(2, 4), g(rq.choice([36, 56])), 'opacity="0.6"')
+    plume(f, [(40, 1236), (220, 1232), (390, 1238)], [50, 60, 50], L=66, op=0.3, filt='steam2', seed=4403)
+    f.rect(0, 1362, 430, 8, g(20))
+    for k in range(7):
+        f.rect(8 + k * 66, 1330, 5, 34, g(18))
+    f.rect(0, 1330, 430, 5, g(22))
+    f.rect(0, 1370, 430, 130, f.lingrad([(0, g(52), 1), (1, g(44), 1)]))
+    # the block of kitchens, close: its corner at the side street, its facade running past the right edge
+    x0, x1, ytop, ybase = 422, 1150, 796, 1492
+    f.poly([(400, ytop + 14), (x0, ytop + 4), (x0, ybase), (400, ybase)], g(17), 'filter="url(#rough2)"')
     f.poly([(x0, ybase), (x0, ytop), (x1, ytop + 4), (x1, ybase)], g(24), 'filter="url(#rough2)"')
     for row in range(1, 4):
-        yy = ytop + 14 + row * 120
-        f.rect(x0, yy - 10, x1 - x0, 7, g(30), 'opacity="0.8"')
-    # the ground floor: the street door (warm), the shop window, the plinth
-    f.rect(x0, 1246, x1 - x0, 90, g(20))
-    f.rect(470, 1252, 80, 84, g(12))
-    f.rect(476, 1258, 68, 78, f.lingrad([(0, HONEY, 1), (1, AMBER, 1)]), 'opacity="0.9"')
-    f.rect(600, 1262, 300, 56, g(52), 'opacity="0.9"')
-    f.rect(140, 1262, 280, 56, g(48), 'opacity="0.9"')
-    for i in range(6):
-        f.rect(150 + i * 46, 1272, 30, 40, g(40), 'opacity="0.7"')
-    kinds = [['hand', 'plant', 'curtain', 'lamp', 'mugs'],
-             ['shelf', 'curtain', 'person', 'blind', 'plant'],
-             ['lamp', 'person', 'mugs', 'hand', 'curtain'],
-             ['curtain', 'blind', 'shelf', 'plant', 'person']]
+        yy = 842 + row * 134 - 26
+        f.rect(x0, yy, x1 - x0, 7, g(30), 'opacity="0.8"')
+    # the ground floor: the street door (warm), the shop windows, the plinth
+    f.rect(x0, 1366, x1 - x0, 126, g(20))
+    f.rect(640, 1384, 74, 108, g(12))
+    f.rect(646, 1390, 62, 102, f.lingrad([(0, HONEY, 1), (1, AMBER, 1)]), 'opacity="0.9"')
+    f.rect(746, 1396, 300, 64, g(50), 'opacity="0.9"')
+    f.rect(450, 1396, 160, 64, g(46), 'opacity="0.9"')
+    for i in range(4):
+        f.rect(458 + i * 38, 1406, 28, 46, g(38), 'opacity="0.7"')
+    kinds = [['hand', 'plant', 'curtain', 'lamp'],
+             ['shelf', 'person', 'blind', 'mugs'],
+             ['lamp', 'mugs', 'hand', 'curtain'],
+             ['curtain', 'plant', 'shelf', 'person']]
     kets = ['round', 'jug', 'whistle', 'round', 'jug', 'whistle', 'round']
     tops = []
     rr = random.Random(77)
     for row in range(4):
-        for c in range(5):
-            wx = x0 + 232 * c + 54 + rr.uniform(-6, 6)
-            wy = ytop + 34 + row * 120 + rr.uniform(-3, 3)
-            tops.append(kitchen(f, wx, wy, 128, 82, kinds[row][c], seed=row * 10 + c,
-                                kettle_kind=kets[(row * 5 + c) % 7], kx=rr.uniform(0.3, 0.55)))
-    # every kitchen's curl wafting up out of its top pane, and all of it drawn up the facade into ONE cloud
-    cx2, cy2 = 712, 716
-    for (sx, sy) in tops:
-        d = f'M{sx:.0f},{sy:.0f} C{sx + 16:.0f},{sy - 26:.0f} {sx - 14:.0f},{sy - 46:.0f} {sx + 2:.0f},{sy - 70:.0f}'
-        f.add(f'<path d="{d}" stroke="{g(94)}" stroke-width="9" fill="none" opacity="0.5" stroke-linecap="round" filter="url(#soft1)"/>')
-    f.add(f'<path d="M80,{ytop + 40} C260,{ytop - 10} 470,{cy2 + 80} {cx2 - 120},{cy2 + 20} L{cx2 + 120},{cy2 + 20} '
-          f'C960,{cy2 + 80} 1080,{ytop - 10} 1140,{ytop + 40}Z" fill="{g(92)}" opacity="0.2" filter="url(#soft4)"/>')
-    snowcap(f, x0, x1, ytop + 2, th=10, L=74)
-    for cxx in (90, 420, 980):
-        f.rect(cxx, ytop - 30, 18, 34, g(20))
-        snowcap(f, cxx - 2, cxx + 20, ytop - 29, th=5, L=74)
-    # the street: kerb, the road's snow and its tram rails, the near pavement
-    f.rect(0, 1336, W, 16, g(46), 'filter="url(#rough2)"')
-    f.rect(0, 1352, W, 92, f.lingrad([(0, g(40), 1), (1, g(33), 1)]))
-    for yy in (1374, 1388, 1412, 1426):
-        f.add(f'<line x1="0" y1="{yy}" x2="{W}" y2="{yy + 4}" stroke="{g(24)}" stroke-width="3.5" opacity="0.8"/>')
-    near = f.lingrad([(0, g(36), 1), (0.3, g(26), 1), (1, g(12), 1)])
-    f.poly([(0, 1448), (W, 1440), (W, H), (0, H)], near, 'filter="url(#rough)"')
-    snowcap(f, 0, W, 1450, th=10, L=50)
-    # the ONE giant computer out on the pavement: the one big break in the street's pattern of warm kitchens,
-    # melting its own pool in the snow
-    f.ellipse(178, 1470, 230, 30, g(10), 'opacity="0.9" filter="url(#soft1)"')
-    f.ellipse(178, 1470, 260, 40, HONEY, 'opacity="0.12" filter="url(#soft3)"')
-    computer_cabinet(f, 66, 892, 228, 1466, L=11, seed=4, steam=False)
-    # THE TWO CLOUDS, side by side, the same size and height: the computer's single column, and the forty kettles' one
-    plume(f, [(180, 880), (176, 830), (180, 790)], [120, 150, 180], L=88, op=0.9, seed=405, warm_root=0.45)
-    steam_cloud(f, 182, cy2, 300, 190, seed=7, L=90, op=0.95, warm=0.12)
+        for c in range(4):
+            wx = 452 + 172 * c + rr.uniform(-5, 5)
+            wy = 842 + row * 134 + rr.uniform(-3, 3)
+            tops.append((row, kitchen(f, wx, wy, 136, 98, kinds[row][c], seed=row * 10 + c,
+                                      kettle_kind=kets[(row * 4 + c) % 7], kx=rr.uniform(0.32, 0.52), curl_w=10)))
+    snowcap(f, 400, x1, ytop + 2, th=11, L=74)
+    for cxx in (500, 850, 1050):
+        f.rect(cxx, ytop - 34, 20, 38, g(20))
+        snowcap(f, cxx - 2, cxx + 22, ytop - 33, th=5, L=74)
+    # every kitchen's curl wafting up out of its open top pane; the top row's carried up over the roof and gathered
+    # into the block's ONE cloud
+    cx2, cy2 = 786, 722
+    for row, (sx, sy) in tops:
+        d = f'M{sx:.0f},{sy:.0f} C{sx + 18:.0f},{sy - 26:.0f} {sx - 14:.0f},{sy - 44:.0f} {sx + 4:.0f},{sy - 66:.0f}'
+        f.add(f'<path d="{d}" stroke="{g(95)}" stroke-width="11" fill="none" opacity="0.5" stroke-linecap="round" filter="url(#soft1)"/>')
+        if row == 0:
+            d2 = (f'M{sx:.0f},{sy - 30:.0f} C{sx:.0f},{ytop - 10:.0f} {sx + (cx2 - sx) * 0.45:.0f},{ytop - 20:.0f} '
+                  f'{cx2 + (sx - cx2) * 0.35:.0f},{cy2 + 40:.0f}')
+            f.add(f'<path d="{d2}" stroke="{g(92)}" stroke-width="30" fill="none" opacity="0.4" stroke-linecap="round" filter="url(#soft2)"/>')
+    # the ONE giant computer, out on the corner of the pavement in its own space, the harbour behind it, melting
+    # its own pool in the snow
+    f.ellipse(206, 1494, 180, 24, g(14), 'opacity="0.8" filter="url(#soft1)"')
+    f.ellipse(206, 1494, 220, 36, HONEY, 'opacity="0.12" filter="url(#soft3)"')
+    computer_cabinet(f, 94, 904, 226, 1490, L=11, seed=4, steam=False)
+    # THE TWO CLOUDS, side by side, the same size and height, sky between them: the computer's own, and the
+    # forty kettles' one
+    plume(f, [(207, 892), (206, 856), (207, 822)], [64, 78, 92], L=88, op=0.85, seed=405, warm_root=0.4)
+    steam_cloud(f, 207, cy2, 300, 190, seed=7, L=90, op=0.95, warm=0.12)
     steam_cloud(f, cx2, cy2, 300, 190, seed=7, L=90, op=0.95, warm=0.12)
-    # a neighbour and her dog stop beside it and look up (in the read zone)
-    person(f, 380, 1462, 160, L=8, pose='stand', facing=-1, rim=1, scarf=True)
-    f.add(f'<path d="M408,1462 l6,-26 l32,-5 l10,-12 l9,6 l-4,12 l-7,25 l-7,0 l0,-15 l-27,2 l-4,13Z" fill="{g(8)}"/>')
-    breath(f, 360, 1316, s=0.8)
+    # a neighbour and her dog stop beside it and look up
+    person(f, 352, 1488, 164, L=8, pose='stand', facing=-1, rim=1, scarf=True)
+    # her dog, a pale husky, sniffing at the warm pool the machine has melted
+    f.add(f'<path d="M384,1488 l-4,-24 l-30,-6 l-12,-12 l-10,5 l3,13 l8,24 l7,0 l0,-14 l26,2 l5,12Z" fill="{g(66)}" stroke="{g(30)}" stroke-width="2"/>')
+    breath(f, 332, 1340, s=0.8)
+    # the street: the pavement, the kerb, the snowy road and its tram rails, the near kerb's snowbank
+    f.rect(0, 1492, W, 22, g(54), 'filter="url(#rough2)"')
+    f.rect(0, 1514, W, 10, g(30))
+    f.rect(0, 1524, W, 396, f.lingrad([(0, g(40), 1), (0.5, g(30), 1), (1, g(18), 1)]))
+    for yy in (1580, 1600, 1650, 1672):
+        f.rect(0, yy, W, 4, g(22), 'opacity="0.8"')
+    rt = random.Random(4404)
+    for k in range(7):
+        yy = 1700 + k * 30 + rt.uniform(-6, 6)
+        f.add(f'<path d="M-20,{yy:.0f} Q540,{yy - 8 + rt.uniform(-6, 6):.0f} 1100,{yy + rt.uniform(-5, 5):.0f}" stroke="{g(rt.choice([24, 34, 38]))}" '
+              f'stroke-width="{rt.uniform(3, 8):.0f}" fill="none" opacity="0.5" filter="url(#soft1)"/>')
+    for c in range(4):
+        f.rect(452 + 172 * c + 30, 1530, 76, 60, HONEY, 'opacity="0.1" filter="url(#soft3)"')
+    f.add(f'<path d="M-20,1920 L-20,1846 C160,1810 380,1834 560,1816 C760,1798 920,1826 1100,1808 L1100,1920Z" fill="{g(48)}" filter="url(#rough)"/>')
+    snowcap(f, -20, 1100, 1822, th=10, L=60)
     snowfall(f, 120, sizes=(2, 5), seed=41)
     band(f, ['as much heat as', [('forty', True), (' kettles,', False)]], seat=540)
     grain(f)
@@ -1243,101 +1398,246 @@ def frost_person(f, x, yfeet, h, seed=0, w=3.0):
     frost_stroke(f, [(x + hd * 0.5, yfeet - h * 0.72), (x + hd * 1.7, yfeet - h * 0.58)], w=w, seed=seed + 4, feathers=False, glints=1, glow=False)
 
 
+COOL = g(72, -12)  # the cool water coming in (pale blue-grey)
+
+
+def frost_solid(f, pts, L=60, seed=0, ferns=10, warm=0.0, wc=None):
+    """(round 2) a SOLID of frost for the plan's hall (frosted glass with body, never a line on the dark): pale,
+    crystalline, ferns growing in from its edges, lit warm from within (warm: how much)"""
+    pp = ' '.join(f'{x:.1f},{y:.1f}' for x, y in pts)
+    xs, ys = [p[0] for p in pts], [p[1] for p in pts]
+    f.add(f'<polygon points="{pp}" fill="{g(L)}"/>')
+    cid = f.uid('solid')
+    f.defs.append(f'<clipPath id="{cid}"><polygon points="{pp}"/></clipPath>')
+    f.add(f'<g clip-path="url(#{cid})">')
+    frost_field(f, min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys), L=min(96, L + 18), op=0.55, density=ferns,
+                seed=seed, base_op=0.22)
+    if warm > 0:
+        cx, cy = wc or ((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2)
+        f.ellipse(cx, cy, (max(xs) - min(xs)) * 0.6, (max(ys) - min(ys)) * 0.5, HONEY, f'opacity="{warm:.2f}" filter="url(#soft4)"')
+    f.add('</g>')
+
+
+def frost_machine(f, x0, y0, x1, y1, vp=(1150, 1120), depth=64, rows=9, seed=1000, side=True, edge_w=7):
+    """one giant computer of the plan, built of frost: a pale glowing slab, its glass door of trays, each tray's vent
+    glowing honey with its heat, a row of tiny cold lights on each; glittering frost edges. Returns the trays' y."""
+    if side:
+        k = depth / max(60, vp[0] - x1)
+        sd = [(x1, y0), (x1 + depth, y0 + (vp[1] - y0) * k), (x1 + depth, y1 - (y1 - vp[1]) * k), (x1, y1)]
+        frost_solid(f, sd, L=42, seed=seed + 1, ferns=4, warm=0.25)
+        frost_stroke(f, sd[:3] + [sd[3]], w=edge_w * 0.6, seed=seed + 2, L=92, op=0.8, glints=1)
+    f.add(f'<rect x="{x0 - 60}" y="{y0 - 40}" width="{x1 - x0 + 120}" height="{y1 - y0 + 80}" fill="{HONEY}" opacity="0.2" filter="url(#glow2)"/>')
+    frost_solid(f, [(x0, y0), (x1, y0), (x1, y1), (x0, y1)], L=64, seed=seed + 3, ferns=14, warm=0.3)
+    # the glass door: a darker inset with the trays behind it
+    gx0, gx1, gy0, gy1 = x0 + (x1 - x0) * 0.1, x1 - (x1 - x0) * 0.1, y0 + (y1 - y0) * 0.05, y1 - (y1 - y0) * 0.06
+    f.rect(gx0, gy0, gx1 - gx0, gy1 - gy0, g(34), 'rx="6"')
+    ys = []
+    th = (gy1 - gy0) / rows
+    rr = random.Random(seed + 4)
+    for j in range(rows):
+        ty = gy0 + th * j + th * 0.14
+        f.rect(gx0 + 8, ty, gx1 - gx0 - 16, th * 0.72, g(24), 'rx="3"')
+        # the vent glowing with the machine's heat
+        f.rect(gx0 + 14, ty + th * 0.38, gx1 - gx0 - 28, th * 0.2, AMBER, f'opacity="{0.55 + 0.15 * rr.random():.2f}"')
+        f.rect(gx0 + 10, ty + th * 0.2, gx1 - gx0 - 20, th * 0.5, HONEY, 'opacity="0.35" filter="url(#soft2)"')
+        for c in range(rr.randint(4, 7)):
+            f.rect(gx0 + 24 + c * 16, ty + th * 0.12, 6, 4, g(97, -10))
+        ys.append(ty + th * 0.48)
+    f.add(f'<rect x="{gx0}" y="{gy0}" width="{gx1 - gx0}" height="{gy1 - gy0}" rx="6" fill="none" stroke="{g(86)}" stroke-width="3" opacity="0.6"/>')
+    frost_stroke(f, [(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0, y0)], w=edge_w, seed=seed + 5, L=96, glints=3)
+    return ys, gx0
+
+
+def frost_figure(f, x, yfeet, h, hand=None, seed=0, L=80, rim=1):
+    """(round 2) her frost-hand person with body: a frosted figure (a pale, glittering silhouette, never a stick figure)
+    in a long coat, hair up in a bun, head tipped up; one arm out, its palm on `hand`; the machine's warm light on
+    the side facing it"""
+    hd = h / 7.6
+    hx, hy = x + hd * 0.15, yfeet - h + hd * 0.6
+    top = yfeet - h + hd * 1.2
+    hem = yfeet - h * 0.24
+    body = (f'M{hx - hd * 0.55},{top} Q{hx},{top - hd * 0.18} {hx + hd * 0.6},{top} '
+            f'Q{x + hd * 0.85},{(top + hem) / 2} {x + hd * 1.05},{hem} Q{x},{hem + hd * 0.16} {x - hd * 1.0},{hem} '
+            f'Q{x - hd * 0.8},{(top + hem) / 2} {hx - hd * 0.55},{top}Z')
+    legs = (f'M{x - hd * 0.45},{hem - 4} L{x - hd * 0.5},{yfeet} L{x - hd * 0.1},{yfeet} L{x - hd * 0.02},{hem} '
+            f'M{x + hd * 0.08},{hem} L{x + hd * 0.15},{yfeet} L{x + hd * 0.55},{yfeet} L{x + hd * 0.48},{hem - 4}Z')
+    head = f'M{hx + hd * 0.44},{hy} A{hd * 0.44},{hd * 0.54} 0 1 0 {hx - hd * 0.44},{hy} A{hd * 0.44},{hd * 0.54} 0 1 0 {hx + hd * 0.44},{hy}Z'
+    bun = f'M{hx + hd * 0.3},{hy - hd * 0.62} A{hd * 0.26},{hd * 0.24} 0 1 0 {hx - hd * 0.22},{hy - hd * 0.62} A{hd * 0.26},{hd * 0.24} 0 1 0 {hx + hd * 0.3},{hy - hd * 0.62}Z'
+    arm = ''
+    if hand:
+        ax, ay = hx + hd * 0.45, top + hd * 0.35
+        hx2, hy2 = hand
+        nx, ny = -(hy2 - ay), hx2 - ax
+        nl = math.hypot(nx, ny) or 1
+        nx, ny = nx / nl * hd * 0.2, ny / nl * hd * 0.2
+        arm = (f'M{ax - nx},{ay - ny} L{hx2 - nx * 0.8},{hy2 - ny * 0.8} L{hx2 + hd * 0.3},{hy2 - hd * 0.12} '
+               f'L{hx2 + hd * 0.32},{hy2 + hd * 0.2} L{hx2 + nx * 0.8},{hy2 + ny * 0.8} L{ax + nx},{ay + ny}Z')
+    d = body + ' ' + legs + ' ' + head + ' ' + bun + (' ' + arm if arm else '')
+    cid = f.uid('fig')
+    f.defs.append(f'<clipPath id="{cid}"><path d="{d}"/></clipPath>')
+    f.add(f'<path d="{d}" fill="{g(L - 6)}" opacity="0.94"/>')
+    f.add(f'<g clip-path="url(#{cid})">')
+    frost_field(f, x - h * 0.3, yfeet - h - 10, h * 0.8, h + 20, L=min(97, L + 12), op=0.7, density=8, seed=seed, base_op=0.25)
+    f.add(f'<rect x="{x + rim * hd * 0.2}" y="{yfeet - h}" width="{hd * 1.6}" height="{h}" fill="{HONEY}" opacity="0.35" filter="url(#soft3)"/>')
+    f.add('</g>')
+    f.add(f'<path d="{d}" fill="none" stroke="{g(97)}" stroke-width="3.2" stroke-linejoin="round" opacity="0.85" filter="url(#rough2)"/>')
+    for k in range(3):
+        rg = random.Random(seed + k)
+        glint(f, x + rg.uniform(-hd, hd), yfeet - rg.uniform(0.2, 0.9) * h, rg.uniform(9, 14))
+
+
+def water_pipe(f, pts, w=34, warm_from=None, warm_to=None, cols=None, seed=0):
+    """the one painted (real) thing in the plan: the water's pipe along pts, solid and shaded; its colour runs from
+    cool to honey between the points warm_from and warm_to (by path length), cool before, honey after"""
+    # resample by length so the colour can change gradually along it
+    seg = []
+    for (xa, ya), (xb, yb) in zip(pts[:-1], pts[1:]):
+        n = max(1, int(math.hypot(xb - xa, yb - ya) / 14))
+        for i in range(n):
+            seg.append(((xa + (xb - xa) * i / n, ya + (yb - ya) * i / n), (xa + (xb - xa) * (i + 1) / n, ya + (yb - ya) * (i + 1) / n)))
+    L_tot = sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in seg)
+    t0 = warm_from if warm_from is not None else 0.3
+    t1 = warm_to if warm_to is not None else 0.7
+    acc = 0.0
+    out_sh, out_body = '', ''
+    for a, b in seg:
+        acc += math.hypot(b[0] - a[0], b[1] - a[1])
+        u = min(1.0, max(0.0, (acc / L_tot - t0) / max(1e-6, t1 - t0))) ** 1.25
+        # cool pale blue-grey -> grey -> honey, through Lab so it warms steadily as it climbs
+        col = hexc(lab2rgb(72 + 12 * u, 0.6 + 7.4 * u, -12 + 57 * u))
+        sh = hexc(lab2rgb(46 + 8 * u, 0.6 + 9 * u, -12 + 44 * u))
+        d = f'M{a[0]:.1f},{a[1]:.1f} L{b[0]:.1f},{b[1]:.1f}'
+        out_sh += f'<path d="{d}" stroke="{sh}" stroke-width="{w + 8}" stroke-linecap="round"/>'
+        out_body += f'<path d="{d}" stroke="{col}" stroke-width="{w}" stroke-linecap="round"/>'
+    f.add(f'<g fill="none">{out_sh}</g>')
+    f.add(f'<g fill="none">{out_body}</g>')
+    # the highlight along it (a straight polyline: a smoothed curve would overshoot its corners)
+    d_all = 'M' + ' L'.join(f'{x:.1f},{y:.1f}' for x, y in pts)
+    f.add(f'<path d="{d_all}" stroke="{g(97)}" stroke-width="{w * 0.16:.1f}" fill="none" stroke-linejoin="round" opacity="0.45" '
+          f'transform="translate({-w * 0.2:.1f},{-w * 0.2:.1f})"/>')
+    return seg
+
+
 @frame('B10')
 def b10():
+    """(round 2, reworked from the idea: B10alt's staging made a place) inside the plan's hall, built of frost and lit
+    from within by the machines' heat: ONE giant machine close, the water's pipe coming in cool at its foot, climbing
+    its face and drinking its heat tray by tray, warming as it climbs, leaving honey at its top and away toward the
+    warm city glowing through the frost walls; her frost-drawn person with a palm on the machine, looking up"""
     f = Frame(1010)
-    # inside her frost drawing: the planned hall drawn in glittering frost on the dark glass, the warm city faint beyond;
-    # only the water is painted, cool where it comes in, warming machine by machine, honey where it leaves (near)
-    dim_night(f)
-    for (cx, cy, a) in [(0, 980, 0.15), (0, 1500, -0.15), (W, 760, math.pi), (200, H, -1.3), (W, 1880, math.pi + 0.5)]:
-        for k in range(2):
-            frost_fern(f, cx, cy, a + (k - 0.5) * 0.3, 220 + 40 * k, depth=3, L=92, op=0.3, sw=2.0, seed=int(cx * 7 + cy + k))
-    # the hall: floor and ceiling edges running to the far end at the left, the far wall
-    frost_stroke(f, [(0, 1560), (330, 1110)], w=7, seed=1001, op=0.85)
-    frost_stroke(f, [(330, 1110), (330, 930), (0, 700)], w=6, seed=1002, op=0.8)
-    frost_stroke(f, [(330, 1110), (372, 1110)], w=4, seed=1003, op=0.7, feathers=False, glints=0)
-    frost_stroke(f, [(330, 930), (372, 930)], w=4, seed=1004, op=0.7, feathers=False, glints=0)
-    frost_stroke(f, [(1080, 1720), (372, 1110)], w=6, seed=1005, op=0.6, glints=1)
-    # the row of giant computers on the right, receding to the far end, each with its heat glowing inside
-    quad = [(372, 930), (1010, 640), (1010, 1690), (372, 1110)]
-    m = homography(quad)
-    n = 5
-    for i in range(n):
-        u0, u1 = i / n + 0.025, (i + 1) / n - 0.025
-        t = (u0 + u1) / 2
-        c = m(t, 0.5)
-        wd = abs(m(u1, 0.5)[0] - m(u0, 0.5)[0])
-        hh = abs(m(u0, 1.0)[1] - m(u0, 0.0)[1])
-        f.add(f'<ellipse cx="{c[0]:.0f}" cy="{c[1]:.0f}" rx="{wd * 0.42:.0f}" ry="{hh * 0.36:.0f}" fill="{HONEY}" opacity="0.2" filter="url(#glow2)"/>')
-        frost_stroke(f, [m(u0, 0.0), m(u1, 0.0), m(u1, 1.0), m(u0, 1.0), m(u0, 0.0)], w=max(3.0, 9 * t), seed=1100 + i * 9, op=0.95,
-                     glints=1 + int(2 * t))
-        for j in range(7):
-            v = 0.1 + 0.12 * j
-            a_, b_ = m(u0 + 0.03, v), m(u1 - 0.03, v)
-            frost_stroke(f, [a_, b_], w=max(1.5, 3.6 * t), seed=1200 + i * 20 + j, op=0.55, feathers=False, glints=0, glow=False)
-            for cc in range(3):
-                x, y = m(u0 + (u1 - u0) * (0.25 + 0.25 * cc), v + 0.05)
-                f.circle(x, y, max(1.2, 3.5 * t), g(95, -8), 'opacity="0.8"')
-    # a person at the far end, drawn in the same frost hand (the scale of a big new hall)
-    frost_person(f, 352, 1106, 64, seed=1300, w=2.2)
-    # THE WATER: one loop. It comes in COOL along the left (pale blue-grey, quiet), runs to the far end, turns, and comes
-    # back along the machines' feet; each machine pours its heat down into it, so it warms machine by machine and
-    # leaves HONEY only at the near end
-    COOL = g(70, -12)
-    cool_leg = [(-30, 1700), (120, 1500), (250, 1330), (336, 1214), (360, 1180)]
-    for k in range(len(cool_leg) - 1):
-        (xa, ya), (xb, yb) = cool_leg[k], cool_leg[k + 1]
-        wa = 26 - 5 * k
-        f.add(f'<line x1="{xa}" y1="{ya}" x2="{xb}" y2="{yb}" stroke="{COOL}" stroke-width="{wa}" stroke-linecap="round"/>')
-        f.add(f'<line x1="{xa}" y1="{ya}" x2="{xb}" y2="{yb}" stroke="{g(80, -10)}" stroke-width="{max(2, wa * 0.25):.0f}" opacity="0.6" stroke-linecap="round"/>')
-    a = m(0.0, 1.06)
-    f.add(f'<path d="M360,1180 C366,1170 {a[0] - 4:.0f},{a[1] + 6:.0f} {a[0]:.0f},{a[1]:.0f}" stroke="{COOL}" stroke-width="8" fill="none"/>')
-    stops = [m(i / n, 1.06) for i in range(n + 1)] + [(1120, 1880)]
-    cols = [COOL, warm(76, 10, 78), warm(79, 20, 79), warm(81, 30, 80), warm(83, 40, 80), HONEY]
-    for k in range(len(stops) - 1):
-        (xa, ya), (xb, yb) = stops[k], stops[k + 1]
-        wa = 8 + 34 * (k / (len(stops) - 1))
-        col = cols[min(k, len(cols) - 1)]
-        f.add(f'<line x1="{xa:.0f}" y1="{ya:.0f}" x2="{xb:.0f}" y2="{yb:.0f}" stroke="{col}" stroke-width="{wa:.0f}" stroke-linecap="round"/>')
-        if k >= 2:
-            f.add(f'<line x1="{xa:.0f}" y1="{ya:.0f}" x2="{xb:.0f}" y2="{yb:.0f}" stroke="{col}" stroke-width="{wa * 2.4:.0f}" '
-                  f'opacity="{0.08 * k:.2f}" stroke-linecap="round" filter="url(#soft2)"/>')
-    # each machine pouring its glow down into the pipe at its feet
-    for i in range(n):
-        t = (i + 0.5) / n
-        a_, b_ = m(t, 0.84), m(t, 1.05)
-        f.add(f'<path d="M{a_[0]:.0f},{a_[1]:.0f} L{b_[0]:.0f},{b_[1]:.0f}" stroke="{HONEY}" stroke-width="{10 + 26 * t:.0f}" '
-              f'opacity="0.5" stroke-linecap="round" filter="url(#soft2)"/>')
-        f.add(f'<path d="M{a_[0]:.0f},{a_[1]:.0f} L{b_[0]:.0f},{b_[1]:.0f}" stroke="{HONEY_CORE}" stroke-width="{3 + 6 * t:.0f}" '
-              f'opacity="0.85" stroke-linecap="round"/>')
+    vp = (1150, 1120)
+    # the hall's frost wall (her window pane): the warm city glowing through it, brightest round the machine
+    f.rect(0, 0, W, H, g(16))
+    rr = random.Random(1092)
+    bl = ''
+    for k in range(60):
+        x, y = rr.uniform(-60, W + 60), rr.uniform(640, 1460)
+        bl += f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{rr.uniform(26, 70):.0f}" opacity="{rr.uniform(0.25, 0.6):.2f}"/>'
+    f.add(f'<g fill="{HONEY}" filter="url(#soft4)">{bl}</g>')
+    f.add(f'<rect x="0" y="600" width="{W}" height="900" fill="{g(30)}" opacity="0.45"/>')
+    frost_field(f, 0, 610, W, 880, L=74, op=0.65, density=34, seed=1093, base_op=0.3)
+    # the ceiling: calm and dark above (the band sits on it), a soft warm haze under it
+    f.rect(0, 0, W, 640, f.lingrad([(0, g(10), 1), (0.8, g(15), 1), (1, g(20), 0.0)]))
+    f.ellipse(560, 700, 520, 120, HONEY, 'opacity="0.16" filter="url(#soft4)"')
+    # the ice floor, the machines' glow lying on it
+    f.poly([(0, 1462), (W, 1300), (W, H), (0, H)], f.lingrad([(0, g(32), 1), (0.4, g(24), 1), (1, g(14), 1)]))
+    f.add(f'<path d="M0,1462 L{W},1300" stroke="{g(70)}" stroke-width="4" opacity="0.6"/>')
+    for k in range(6):
+        y = 1520 + k * 64
+        f.add(f'<path d="M-20,{y} Q540,{y - 14} 1100,{y - 40 + k * 4}" stroke="{g(40)}" stroke-width="{3 + k}" fill="none" opacity="0.35" filter="url(#soft1)"/>')
+    f.rect(400, 1470, 300, 380, HONEY, 'opacity="0.16" filter="url(#soft4)"')
+    # the row of machines receding behind the near one toward the hall's end, each glowing with its heat
+    for k in (4, 3, 2, 1):
+        t = 1 / (1 + 0.35 * k)
+        X0, X1, Y0, Y1 = (vp[0] + (X - vp[0]) * t for X in (380, 740)), None, None, None
+        x0_, x1_ = vp[0] + (380 - vp[0]) * t, vp[0] + (740 - vp[0]) * t
+        y0_, y1_ = vp[1] + (660 - vp[1]) * t, vp[1] + (1462 - vp[1]) * t
+        frost_machine(f, x0_, y0_, x1_, y1_, vp=vp, depth=64 * t, rows=9, seed=1500 + k * 20, edge_w=7 * t)
+        # each one's own pipe, honey, up out of its top
+        f.rect(x0_ + (x1_ - x0_) * 0.12, y0_ - 30 * t, 14 * t, 32 * t, HONEY, 'opacity="0.8"')
+    # THE ONE MACHINE, close
+    mx0, mx1, my0, my1 = 380, 740, 660, 1462
+    rows, gx0 = frost_machine(f, mx0, my0, mx1, my1, vp=vp, depth=70, rows=9, seed=1600, edge_w=8)
+    # THE WATER: in cool along the floor from the left, up the machine's face drinking its heat tray by tray, warming
+    # as it climbs, honey at the top, and away over the hall toward the warm city
+    px = mx0 + 44
+    pts = [(-40, 1440), (px, 1440), (px, my0 + 26), (mx1 + 50, my0 + 26), (mx1 + 150, my0 + 4), (W + 40, 646)]
+    L1 = (px + 40)
+    L2 = L1 + (1440 - my0 - 26)
+    Ltot = L2 + (mx1 + 50 - px) + math.hypot(100, 22) + math.hypot(W + 40 - mx1 - 150, my0 + 4 - 646)
+    # the heat flowing from each tray's vent into the pipe (before the pipe, so the pipe sits on it)
+    water_pipe(f, pts, w=38, warm_from=(L1 + 20) / Ltot, warm_to=(L2 - 30) / Ltot)
+    # each tray's heat wrapping the pipe where it passes: the water drinking the heat, tray by tray (stronger higher up,
+    # where the water already carries the heat of the trays below)
+    for i, y in enumerate(rows):
+        k = 1 - i / (len(rows) - 1)
+        f.ellipse(px + 10, y, 40, 18, HONEY, f'opacity="{0.25 + 0.3 * k:.2f}" filter="url(#soft2)"')
+        f.add(f'<path d="M{px + 50},{y - 8} C{px + 34},{y - 10} {px + 30},{y - 2} {px + 20},{y}" stroke="{HONEY_CORE}" stroke-width="5" '
+              f'fill="none" stroke-linecap="round" opacity="0.75" filter="url(#soft1)"/>')
+    # small marks of the flow: in from the left, up, out
+    for (x, y, a) in [(110, 1440, 0), (250, 1440, 0), (px, 1300, -90), (930, 668, -10), (1030, 656, -10)]:
+        f.add(f'<path d="M-7,-9 L4,0 L-7,9" transform="translate({x},{y}) rotate({a})" stroke="{g(97)}" stroke-width="4" fill="none" opacity="0.5"/>')
+    # her frost-hand person, a palm on the machine, looking up at the pipe
+    frost_figure(f, 214, 1478, 400, hand=(mx0 + 8, 1186), seed=1700, L=80)
+    snowfall(f, 40, region=(0, 620, W, 1500), sizes=(1.5, 3.5), seed=1094, op=(0.3, 0.6))
     band(f, ['with water', 'in pipes.'], seat=540, L=86)
     grain(f, 0.07)
     return f
 
 
 # ------------------------------------------------------------------ B11: home by home, up the street
-def tram(f, fx, fy, s=1.0, L=40):
+def melt_line(f, pts, widths, seed=0, steam=(), rim=True):
+    """(round 2) the warm water UNDER the snow, as a street really shows it: the snow melted in a ragged line over the
+    pipe, wet dark ground in the melt, a soft slushy lip, the honey glowing up through it from below (never a lit
+    stripe lying on top), a breath of steam off it in the cold. pts near -> far, widths per point"""
+    segs = list(zip(pts[:-1], pts[1:], widths[:-1], widths[1:]))
+    lip, wet, glow, core = '', '', '', ''
+    rr = random.Random(seed)
+    for (a, b, wa, wb) in segs:
+        d = f'M{a[0]:.1f},{a[1]:.1f} L{b[0]:.1f},{b[1]:.1f}'
+        w = (wa + wb) / 2 * rr.uniform(0.85, 1.15)
+        lip += f'<path d="{d}" stroke-width="{w + 12:.1f}"/>'
+        wet += f'<path d="{d}" stroke-width="{w:.1f}"/>'
+        glow += f'<path d="{d}" stroke-width="{w * 0.7:.1f}"/>'
+        core += f'<path d="{d}" stroke-width="{max(1.5, w * 0.2):.1f}"/>'
+    if rim:
+        f.add(f'<g stroke="{warm(60, 6, 76)}" fill="none" stroke-linecap="round" opacity="0.55" filter="url(#soft1)">{lip}</g>')
+    f.add(f'<g stroke="{g(15)}" fill="none" stroke-linecap="round" filter="url(#rough)">{wet}</g>')
+    f.add(f'<g stroke="{HONEY}" fill="none" stroke-linecap="round" opacity="0.55" filter="url(#soft2)">{glow}</g>')
+    f.add(f'<g stroke="{HONEY_CORE}" fill="none" stroke-linecap="round" opacity="0.4" filter="url(#soft2)">{core}</g>')
+    for i, (x, y, sz) in enumerate(steam):
+        plume(f, [(x, y - sz * 0.3), (x + sz * 0.15, y - sz * 0.9), (x + sz * 0.4, y - sz * 1.5)], [sz * 0.7, sz * 0.9, sz],
+              L=86, op=0.36, filt='steam2', seed=seed + 31 + i)
+
+
+def tram(f, fx, fy, s=1.0, L=40, dim=False):
     """a Helsinki tram coming down its rails toward us (three-quarter front): rounded nose, big lit windscreen, the
-    destination sign, headlights, lit side windows receding up the street, the pantograph up to the wire"""
+    destination sign, headlights, lit side windows receding up the street, the pantograph up to the wire.
+    dim (B11, round 2): its lights low (no white glare, no beam on the snow), so it is life in the street, not the focus"""
     w, h = 170 * s, 190 * s
+    Lwin, Lscr, Lsign = (56, 50, 62) if dim else (86, 84, 94)
     # the side, receding up-left toward the street's far end
     side = [(fx, fy - h), (fx - 150 * s, fy - h * 0.72), (fx - 150 * s, fy - h * 0.12), (fx, fy)]
     f.poly(side, g(L - 6))
     for i in range(4):
         u0, u1 = 0.08 + i * 0.22, 0.24 + i * 0.22
         p = [bil(side, u0, 0.2), bil(side, u1, 0.2), bil(side, u1, 0.48), bil(side, u0, 0.48)]
-        f.poly(p, g(86, -6))
+        f.poly(p, g(Lwin, -6))
     f.poly([bil(side, 0, 0.62), bil(side, 1, 0.62), bil(side, 1, 0.7), bil(side, 0, 0.7)], g(L + 12))
     # the front: rounded nose, the windscreen lit, the sign above, two headlights
     f.add(f'<path d="M{fx},{fy - h} C{fx + w * 0.2},{fy - h * 1.04} {fx + w * 0.8},{fy - h * 1.04} {fx + w},{fy - h * 0.98} '
           f'L{fx + w * 1.02},{fy - h * 0.08} C{fx + w * 0.7},{fy + h * 0.02} {fx + w * 0.3},{fy + h * 0.02} {fx},{fy}Z" fill="{g(L)}"/>')
-    f.add(f'<path d="M{fx + w * 0.08},{fy - h * 0.84} L{fx + w * 0.92},{fy - h * 0.82} L{fx + w * 0.9},{fy - h * 0.42} L{fx + w * 0.1},{fy - h * 0.44}Z" fill="{g(84, -6)}"/>')
-    f.add(f'<rect x="{fx + w * 0.22}" y="{fy - h * 0.97}" width="{w * 0.56}" height="{h * 0.09}" rx="3" fill="{g(94)}"/>')
+    f.add(f'<path d="M{fx + w * 0.08},{fy - h * 0.84} L{fx + w * 0.92},{fy - h * 0.82} L{fx + w * 0.9},{fy - h * 0.42} L{fx + w * 0.1},{fy - h * 0.44}Z" fill="{g(Lscr, -6)}"/>')
+    f.add(f'<rect x="{fx + w * 0.22}" y="{fy - h * 0.97}" width="{w * 0.56}" height="{h * 0.09}" rx="3" fill="{g(Lsign)}"/>')
     for hx in (0.18, 0.82):
+        if dim:
+            f.circle(fx + w * hx, fy - h * 0.22, 6 * s, g(70))
+            continue
         f.circle(fx + w * hx, fy - h * 0.22, 9 * s, g(98))
         f.add(f'<circle cx="{fx + w * hx}" cy="{fy - h * 0.22}" r="{30 * s}" fill="{g(95)}" opacity="0.35" filter="url(#soft2)"/>')
     # the headlights' light on the snow ahead of it
-    f.add(f'<path d="M{fx + w * 0.1},{fy} L{fx + w * 0.9},{fy} L{fx + w * 1.6},{fy + 160 * s} L{fx - w * 0.4},{fy + 160 * s}Z" fill="{g(80)}" opacity="0.18" filter="url(#soft3)"/>')
+    if not dim:
+        f.add(f'<path d="M{fx + w * 0.1},{fy} L{fx + w * 0.9},{fy} L{fx + w * 1.6},{fy + 160 * s} L{fx - w * 0.4},{fy + 160 * s}Z" fill="{g(80)}" opacity="0.18" filter="url(#soft3)"/>')
     # wheels on the rails, the pantograph up to its wire
     f.rect(fx + w * 0.05, fy - 4, w * 0.9, 10 * s, g(14))
     f.add(f'<path d="M{fx + w * 0.4},{fy - h * 1.02} L{fx + w * 0.55},{fy - h * 1.3} L{fx + w * 0.7},{fy - h * 1.02} M{fx + w * 0.42},{fy - h * 1.3} L{fx + w * 0.7},{fy - h * 1.3}" '
@@ -1378,38 +1678,35 @@ def b11():
     # the street's snow
     street = f.lingrad([(0, g(50), 1), (0.4, g(42), 1), (1, g(22), 1)])
     f.poly([(-60, 1680), (435, 1188), (705, 1188), (1140, 1650), (1140, H), (-60, H)], street)
-    # tram rails up the right side of the street, its wire
-    for x_near, x_far in ((690, 600), (840, 640)):
-        f.add(f'<path d="M{x_near + 120},{H} L{x_far},1192" stroke="{g(30)}" stroke-width="5"/>')
+    # tram rails up the right side of the street (round 2: the tram moved back and aside onto them), its wire
+    for x_near, x_far in ((900, 650), (1060, 690)):
+        f.add(f'<path d="M{x_near},{H} L{x_far},1192" stroke="{g(30)}" stroke-width="5"/>')
     f.add(f'<path d="M{1140},{900} L{650},{1150}" stroke="{g(20)}" stroke-width="2.5" opacity="0.7"/>')
-    # THE WARM WATER UNDER THE STREET: a soft painted cut in the near-left snowbank shows the twin pipes (the warm one
-    # honey); past it the melt line runs up each kerb and turns in at every door the warmth has reached
-    f.add(f'<path d="M-40,1560 C40,1540 120,1500 190,1450 C240,1420 300,1380 330,1360 C340,1380 330,1420 300,1450 '
-          f'C230,1530 130,1640 40,1720 C10,1740 -30,1760 -40,1760Z" fill="{g(10)}" filter="url(#rough)"/>')
-    f.add(f'<path d="M-40,1560 C40,1540 120,1500 190,1450 C240,1420 300,1380 330,1360" stroke="{g(72)}" stroke-width="14" fill="none" filter="url(#rough)"/>')
-    f.add(f'<path d="M-40,1640 C60,1600 180,1520 316,1400" stroke="{HONEY}" stroke-width="30" fill="none" stroke-linecap="round"/>')
-    f.add(f'<path d="M-40,1640 C60,1600 180,1520 316,1400" stroke="{HONEY}" stroke-width="80" fill="none" opacity="0.2" filter="url(#soft3)"/>')
-    f.add(f'<path d="M-40,1700 C70,1660 190,1580 300,1450" stroke="{g(46)}" stroke-width="24" fill="none" stroke-linecap="round"/>')
+    # THE WARM WATER UNDER THE STREET (round 2): no cut, no lit stripe: the snow melted in a line over the pipe up each
+    # kerb, the honey glowing up through it, turning in at every door the warmth has reached; ahead of its front the
+    # snow is still whole, only a faint warmth under it on the way to her door
 
     def kerb(q, u, off):
         mm = homography(q)
         x, y = mm(u, 1.0)
         return (x + off * (1 - u), y + 10 * (1 - u))
 
-    cut_pipe = [(-40, 1640), (60, 1600), (180, 1520), (316, 1400)]
-    for q, doors, sgn, start, us in ((lq, doors_l, 1, cut_pipe, (0.4, 0.44, 0.48)),
-                                     (rq, doors_r, -1, [(1100, 1720)], (0.12, 0.2, 0.28, 0.36, 0.44, 0.48))):
+    for q, doors, sgn, us, steam in ((lq, doors_l, 1, (0.0, 0.08, 0.16, 0.24, 0.32, 0.4, 0.44, 0.48), ((150, 1560, 70), (300, 1420, 44))),
+                                     (rq, doors_r, -1, (0.04, 0.12, 0.2, 0.28, 0.36, 0.44, 0.48), ((960, 1520, 54),))):
         front_u = 0.48
-        pts = start[-1:] + [kerb(q, u, sgn * 46) for u in us]
-        line_pts = start + pts[1:]
-        d = smooth_d(pts)
-        f.add(f'<path d="{d}" stroke="{g(22)}" stroke-width="22" fill="none" stroke-linecap="round" filter="url(#rough)"/>')
-        f.add(f'<path d="{d}" stroke="{HONEY}" stroke-width="7" fill="none" opacity="0.9" stroke-linecap="round" filter="url(#soft1)"/>')
+        pts = [kerb(q, u, sgn * 46) for u in us]
+        if sgn > 0:
+            pts = [(-50, 1736)] + pts
+            ws = [62] + [6 + 52 * (1 - u) ** 1.4 for u in us]
+        else:
+            ws = [6 + 52 * (1 - u) ** 1.4 for u in us]
+        line_pts = pts
+        melt_line(f, pts, ws, seed=1120 + (sgn > 0), steam=steam)
         tip = pts[-1]
-        f.ellipse(tip[0], tip[1], 26, 10, HONEY_CORE, 'opacity="0.8" filter="url(#soft2)"')
-        # ahead of the front, the pipe still under unmelted snow: a faint line to her door
+        f.ellipse(tip[0], tip[1], 24, 9, HONEY_CORE, 'opacity="0.7" filter="url(#soft2)"')
+        # ahead of the front, the pipe still under unmelted snow: only a faint warmth under it on the way to her door
         rest = [kerb(q, u, sgn * 46) for u in (front_u, 0.6, 0.75, 0.9, 1.0)] + [(560 + sgn * 20, 1190)]
-        f.add(f'<path d="{smooth_d(rest)}" stroke="{HONEY}" stroke-width="3" fill="none" opacity="0.18" stroke-dasharray="10 14"/>')
+        f.add(f'<path d="{smooth_d(rest)}" stroke="{HONEY}" stroke-width="14" fill="none" opacity="0.07" filter="url(#soft2)"/>')
         for (k, (tx, ty), kind) in doors:
             if kind != 'warm':
                 continue
@@ -1421,11 +1718,11 @@ def b11():
                     dd = math.hypot(x_ - tx, y_ - ty)
                     if dd < best:
                         best, uu = dd, (x_, y_)
-            f.add(f'<path d="M{uu[0]:.0f},{uu[1]:.0f} L{tx:.0f},{ty:.0f}" stroke="{g(22)}" stroke-width="14" stroke-linecap="round" filter="url(#rough)"/>')
-            f.add(f'<path d="M{uu[0]:.0f},{uu[1]:.0f} L{tx:.0f},{ty:.0f}" stroke="{HONEY}" stroke-width="5" opacity="0.9" stroke-linecap="round"/>')
+            wb = max(5, 20 * (ty - 1150) / 600)
+            melt_line(f, [uu, ((uu[0] + tx) / 2, (uu[1] + ty) / 2 + 2), (tx, ty)], [wb, wb * 0.9, wb * 0.8], seed=int(tx), rim=False)
             f.ellipse(tx, ty, 30, 10, HONEY, 'opacity="0.55" filter="url(#soft2)"')
-    # the tram on its rails on the right, nearer, lit, coming down the street
-    tram(f, 640, 1360, s=1.0, L=40)
+    # the tram (round 2): moved back and aside onto the right-hand rails, its lights low
+    tram(f, 680, 1300, s=0.6, L=40, dim=True)
     # people on the pavements, falling snow
     person(f, 360, 1470, 118, L=10, pose='walk', facing=1, rim=-1)
     f.add(f'<path d="M382,1470 l4,-18 l24,-3 l8,-9 l6,4 l-3,9 l-4,17 l-5,0 l0,-10 l-20,2 l-3,8Z" fill="{g(10)}"/>')
@@ -1439,22 +1736,30 @@ def b11():
 # ------------------------------------------------------------------ B12: your chat, her window
 @frame('B12')
 def b12():
+    """(round 2) the home view stepped in on her block (the same place as B1, nearer): her window the warm box, her
+    in it lifting her cup toward you (B5's toast returned); your phone raised, your message right on it; the pulse
+    leaving from behind your phone along the shore; your bubble, the pulse and her window on one diagonal. The plan's
+    frost-line building let go (it read as a neon gate): the warm run leaves the site behind your phone"""
     f = Frame(1212)
-    home_view(f, wave=1.0, all_warm=True, her_step=True, her_inside=True, resident=False, pulse=True, plan_site=True,
-              dim_city=0.5)
-    # your hand, lower left, gentle: a light knit glove and sleeve cut by the bottom edge, the phone held up; your chat's
-    # bubble, her window and the pulse between them on one diagonal
-    s = 0.74
-    x, y = 132, 1300
-    f.add(f'<path d="M{x - 64},{H + 20} C{x - 58},{y + 500} {x - 38},{y + 390} {x - 22},{y + 316} L{x + 156},{y + 316} '
-          f'C{x + 172},{y + 400} {x + 186},{y + 520} {x + 196},{H + 20}Z" fill="{g(30)}"/>')
+    zs, (zx, zy) = 1.25, (380, 860)  # stepped in; the tower top stays clear of the band (y 610)
+    f.add(f'<g transform="translate({zx},{zy}) scale({zs}) translate({-zx},{-zy})">')
+    home_view(f, wave=1.0, all_warm=True, her_step=True, her_toast=True, resident=False, pulse=True, plan_site=True,
+              plan_drawn=False, pulse_x=388, dim_city=0.5)
+    f.add('</g>')
+    # your hand, lower left: a light knit glove and sleeve cut by the bottom edge, the phone raised; your message on it
+    s = 1.0
+    x, y = 100, 1234
+    sw, sh = 190 * s, 330 * s
+    f.add(f'<path d="M{x - 70},{H + 20} C{x - 60},{y + sh + 330} {x - 40},{y + sh + 220} {x - 26},{y + sh + 140} L{x + sw + 6},{y + sh + 140} '
+          f'C{x + sw + 26},{y + sh + 240} {x + sw + 40},{y + sh + 380} {x + sw + 50},{H + 20}Z" fill="{g(30)}"/>')
     for k in range(4):
-        f.add(f'<path d="M{x - 30 + k * 4},{y + 346 + k * 26} C{x + 40},{y + 336 + k * 26} {x + 110},{y + 338 + k * 26} {x + 168 + k * 4},{y + 350 + k * 26}" '
-              f'stroke="{g(25)}" stroke-width="6" fill="none" opacity="0.6"/>')
-    hand_phone(f, x, y, s=s, L_glove=34)
-    # the bubble glowing: the one honey on your side of the picture
-    f.add(f'<rect x="{x + 10}" y="{y + 110}" width="{190 * s - 10}" height="{70 * s}" rx="26" fill="{HONEY}" opacity="0.55" filter="url(#glow2)"/>')
-    f.add(f'<rect x="{x + 22 * s}" y="{y + 150 * s}" width="{190 * s - 50 * s}" height="{58 * s}" rx="{26 * s}" fill="{HONEY_CORE}" opacity="0.45"/>')
+        yy = y + sh + 176 + k * 32
+        f.add(f'<path d="M{x - 34 + k * 4},{yy} C{x + 50},{yy - 10} {x + 130},{yy - 8} {x + sw + 20 + k * 4},{yy + 6}" '
+              f'stroke="{g(25)}" stroke-width="7" fill="none" opacity="0.6"/>')
+    hand_phone(f, x, y, s=s, L_glove=34, mine_right=True)
+    # your bubble glowing: the one honey on your side of the picture
+    f.add(f'<rect x="{x + sw * 0.3 - 12}" y="{y + sh * 0.52 - 12}" width="{sw * 0.62 + 24}" height="{58 * s + 24}" rx="34" fill="{HONEY}" '
+          f'opacity="0.5" filter="url(#glow2)"/>')
     band(f, ['could soon heat', [('an ', False), ('apartment', True)]], seat=540)
     grain(f)
     return f
@@ -1463,55 +1768,70 @@ def b12():
 # ------------------------------------------------------------------ the alternates
 @frame('B4alt')
 def b4alt():
-    """the seesaw in the snowy courtyard park: one computer balances forty kettles"""
+    """(round 2, reworked from the idea; the seesaw retired) THE MACHINE OF FORTY KITCHENS: the one giant computer
+    stands alone in a snowy little square, and where its rows of lights should be, its whole front is forty tiny lit
+    kitchen windows, a kettle boiling in each, the heat of all forty pouring out of its top as ONE cloud; a neighbour
+    and her dog stop and stare up. The film's own rhyme (the machine's lights in rows like a facade's windows, B2)
+    turned into the joke: one computer holds a whole block's kettles"""
     f = Frame(4041)
-    sky(f, [(0, 14), (0.5, 21), (1, 32)], 0, 1300)
-    cloud(f, 760, 150, 820, 220, 22, 0.9, seed=401)
-    # the courtyard held by blocks on three sides (frosted panes, a few warm)
+    sky(f, [(0, 13), (0.45, 19), (0.8, 26), (1, 31)], 0, 1320)
+    cloud(f, 820, 150, 700, 200, 22, 0.85, seed=401)
+    # the little square held by blocks, their windows frosted and quiet (the cold city around the warm machine)
     rr = random.Random(402)
     FROST.update(glint_p=0.15)
-    block(f, -40, 300, 760, 1300, 6, 4, L=24, states=lambda r_, c: 'warm' if rr.random() < 0.2 else 'frost', chimneys=2, frost_L=42, seed=403)
-    block(f, 300, 780, 860, 1300, 5, 6, L=28, states=lambda r_, c: 'warm' if rr.random() < 0.15 else 'frost', chimneys=3, frost_L=42, seed=404)
-    block(f, 780, 1120, 790, 1300, 6, 4, L=22, states=lambda r_, c: 'warm' if rr.random() < 0.2 else 'frost', chimneys=2, frost_L=42, seed=405)
+    block(f, -40, 300, 820, 1320, 6, 4, L=23, states=lambda r_, c: 'frost', chimneys=2, frost_L=46, seed=403)
+    block(f, 780, 1120, 860, 1320, 5, 4, L=21, states=lambda r_, c: 'frost', chimneys=2, frost_L=46, seed=405)
+    block(f, 300, 780, 900, 1320, 5, 6, L=26, states=lambda r_, c: 'frost', chimneys=3, frost_L=44, seed=404)
     FROST.update(glint_p=0.45)
-    # the courtyard's snow, a slide and a bench under snow
-    yard = f.lingrad([(0, g(52), 1), (0.5, g(40), 1), (1, g(20), 1)])
-    f.rect(0, 1300, W, 620, yard)
-    f.add(f'<path d="M820,1330 L880,1250 L900,1250 L960,1340" stroke="{g(18)}" stroke-width="8" fill="none"/>')
-    f.rect(120, 1330, 140, 14, g(20)); snowcap(f, 118, 262, 1332, th=6, L=74)
-    # the seesaw, level: the computer on the left, forty kettles stacked on the right, the same steam off both
-    f.poly([(510, 1520), (570, 1520), (556, 1440), (524, 1440)], g(14))
-    f.add(f'<path d="M110,1442 L970,1438" stroke="{g(12)}" stroke-width="22" stroke-linecap="round"/>')
-    snowcap(f, 110, 970, 1430, th=6, L=72)
-    computer_cabinet(f, 140, 900, 200, 1428, L=11, seed=6, steam=False)
-    plume(f, [(240, 880), (250, 800), (270, 720), (300, 660)], [110, 150, 190, 210], L=86, op=0.85, seed=406, warm_root=0.45)
-    # forty kettles in a tall teetering heap, big and light, each with its own curl of steam
-    rows = [8, 7, 6, 5, 5, 4, 3, 2]
-    ks = 1.5
+    yard = f.lingrad([(0, g(50), 1), (0.45, g(38), 1), (1, g(18), 1)])
+    f.rect(0, 1320, W, 600, yard)
+    f.rect(980, 1150, 10, 330, g(14))
+    f.ellipse(985, 1146, 26, 10, g(20))
+    f.add(f'<ellipse cx="985" cy="1166" rx="70" ry="40" fill="{g(84)}" opacity="0.22" filter="url(#soft3)"/>')
+    # the ONE giant computer: rounded shoulders, a plinth, vents on top, its warm pool melted in the snow
+    x0, x1, y0, y1 = 262, 818, 800, 1478
+    f.ellipse((x0 + x1) / 2, y1 + 6, 360, 40, g(14), 'opacity="0.85" filter="url(#soft1)"')
+    f.ellipse((x0 + x1) / 2, y1 + 6, 420, 60, HONEY, 'opacity="0.16" filter="url(#soft3)"')
+    f.add(f'<rect x="{x0 - 50}" y="{y0 - 30}" width="{x1 - x0 + 100}" height="{y1 - y0 + 60}" fill="{HONEY}" opacity="0.2" filter="url(#glow2)"/>')
+    f.add(f'<rect x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" rx="34" fill="{g(12)}"/>')
+    f.add(f'<rect x="{x0}" y="{y0}" width="26" height="{y1 - y0}" rx="16" fill="{g(30)}" opacity="0.8"/>')
+    f.rect(x0 - 18, y1 - 26, x1 - x0 + 36, 30, g(8), 'rx="6"')
+    for k in range(6):
+        f.rect(x0 + 60 + k * 76, y0 + 14, 50, 14, g(26), 'rx="4"')
+    # its front: forty tiny kitchen windows (8 floors of 5), each lit warm with a kettle boiling on its sill
+    cols, rows = 5, 8
+    gx0, gx1, gy0, gy1 = x0 + 44, x1 - 34, y0 + 48, y1 - 44
+    pw, ph = (gx1 - gx0) / cols, (gy1 - gy0) / rows
+    kets = ['round', 'jug', 'whistle']
     rk = random.Random(4077)
-    tops = []
-    for i, n in enumerate(rows):
-        y = 1428 - i * 38
-        lean = i * 5 + (6 if i % 2 else -4)
-        for j in range(n):
-            x = 790 + lean - (n - 1) * 44 / 2 + j * 44 + rk.uniform(-4, 4)
-            rot = rk.uniform(-9, 9) * (1 + i * 0.25)
-            f.add(f'<g transform="rotate({rot:.1f} {x:.0f} {y:.0f})">')
-            c, o = g(rk.uniform(64, 76)), g(26)
-            d = f'M{x - 15 * ks},{y} L{x - 12 * ks},{y - 20 * ks} Q{x},{y - 26 * ks} {x + 12 * ks},{y - 20 * ks} L{x + 15 * ks},{y}Z'
-            f.add(f'<path d="{d}" fill="{c}" stroke="{o}" stroke-width="2.4"/>')
-            f.add(f'<path d="M{x + 11 * ks},{y - 12 * ks} L{x + 24 * ks},{y - 22 * ks} L{x + 25 * ks},{y - 19 * ks} L{x + 13 * ks},{y - 7 * ks}Z" fill="{c}" stroke="{o}" stroke-width="2"/>')
-            f.add(f'<path d="M{x - 9 * ks},{y - 22 * ks} Q{x},{y - 34 * ks} {x + 9 * ks},{y - 22 * ks}" stroke="{o}" stroke-width="{2.8 * ks}" fill="none"/>')
-            f.add(f'<path d="M{x - 9 * ks},{y - 15 * ks} L{x - 6 * ks},{y - 4 * ks}" stroke="{g(92)}" stroke-width="3" opacity="0.8"/>')
-            f.add('</g>')
-            tops.append((x + 25 * ks, y - 22 * ks))
-    for (x, y) in tops:
-        curl(f, x, y, h=30, L=95, op=0.85, sw=3.2)
-    plume(f, [(800, 1080), (810, 980), (830, 880), (860, 780), (890, 680)], [150, 170, 190, 210, 220], L=86, op=0.85, seed=407, warm_root=0.45)
-    # a child with a sled stops to look
-    person(f, 1000, 1640, 150, L=9, pose='stand', facing=-1, rim=1)
-    f.add(f'<path d="M930,1640 L1060,1640 Q1072,1640 1070,1628" stroke="{g(12)}" stroke-width="6" fill="none"/>')
-    snowfall(f, 120, sizes=(2, 5), seed=408)
+    for r_ in range(rows):
+        for c in range(cols):
+            wx, wy = gx0 + c * pw + 7, gy0 + r_ * ph + 8
+            ww, wh = pw - 14, ph - 16
+            f.rect(wx - 4, wy - 4, ww + 8, wh + 8, g(6))
+            f.rect(wx, wy, ww, wh, f.radgrad([(0, HONEY_CORE, 1), (0.55, HONEY, 1), (1, AMBER, 1)], cx=rk.uniform(0.35, 0.65), cy=0.3, r=0.8))
+            if rk.random() < 0.3:
+                f.rect(wx, wy, ww * 0.22, wh, g(26), 'opacity="0.7"')
+            kk = kettle2(f, wx + ww * rk.uniform(0.34, 0.5), wy + wh - 3, s=wh / 46, kind=kets[(r_ * cols + c) % 3], L=9)
+            sx, sy = kk
+            curl(f, sx, sy, h=max(10, (sy - wy) * 0.9), L=97, op=0.95, sw=5.5)
+            f.rect(wx - 5, wy + wh + 1, ww + 10, 4, g(70))
+        # a server's cold status lights down the side of each floor
+        for j in range(3):
+            f.rect(gx1 + 8, gy0 + r_ * ph + 14 + j * 14, 7, 5, g(97, -10))
+    # the glass door's frame round the forty, and the thick cable into the snow: a machine, not a building
+    f.add(f'<rect x="{gx0 - 12}" y="{gy0 - 12}" width="{gx1 - gx0 + 24}" height="{gy1 - gy0 + 22}" rx="10" fill="none" stroke="{g(34)}" stroke-width="5"/>')
+    f.add(f'<path d="M{x1 - 60},{y1 - 4} C{x1 + 40},{y1 + 50} {x1 + 120},{y1 + 40} {x1 + 260},{y1 + 110}" stroke="{g(8)}" stroke-width="16" fill="none"/>')
+    # the heat of all forty pouring up out of its top vents as ONE cloud (kept under the band)
+    plume(f, [(540, y0 + 4), (544, y0 - 20), (548, y0 - 42)], [140, 165, 185], L=90, op=0.85, seed=406, warm_root=0.4)
+    steam_cloud(f, 548, 748, 360, 98, seed=7, L=92, op=0.95, warm=0.12)
+    # a neighbour and her pale dog stop and stare up at it
+    person(f, 902, 1478, 168, L=8, pose='stand', facing=-1, rim=1, scarf=True)
+    f.add(f'<path d="M866,1478 l-4,-24 l-30,-6 l-12,-12 l-10,5 l3,13 l8,24 l7,0 l0,-14 l26,2 l5,12Z" fill="{g(66)}" stroke="{g(30)}" stroke-width="2"/>')
+    breath(f, 880, 1326, s=0.8)
+    for k in range(10):
+        f.ellipse(930 + k * 18, 1500 + k * 22, 7, 3.5, g(16), 'opacity="0.7"')
+    snowfall(f, 110, sizes=(2, 5), seed=408)
     band(f, ['as much heat as', [('forty', True), (' kettles,', False)]], seat=540)
     grain(f)
     return f
@@ -1595,8 +1915,11 @@ def b7alt():
 @frame('B9alt')
 def b9alt():
     """the roof lifts: pushed in on her frost drawing, her fingertip lifts the frost roof of the little building she drew
-    like a lid, and we lean in from above onto the hall inside: rows of machines in glittering frost, their lights, a cool
-    glow, the pipe of cool water waiting in the aisle"""
+    like a lid, and we lean in from above onto the hall inside.
+    (round 2) the building given body and a place (walls of frost with her glowing lines at their edges, standing on
+    the shore line she drew, the warm line running off it toward her home) and the inside given depth: we look DOWN
+    into a deep hall, two rows of machines standing along an aisle that runs away from us, the cool pipe waiting on
+    its floor, a cool glow at its far end"""
     f = Frame(9091)
     f.rect(0, 0, W, H, g(20))
     rr = random.Random(9092)
@@ -1606,54 +1929,80 @@ def b9alt():
     f.add(f'<g fill="{HONEY}" filter="url(#soft4)">{bl}</g>')
     frost_field(f, 0, 0, W, H, L=80, op=0.9, density=70, seed=9093, base_op=0.72)
     f.add(f'<rect x="0" y="0" width="{W}" height="{H}" fill="{g(10)}" opacity="0.2" filter="url(#soft4)"/>')
-    # the drawn building, seen three-quarter: front face, side face, and its open top
-    F = [(200, 1230), (690, 1280), (690, 1600), (200, 1560)]
-    S = [(690, 1280), (880, 1100), (880, 1420), (690, 1600)]
-    T = [(200, 1230), (690, 1280), (880, 1100), (390, 1050)]
-    # inside, seen from above: dark, a cool glow, two rows of machines in frost, the pipe of cool water in the aisle
+
+    # the box in an oblique view from above: X right, Y away (up and to the right), Z up
+    O = (226, 1516)
+
+    def P(X, Y, Z):
+        return (O[0] + X + 0.32 * Y, O[1] - 0.62 * Y - 0.55 * Z)
+    BX, BY_, BZ = 560, 520, 300
+    T = [P(0, 0, BZ), P(BX, 0, BZ), P(BX, BY_, BZ), P(0, BY_, BZ)]
+    # her drawn shore line under it, and the warm line running off it toward her home (her plan, as in B8)
+    glow_line(f, wobble([(-20, 1530), (180, 1524), (420, 1532), (700, 1526), (1100, 1534)], amp=3, seed=9301, step=18), 12)
+    glow_line(f, wobble([P(BX, 60, 0), (900, 1440), (990, 1380), (1100, 1300)], amp=3, seed=9302, step=18), 16)
+    # INSIDE, seen down through the open top (clipped to the opening)
     cid = f.uid('top')
     f.defs.append(f'<clipPath id="{cid}"><polygon points="{" ".join(f"{x:.0f},{y:.0f}" for x, y in T)}"/></clipPath>')
     f.add(f'<g clip-path="url(#{cid})">')
-    f.poly(T, g(9))
-    c = bil(T, 0.5, 0.55)
-    f.add(f'<ellipse cx="{c[0]:.0f}" cy="{c[1]:.0f}" rx="230" ry="90" fill="{g(66, -10)}" opacity="0.5" filter="url(#soft4)"/>')
-    for (s0, s1) in ((0.08, 0.38), (0.62, 0.92)):
-        for i in range(4):
-            t0, t1 = 0.06 + 0.23 * i, 0.22 + 0.23 * i
-            q = [bil(T, s0, t0), bil(T, s1, t0), bil(T, s1, t1), bil(T, s0, t1)]
-            frost_stroke(f, q + [q[0]], w=max(2.0, 5 - 2.5 * i / 3), seed=9100 + i * 7 + int(s0 * 100), op=0.95, feathers=i < 2,
-                         glints=1 if i == 0 else 0, glow=True)
-            for j in range(3):
-                for kk in range(2):
-                    x, y = bil(T, s0 + (s1 - s0) * (0.3 + 0.4 * kk), t0 + (t1 - t0) * (0.25 + 0.25 * j))
-                    f.circle(x, y, 3.2 - i * 0.5, g(95, -8), 'opacity="0.9"')
-    pa, pb = bil(T, 0.5, -0.02), bil(T, 0.5, 1.02)
-    f.add(f'<path d="M{pa[0]:.0f},{pa[1]:.0f} L{pb[0]:.0f},{pb[1]:.0f}" stroke="{g(72, -12)}" stroke-width="16" stroke-linecap="round"/>')
-    f.add(f'<path d="M{pa[0]:.0f},{pa[1] - 4:.0f} L{pb[0]:.0f},{pb[1] - 4:.0f}" stroke="{g(90, -8)}" stroke-width="4" opacity="0.8"/>')
+    f.poly([P(0, 0, 0), P(BX, 0, 0), P(BX, BY_, 0), P(0, BY_, 0)], g(13))
+    f.poly([P(0, BY_, 0), P(BX, BY_, 0), P(BX, BY_, BZ), P(0, BY_, BZ)], g(22))
+    f.poly([P(0, 0, 0), P(0, BY_, 0), P(0, BY_, BZ), P(0, 0, BZ)], g(30))
+    c = P(BX * 0.5, BY_ - 4, BZ * 0.35)
+    f.ellipse(c[0], c[1], 200, 90, g(74, -10), 'opacity="0.55" filter="url(#soft4)"')
+    f.ellipse(c[0], c[1], 60, 30, g(92, -8), 'opacity="0.7" filter="url(#soft3)"')
+    # the cool pipe waiting on the aisle's floor, running away to the glow
+    pa, pb = P(280, 0, 0), P(280, BY_, 0)
+    f.add(f'<path d="M{pa[0] - 13:.0f},{pa[1]:.0f} L{pb[0] - 7:.0f},{pb[1]:.0f} L{pb[0] + 7:.0f},{pb[1]:.0f} L{pa[0] + 13:.0f},{pa[1]:.0f}Z" fill="{COOL}"/>')
+    f.add(f'<path d="M{pa[0] - 5:.0f},{pa[1]:.0f} L{pb[0] - 2:.0f},{pb[1]:.0f}" stroke="{g(92, -8)}" stroke-width="3" opacity="0.8"/>')
+    # two rows of machines standing along the aisle, far ones first: tops catching the light, fronts with cold lights
+    for Y0 in (410, 250, 90):
+        Y1 = Y0 + 70
+        for (X0, X1) in ((40, 190), (370, 520)):
+            Z1 = 170
+            top = [P(X0, Y0, Z1), P(X1, Y0, Z1), P(X1, Y1, Z1), P(X0, Y1, Z1)]
+            front = [P(X0, Y0, 0), P(X1, Y0, 0), P(X1, Y0, Z1), P(X0, Y0, Z1)]
+            side = [P(X1, Y0, 0), P(X1, Y1, 0), P(X1, Y1, Z1), P(X1, Y0, Z1)]
+            f.poly(side, g(16))
+            f.poly(front, g(32))
+            f.poly(top, g(50))
+            for j in range(5):
+                for k in range(4):
+                    x, y = P(X0 + 22 + k * 32, Y0, Z1 * (0.18 + 0.16 * j))
+                    f.circle(x, y, 3.2, g(97, -9), 'opacity="0.95"')
+            frost_stroke(f, top + [top[0]], w=2.4, seed=9400 + Y0 + X0, L=92, op=0.85, feathers=False, glints=0, glow=False)
+            frost_stroke(f, [front[0], front[3], front[2], front[1]], w=2.0, seed=9500 + Y0 + X0, L=90, op=0.7, feathers=False, glints=0, glow=False)
     f.add('</g>')
-    # the walls she drew: cleared lines with the warm night glowing through them; a door on the front
-    glow_line(f, wobble([F[3], F[0], F[1], F[2], F[3]], amp=3, seed=9201, step=18), 22)
-    glow_line(f, wobble([S[0], S[1], S[2], S[3]], amp=3, seed=9202, step=18), 18)
-    glow_line(f, wobble([T[3], T[2]], amp=3, seed=9203, step=18), 14)
-    glow_line(f, wobble([T[0], T[3]], amp=3, seed=9204, step=18), 14)
-    glow_line(f, wobble([(400, 1578), (402, 1462), (480, 1468), (482, 1584)], amp=2.5, seed=9205, step=16), 16)
-    # the roof: a sheet of frost hinged at the back, lifted toward us like a lid, its edge catching the warm light
-    R = [(390, 1050), (880, 1100), (830, 740), (340, 700)]
-    f.poly(R, f.lingrad([(0, g(70), 1), (1, g(88), 1)]))
+    # the walls she drew, with body: frost slabs (the front lit by the candle below, the side in shade), the wall tops'
+    # thickness round the opening, her cleared lines glowing honey along every edge, the door
+    front_w = [P(0, 0, 0), P(BX, 0, 0), P(BX, 0, BZ), P(0, 0, BZ)]
+    side_w = [P(BX, 0, 0), P(BX, BY_, 0), P(BX, BY_, BZ), P(BX, 0, BZ)]
+    frost_solid(f, side_w, L=56, seed=9601, ferns=6, warm=0.12)
+    frost_solid(f, front_w, L=70, seed=9602, ferns=10, warm=0.18)
+    rim = [P(-8, -12, BZ), P(BX + 8, -12, BZ), P(BX + 8, BY_ + 8, BZ), P(-8, BY_ + 8, BZ)]
+    f.add(f'<polygon points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in rim + [rim[0]] + T[::-1])}" fill="{g(84)}" fill-rule="evenodd" opacity="0.9"/>')
+    glow_line(f, wobble([front_w[3], front_w[0], front_w[1], front_w[2], front_w[3]], amp=3, seed=9201, step=18), 20)
+    glow_line(f, wobble([side_w[0], side_w[1], side_w[2], side_w[3]], amp=3, seed=9202, step=18), 16)
+    glow_line(f, wobble([T[3], T[2]], amp=3, seed=9203, step=18), 12)
+    glow_line(f, wobble([T[0], T[3]], amp=3, seed=9204, step=18), 12)
+    d0, d1 = P(230, 0, 0), P(330, 0, 150)
+    glow_line(f, wobble([d0, (d0[0], d1[1]), (d1[0], d1[1]), (d1[0], d0[1])], amp=2.5, seed=9205, step=16), 15)
+    # the roof: a sheet of frost hinged at the back, lifted up like a lid, its underside toward us, its edge catching
+    # the warm light; her fingertip under its edge
+    R = [P(0, BY_, BZ), P(BX, BY_, BZ), P(BX, BY_ + 45, BZ + 518), P(0, BY_ + 45, BZ + 518)]
+    f.poly(R, f.lingrad([(0, g(70), 1), (1, g(86), 1)], x1=0, y1=1, x2=0, y2=0))
     rc = f.uid('roof')
     f.defs.append(f'<clipPath id="{rc}"><polygon points="{" ".join(f"{x:.0f},{y:.0f}" for x, y in R)}"/></clipPath>')
     f.add(f'<g clip-path="url(#{rc})">')
     for k in range(8):
-        x, y = bil(R, 0.06 + k * 0.125, 0.03)
+        x, y = bil([R[3], R[2], R[1], R[0]], 0.06 + k * 0.125, 0.97)
         frost_fern(f, x, y, -1.57 + rr.uniform(-0.5, 0.5), 170, depth=3, L=99, op=0.55, sw=2.4, seed=9300 + k)
     for k in range(5):
         x, y = bil(R, rr.uniform(0.1, 0.9), rr.uniform(0.1, 0.9))
         glint(f, x, y, rr.uniform(10, 18))
     f.add('</g>')
-    f.add(f'<path d="M340,700 L830,740" stroke="{HONEY}" stroke-width="10" opacity="0.8" filter="url(#soft1)"/>')
-    f.add(f'<path d="M340,700 L830,740" stroke="{HONEY_CORE}" stroke-width="3"/>')
-    # her fingertip under the lid's edge, lifting it
-    knit_hand(f, (770, 760), reach=1.0, rot=-18)
+    glow_line(f, wobble([R[3], R[2]], amp=2.5, seed=9206, step=16), 12)
+    glow_line(f, wobble([R[0], R[1]], amp=2.5, seed=9207, step=16), 10)
+    knit_hand(f, (R[2][0] - 70, R[2][1] + 8), reach=1.0, rot=-18)
     band(f, ['So how would', 'that work?'], seat=540, L=86)
     grain(f, 0.07)
     return f

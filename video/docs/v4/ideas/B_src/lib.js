@@ -745,3 +745,664 @@ function flakeMove(x, y, r, len, dir, op = 0.9, sway = 0) {
   const tail = [[x + sway * 0.5, y - dir * len * 0.5], [x + sway, y - dir * len]];
   return S(smoothD([[x, y]].concat(tail), false), '#f6f7f9', r * 1.7, `opacity="${f1(op * 0.3)}" filter="url(#b2)"`) + ell(x, y, r, r * 1.05, '#fbfcfd', `opacity="${f1(op)}" filter="url(#b1)"`);
 }
+
+// ======================================================================================
+// ROUND 1, part 2 (new functions only; nothing above changes, so the frames judged THERE redraw exactly as they were)
+// ======================================================================================
+
+// an organic tapered limb through pts (screen space), widths ws at each point, round ends
+function limb(pts, ws, fill, ex = '') {
+  const n = pts.length, L = [], R = [];
+  for (let i = 0; i < n; i++) {
+    const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)];
+    let nx = -(b[1] - a[1]), ny = b[0] - a[0]; const ln = Math.hypot(nx, ny) || 1; nx /= ln; ny /= ln;
+    L.push([pts[i][0] + nx * ws[i] / 2, pts[i][1] + ny * ws[i] / 2]);
+    R.push([pts[i][0] - nx * ws[i] / 2, pts[i][1] - ny * ws[i] / 2]);
+  }
+  const cap = (p, q, w) => { const dx = p[0] - q[0], dy = p[1] - q[1], l = Math.hypot(dx, dy) || 1; return [p[0] + dx / l * w * 0.42, p[1] + dy / l * w * 0.42]; };
+  const c0 = cap(pts[0], pts[1], ws[0]), cn = cap(pts[n - 1], pts[n - 2], ws[n - 1]);
+  return P(smoothD([c0].concat(L, [cn], R.reverse()), true, 0.85), fill, ex);
+}
+// a joint chain from a root: angles in degrees from straight down, turning toward sd (+1 = toward +x)
+function chain(root, segs, sd = 1) {
+  const pts = [root]; let a = 0, p = root;
+  for (const [ang, len] of segs) { a += ang; const r = a * Math.PI / 180; p = [p[0] + sd * Math.sin(r) * len, p[1] + Math.cos(r) * len]; pts.push(p); }
+  return pts;
+}
+// a mitten / small hand at the end of a forearm (from e to w), length l
+function mitt(e, w, l, fill, ex = '') {
+  const dx = w[0] - e[0], dy = w[1] - e[1], ln = Math.hypot(dx, dy) || 1, ux = dx / ln, uy = dy / ln;
+  const c = [w[0] + ux * l * 0.42, w[1] + uy * l * 0.42];
+  const ang = Math.atan2(uy, ux) * 180 / Math.PI;
+  return `<g transform="rotate(${f1(ang)} ${f1(c[0])} ${f1(c[1])})">` + P(smoothD([[c[0] - l * 0.5, c[1] - l * 0.24], [c[0] + l * 0.2, c[1] - l * 0.3], [c[0] + l * 0.5, c[1] - l * 0.06], [c[0] + l * 0.42, c[1] + l * 0.22], [c[0] - l * 0.1, c[1] + l * 0.3], [c[0] - l * 0.5, c[1] + l * 0.2]], true), fill, ex) + '</g>';
+}
+
+// HER (and the cast), a value-sketch figure with a designed silhouette: ~7.5 heads, a long A-line coat, a scarf, a bob
+// with weight, tapered arms, mittens or hands. (x, y) = between the feet; h = height in px.
+// view: 'back' | 'front' | 'side' (side faces dir). arms: [[upper, fore], [upper, fore]] in degrees from hanging
+// (+ = outward for back/front, forward for side); arms[0] is her left on screen in back/front views.
+// o.step: [l, r] foot offsets in units; o.lean (deg, + = toward dir); o.hold: {0|1: 'mug' | 'beanie'}; o.open: coat open
+// (front); o.lift: hair lifting 0..1; o.rim: the rim colour (one side, head and shoulder only); o.face: front/side face marks
+function her(x, y, h, o = {}) {
+  const {view = 'back', dir = 1, coat = V[2], coatL = V[3], knit = V[9], hair = V[1], hairL = V[3], skin = V[8],
+    boot = V[0], leg = V[1], scarf = V[8], rim = null, open = false, lift = 0, lean = 0, hold = {}, face = true,
+    mittCol = null, mugBand = V[12]} = o;
+  const arms = o.arms || [[8, 6], [8, 6]], step = o.step || [3, 3];
+  const u = h / 100, side = view === 'side';
+  const sx = (v) => x + v * u * (side ? dir : 1), Y = (v) => y - v * u;
+  let back = '', body = '', front = '', top = '';
+  // legs below the hem, boots
+  if (side) {
+    for (const [k, fx] of [[0, -step[0]], [1, step[1]]]) {
+      const col = k === 0 ? V[0] : leg;
+      body += limb([[sx(0.5 + fx * 0.25), Y(30)], [sx(fx * 0.7 + 0.5), Y(14)], [sx(fx), Y(3)]], [5.6 * u, 4.6 * u, 3.8 * u], col);
+      body += P(smoothD([[sx(fx - 2.4), Y(4.6)], [sx(fx + 2), Y(4.8)], [sx(fx + 6), Y(1.8)], [sx(fx + 6.2), Y(0)], [sx(fx - 2.6), Y(0)]], true), boot);
+    }
+  } else {
+    for (const sd of [-1, 1]) {
+      const fx = sd * (sd < 0 ? step[0] : step[1]);
+      body += limb([[x + sd * 3.4 * u, Y(30)], [x + (fx * 0.6 + sd * 1.4) * u, Y(14)], [x + fx * u, Y(3.4)]], [6 * u, 4.8 * u, 4 * u], leg);
+      body += P(smoothD([[x + (fx - 3) * u, Y(4.4)], [x + (fx + 3) * u, Y(4.4)], [x + (fx + 3.4) * u, Y(0)], [x + (fx - 3.4) * u, Y(0)]], true), boot);
+    }
+  }
+  // the coat: shoulders, a soft waist, an A-line to below the knee (the hem the one flowing line)
+  const coatPts = side ?
+    [[-4.6, 82.5], [-6.4, 78], [-6.6, 66], [-6, 55], [-7.6, 40], [-9.6, 26], [0, 24.6], [9, 25.6], [7.2, 40], [6.6, 54], [7.4, 66], [6.4, 79], [3.4, 82.8], [0, 83.6]] :
+    [[-6, 83], [-11, 81.4], [-11.6, 74], [-9.8, 62], [-9.4, 52], [-11.8, 38], [-13.6, 26], [-6, 24.6], [0, 24.2], [6, 24.6], [13.6, 26], [11.8, 38], [9.4, 52], [9.8, 62], [11.6, 74], [11, 81.4], [6, 83], [0, 83.8]];
+  body += P(smoothD(coatPts.map(([a, b]) => [sx(a), Y(b)]), true), coat);
+  if (!side) body += P(smoothD([[sx(4), Y(82)], [sx(10.6), Y(80.6)], [sx(11.2), Y(74)], [sx(9.4), Y(62)], [sx(9), Y(52)], [sx(11.4), Y(38)], [sx(13), Y(26.4)], [sx(9.4), Y(25.6)], [sx(8), Y(40)], [sx(6.6), Y(60)], [sx(6), Y(76)]], true), coatL, 'opacity="0.55"');
+  else body += P(smoothD([[sx(1), Y(82)], [sx(6), Y(78)], [sx(6.8), Y(66)], [sx(6), Y(54)], [sx(6.8), Y(40)], [sx(8.4), Y(26)], [sx(5.4), Y(25.6)], [sx(4.4), Y(40)], [sx(3.6), Y(60)], [sx(2.6), Y(78)]], true), coatL, 'opacity="0.5"');
+  if (open && view === 'front') {
+    body += P(smoothD([[sx(-3.6), Y(80)], [sx(3.6), Y(80)], [sx(4.4), Y(50)], [sx(5.4), Y(26)], [sx(-5.4), Y(26)], [sx(-4.4), Y(50)]], true), knit);
+    body += P(polyD([[sx(-3.8), Y(80.4)], [sx(-7.4), Y(78)], [sx(-4.6), Y(64)]], 0.2), coatL) + P(polyD([[sx(3.8), Y(80.4)], [sx(7.4), Y(78)], [sx(4.6), Y(64)]], 0.2), coatL);
+  }
+  // the arms (tapered sleeves, mittens or hands); the far arm in a side view goes behind the body
+  const L1 = 17.5 * u, L2 = 16 * u;
+  const armSvg = (i) => {
+    const [a1, a2] = arms[i];
+    const sd = side ? dir : (i === 0 ? -1 : 1);
+    const S0 = side ? [sx(i === 0 ? -1.2 : 0.6), Y(79)] : [x + sd * 9.6 * u, Y(79.2)];
+    const q = chain(S0, [[a1, L1], [a2, L2]], sd);
+    let g = limb(q, [6.4 * u, 5 * u, 4.2 * u], side && i === 0 ? V[0] : coat);
+    g += S(smoothD([q[0], q[1]], false), coatL, 1.6 * u, 'opacity="0.3"');
+    const mc = mittCol || (side && i === 0 ? V[1] : skin);
+    g += mitt(q[1], q[2], 6.2 * u, mc);
+    const it = hold[i];
+    const hx = q[2][0] + (q[2][0] - q[1][0]) / L2 * 4 * u, hy = q[2][1] + (q[2][1] - q[1][1]) / L2 * 4 * u;
+    if (it === 'beanie') {
+      // the knit hat hanging from her fingers: floppy, a fold of rib at its rim, the pompom swinging below
+      const bx = hx, by = hy + 1 * u, hc = o.hatCol || V[6];
+      g += P(smoothD([[bx - 3.4 * u, by], [bx - 4.6 * u, by + 4.4 * u], [bx - 3.6 * u, by + 9 * u], [bx + 0.6 * u, by + 10.6 * u], [bx + 4.2 * u, by + 8 * u], [bx + 4.4 * u, by + 2.6 * u], [bx + 2.4 * u, by - 0.6 * u]], true), hc);
+      g += P(smoothD([[bx - 3.6 * u, by + 0.4 * u], [bx + 3.6 * u, by - 0.4 * u], [bx + 4 * u, by + 2.4 * u], [bx - 3.8 * u, by + 3 * u]], true), V[8]);
+      g += ell(bx + 1.6 * u, by + 12.4 * u, 2.6 * u, 2.4 * u, V[10]);
+    } else if (it === 'mug') {
+      g += herMug(hx, hy - 2 * u, 6.4 * u, {band: mugBand, dir: sd, steamH: o.steamH || 28});
+    }
+    return g;
+  };
+  if (side) back += armSvg(0); else if (view === 'back') { front += armSvg(0) + armSvg(1); } else { front += armSvg(0) + armSvg(1); }
+  if (side) front += armSvg(1);
+  // the scarf: a soft knot at the neck, one end hanging
+  const scarfSvg = side ?
+    P(smoothD([[sx(-4.6), Y(80.6)], [sx(4.4), Y(81)], [sx(4.8), Y(86)], [sx(-4.2), Y(86.4)]], true), scarf) + P(smoothD([[sx(-3.4), Y(81)], [sx(-6.4), Y(72)], [sx(-4.4), Y(71)], [sx(-1.6), Y(80)]], true), scarf) :
+    P(smoothD([[sx(-6), Y(80.4)], [sx(6), Y(80.4)], [sx(6.4), Y(86)], [sx(-6.4), Y(86)]], true), scarf) + P(smoothD([[sx(1.6), Y(81)], [sx(4.4), Y(71)], [sx(7), Y(71.6)], [sx(4.6), Y(81)]], true), scarf);
+  // the head, the neck, the face, the bob (it has weight: a mass wider than the head, the ends turning out when it lifts)
+  let hd = '';
+  const hc = side ? [sx(1.2), Y(91.6)] : [x, Y(91.6)];
+  hd += limb([[hc[0], Y(84)], [hc[0], Y(88)]], [4.2 * u, 4 * u], skin);
+  if (side) {
+    hd += P(smoothD([[sx(-3.4), Y(96)], [sx(0.6), Y(98.4)], [sx(4.4), Y(97)], [sx(5.8), Y(93.4)], [sx(6.2), Y(91.4)], [sx(7.3), Y(90.2)], [sx(6.2), Y(89.2)], [sx(6.3), Y(87.8)], [sx(5.4), Y(86.6)], [sx(4.4), Y(85.2)], [sx(1.6), Y(85)], [sx(-2.6), Y(86.6)]], true), skin);
+    if (face) hd += ell(sx(4.2), Y(92.2), 0.62 * u, 0.74 * u, V[0]) + S(lineD([[sx(3.6), Y(93.6)], [sx(5), Y(93.9)]]), V[2], 0.5 * u, 'opacity="0.6"');
+    hd += P(smoothD([[sx(-5.8), Y(86 + lift * 2)], [sx(-7.6 - lift * 2.4), Y(88.4 + lift * 3.2)], [sx(-7), Y(94)], [sx(-4.4), Y(98.8)], [sx(0.4), Y(100.2)], [sx(4.6), Y(98.8)], [sx(6.4), Y(95.8)], [sx(4.8), Y(94.6)], [sx(2.4), Y(95)], [sx(1), Y(92.6)], [sx(0), Y(88)], [sx(-1.6), Y(85.6)], [sx(-3.6), Y(85.2 + lift)]], true), hair);
+    hd += P(smoothD([[sx(-3), Y(98.8)], [sx(1.6), Y(99.6)], [sx(4.4), Y(98.2)], [sx(1.4), Y(98)]], true), hairL, 'opacity="0.6"');
+  } else {
+    hd += P(smoothD([[x - 5.2 * u, Y(93)], [x - 4.8 * u, Y(97.4)], [x, Y(99)], [x + 4.8 * u, Y(97.4)], [x + 5.2 * u, Y(93)], [x + 4.6 * u, Y(88)], [x + 2.6 * u, Y(85.2)], [x, Y(84.6)], [x - 2.6 * u, Y(85.2)], [x - 4.6 * u, Y(88)]], true), skin);
+    if (view === 'back') {
+      hd += P(smoothD([[x - 6.4 * u, Y(85.6 + lift * 1.6)], [x - (7.8 + lift * 2.6) * u, Y(88 + lift * 3.4)], [x - 7.4 * u, Y(94)], [x - 5 * u, Y(99.2)], [x, Y(100.6)], [x + 5 * u, Y(99.2)], [x + 7.4 * u, Y(94)], [x + (7.8 + lift * 2.6) * u, Y(88 + lift * 3.4)], [x + 6.4 * u, Y(85.6 + lift * 1.6)], [x + 3, Y(85.2)], [x, Y(85.8)], [x - 3, Y(85.2)]], true), hair);
+      hd += P(smoothD([[x - 4.6 * u, Y(97.6)], [x - 1 * u, Y(99.6)], [x + 3 * u, Y(98.6)], [x - 0.6 * u, Y(97.6)]], true), hairL, 'opacity="0.55"');
+    } else {
+      if (face) {
+        const lk = o.look || 0;
+        hd += ell(x + (lk - 1.9) * u, Y(92.4), 0.6 * u, 0.7 * u, V[0]) + ell(x + (lk + 1.9) * u, Y(92.4), 0.6 * u, 0.7 * u, V[0]);
+        hd += S(smoothD([[x + (lk - 1.3) * u, Y(88.2)], [x + lk * u, Y(87.6 - (o.smile || 0) * 0.6)], [x + (lk + 1.3) * u, Y(88.2)]], false), V[3], 0.55 * u, 'opacity="0.7"');
+        hd += ell(x + (lk - 3) * u, Y(90.4), 1.1 * u, 0.6 * u, C.honey, 'opacity="0.18"') + ell(x + (lk + 3) * u, Y(90.4), 1.1 * u, 0.6 * u, C.honey, 'opacity="0.18"');
+      }
+      // the cap of the bob and its fringe, the two side curtains to the jaw (their ends flick out and up when it lifts)
+      hd += P(smoothD([[x - 6 * u, Y(91)], [x - 5.6 * u, Y(97)], [x - 2.6 * u, Y(100.4)], [x + 1.6 * u, Y(100.6)], [x + 5.4 * u, Y(98.6)], [x + 6.2 * u, Y(92)], [x + 4.6 * u, Y(95.2)], [x + 1.6 * u, Y(96)], [x - 1.6 * u, Y(95.6)], [x - 4.4 * u, Y(94.6)]], true), hair);
+      for (const sd of [-1, 1]) hd += P(smoothD([[x + sd * 6.2 * u, Y(94)], [x + sd * 4.9 * u, Y(93.4)], [x + sd * 4.8 * u, Y(88.4)], [x + sd * 5.2 * u, Y(85.2 + lift * 2)], [x + sd * (7.2 + lift * 3) * u, Y(85.4 + lift * 4)], [x + sd * (7.6 + lift * 1.6) * u, Y(89 + lift * 1.4)]], true), hair);
+    }
+  }
+  // the rim: the story light on one side only (the hair's edge and the shoulder's top)
+  let rm = '';
+  if (rim) {
+    const rs = o.rimSide || dir;
+    if (side) rm += S(smoothD([[sx(-4.4), Y(98.6)], [sx(0.4), Y(100)], [sx(4.4), Y(98.6)]], false), rim, 0.9 * u, 'opacity="0.85"');
+    else rm += S(smoothD([[x + rs * 5 * u, Y(99)], [x + rs * 7.2 * u, Y(94.4)], [x + rs * (7.6 + lift * 2.4) * u, Y(88.4 + lift * 3)]], false), rim, 0.9 * u, 'opacity="0.85"') + S(smoothD([[x + rs * 6.4 * u, Y(82.6)], [x + rs * 10.6 * u, Y(81.2)], [x + rs * 11.6 * u, Y(76)]], false), rim, 0.8 * u, 'opacity="0.65"');
+  }
+  const out = back + body + scarfSvg + (view === 'back' ? hd + front : hd + front) + rm;
+  return lean ? G(out, `transform="rotate(${f1(lean * (side ? dir : 1))} ${f1(x)} ${f1(y)})"`) : G(out);
+}
+
+// her mug (it comes back in her window at the end): dark, a pale band, warm tea, the tag on its string, a curl of steam.
+// (x, y) = the mug's centre; w = its width in px; o.dir = the handle's side
+function herMug(x, y, w, o = {}) {
+  const {band = V[12], dir = 1, steamOn = true, steamH = 30, body = V[0], tag = true, glow = 0} = o;
+  const h = w * 1.08;
+  let g = '';
+  if (glow) g += ell(x, y - h * 0.5, w * 0.9, w * 0.32, C.honeyL, `opacity="${f1(0.5 * glow)}" filter="url(#b8)"`);
+  g += S(smoothD([[x + dir * w * 0.44, y - h * 0.26], [x + dir * w * 0.86, y - h * 0.22], [x + dir * w * 0.84, y + h * 0.16], [x + dir * w * 0.42, y + h * 0.24]], false), body, w * 0.13);
+  g += P(smoothD([[x - w * 0.5, y - h * 0.5], [x + w * 0.5, y - h * 0.5], [x + w * 0.47, y + h * 0.42], [x + w * 0.36, y + h * 0.5], [x - w * 0.36, y + h * 0.5], [x - w * 0.47, y + h * 0.42]], true, 0.4), body);
+  g += P(polyD([[x - w * 0.49, y - h * 0.08], [x + w * 0.49, y - h * 0.08], [x + w * 0.485, y + h * 0.14], [x - w * 0.485, y + h * 0.14]], 0.2), band);
+  g += ell(x, y - h * 0.5, w * 0.5, w * 0.1, V[1]) + ell(x, y - h * 0.49, w * 0.43, w * 0.075, C.honey) + ell(x - w * 0.08, y - h * 0.5, w * 0.22, w * 0.035, C.honeyL, 'opacity="0.8"');
+  if (tag) {
+    const tx = x - dir * w * 0.62;
+    g += S(smoothD([[x - dir * w * 0.3, y - h * 0.5], [x - dir * w * 0.56, y - h * 0.32], [tx, y + h * 0.02]], false), V[11], Math.max(1, w * 0.02));
+    g += P(polyD([[tx - w * 0.09, y], [tx + w * 0.09, y], [tx + w * 0.09, y + w * 0.2], [tx - w * 0.09, y + w * 0.2]], 0.2), '#f2eee2');
+  }
+  if (steamOn) g += steam(x, y - h * 0.62, w * 1.4, w * steamH / 10, {n: 6, warm: true, col: '#f4f5f7', op: 0.85, lean: 0.1 * dir, root: 0.28});
+  return g;
+}
+
+// a person leaning out of an open window over its sill, the body inside, turned toward dir (a 3/4 profile against the
+// warm room, a warm rim on the top edges). (cx, sy) = the sill's centre; s = px per metre (people drawn ~1.15x for the
+// read at phone size). kind: 'mug' (a woman toasting with her mug) | 'point' (an old man in a flat cap, pointing) |
+// 'child' (a beanie with a pompom, both arms out, kneeling on the sill) | 'reach' (a young man, both hands out) |
+// 'mittens' (a woman pegging knitted mittens on a string in the warm air) | 'cat' (a cat on the outer sill, nose up) |
+// 'couple' (two leaning together, one waving)
+function leanOut(kind, cx, sy, s, dir = -1, o = {}) {
+  const k = s * 1.15, body = o.body || V[1], skin = o.skin || V[5], rimC = o.rim || C.honeyL;
+  const X = (m) => cx + dir * m * k, Y = (m) => sy - m * k;   // m forward (toward dir) and up, in metres
+  let g = '', rims = '';
+  const torso = (w0, a, len, wS, col = body) => {
+    // from the waist (at the sill, w0 forward), tilted a degrees toward dir, len long; returns the shoulder point
+    const r = a * Math.PI / 180, W0 = [X(w0), Y(0.02)], S0 = [W0[0] + dir * Math.sin(r) * len * k, W0[1] - Math.cos(r) * len * k];
+    const nx = Math.cos(r), ny = dir * Math.sin(r), hw = 0.17 * k, hs = wS * k / 2;
+    g += P(smoothD([[W0[0] - nx * hw, W0[1] - ny * hw], [W0[0] + nx * hw, W0[1] + ny * hw], [S0[0] + nx * hs * 1.05, S0[1] + ny * hs + 0.03 * k], [S0[0] + nx * hs * 0.6, S0[1] + ny * hs - 0.05 * k], [S0[0] - nx * hs * 0.6, S0[1] - ny * hs - 0.05 * k], [S0[0] - nx * hs, S0[1] - ny * hs + 0.03 * k]], true, 0.8), col);
+    rims += S(smoothD([[S0[0] - nx * hs * 0.9, S0[1] - ny * hs], [S0[0] + dir * 0.05 * k, S0[1] - 0.06 * k], [S0[0] + nx * hs * 0.8 + dir * 0.06 * k, S0[1] + ny * hs - 0.02 * k]], false), rimC, Math.max(1.2, 0.022 * k), 'opacity="0.8"');
+    return S0;
+  };
+  const arm = (Sh, segs, col = body, hand = true, wd = 0.1) => {
+    const q = chain(Sh, segs.map(([a, l]) => [a, l * k]), dir);
+    g += limb(q, [wd * k, wd * 0.8 * k, wd * 0.66 * k], col);
+    if (hand) g += mitt(q[q.length - 2], q[q.length - 1], 0.11 * k, skin);
+    rims += S(smoothD(q, false, 0.6), rimC, Math.max(1, 0.016 * k), 'opacity="0.55" transform="translate(0 -' + f1(0.04 * k) + ')"');
+    return q[q.length - 1];
+  };
+  const head = (c, r, style, hairCol = V[0]) => {
+    g += limb([[c[0] - dir * 0.02 * k, c[1] + r * 0.9], [c[0] - dir * 0.03 * k, c[1] + r * 1.5]], [0.075 * k, 0.07 * k], skin);
+    g += P(smoothD([[c[0] - dir * r * 0.9, c[1] + r * 0.2], [c[0] - dir * r * 0.7, c[1] - r * 0.8], [c[0] + dir * r * 0.2, c[1] - r * 1.02], [c[0] + dir * r * 0.86, c[1] - r * 0.4], [c[0] + dir * r * 1.02, c[1] + r * 0.05], [c[0] + dir * r * 1.24, c[1] + r * 0.22], [c[0] + dir * r * 0.98, c[1] + r * 0.36], [c[0] + dir * r * 0.86, c[1] + r * 0.7], [c[0] + dir * r * 0.3, c[1] + r * 1.0], [c[0] - dir * r * 0.5, c[1] + r * 0.8]], true), skin);
+    if (style === 'bun') g += P(smoothD([[c[0] - dir * r * 1.0, c[1] + r * 0.5], [c[0] - dir * r * 1.06, c[1] - r * 0.5], [c[0] - dir * r * 0.3, c[1] - r * 1.08], [c[0] + dir * r * 0.66, c[1] - r * 0.9], [c[0] + dir * r * 0.7, c[1] - r * 0.36], [c[0] + dir * r * 0.1, c[1] - r * 0.4], [c[0] - dir * r * 0.36, c[1] + r * 0.56]], true), hairCol) + ell(c[0] - dir * r * 0.86, c[1] - r * 0.9, r * 0.46, r * 0.44, hairCol);
+    if (style === 'bob') g += P(smoothD([[c[0] - dir * r * 1.08, c[1] + r * 0.98], [c[0] - dir * r * 1.2, c[1] - r * 0.2], [c[0] - dir * r * 0.4, c[1] - r * 1.14], [c[0] + dir * r * 0.66, c[1] - r * 1.04], [c[0] + dir * r * 0.98, c[1] - r * 0.3], [c[0] + dir * r * 0.44, c[1] - r * 0.4], [c[0] + dir * r * 0.06, c[1] + r * 0.2], [c[0] - dir * r * 0.2, c[1] + r * 1.0]], true), hairCol);
+    if (style === 'cap') g += P(smoothD([[c[0] - dir * r * 1.02, c[1] - r * 0.1], [c[0] - dir * r * 0.8, c[1] - r * 0.92], [c[0] + dir * r * 0.4, c[1] - r * 1.1], [c[0] + dir * r * 1.0, c[1] - r * 0.56], [c[0] + dir * r * 1.5, c[1] - r * 0.38], [c[0] + dir * r * 0.9, c[1] - r * 0.22]], true), V[3]) + P(smoothD([[c[0] - dir * r * 0.98, c[1] + r * 0.62], [c[0] - dir * r * 1.04, c[1] - r * 0.04], [c[0] - dir * r * 0.56, c[1] + r * 0.06], [c[0] - dir * r * 0.5, c[1] + r * 0.6]], true), V[12]) + P(smoothD([[c[0] + dir * r * 0.5, c[1] + r * 0.44], [c[0] + dir * r * 1.06, c[1] + r * 0.4], [c[0] + dir * r * 0.94, c[1] + r * 0.58], [c[0] + dir * r * 0.5, c[1] + r * 0.58]], true), V[12]);
+    if (style === 'beanie') g += P(smoothD([[c[0] - r * 1.02, c[1] - r * 0.02], [c[0] - r * 0.92, c[1] - r * 0.86], [c[0], c[1] - r * 1.3], [c[0] + r * 0.92, c[1] - r * 0.86], [c[0] + r * 1.02, c[1] - r * 0.02]], true), o.hat || V[7]) + rect(c[0] - r * 1.04, c[1] - r * 0.26, r * 2.08, r * 0.3, V[10]) + ell(c[0] + dir * r * 0.1, c[1] - r * 1.44, r * 0.36, r * 0.34, V[12]);
+    if (style === 'tousled') g += P(smoothD([[c[0] - dir * r * 1.04, c[1] + r * 0.5], [c[0] - dir * r * 1.2, c[1] - r * 0.5], [c[0] - dir * r * 0.6, c[1] - r * 1.16], [c[0], c[1] - r * 1.34], [c[0] + dir * r * 0.5, c[1] - r * 1.2], [c[0] + dir * r * 1.04, c[1] - r * 0.7], [c[0] + dir * r * 0.5, c[1] - r * 0.5], [c[0] - dir * r * 0.3, c[1] + r * 0.4]], true), hairCol);
+    rims += S(smoothD([[c[0] - dir * r * 0.9, c[1] - r * 0.6], [c[0] - dir * r * 0.2, c[1] - r * 1.08], [c[0] + dir * r * 0.6, c[1] - r * 1.0]], false), rimC, Math.max(1.2, 0.02 * k), 'opacity="0.9"');
+  };
+  const r = 0.115;
+  if (kind === 'mug') {
+    const Sh = torso(0.02, 22, 0.5, 0.36, V[1]);
+    arm([Sh[0] - dir * 0.05 * k, Sh[1] + 0.06 * k], [[25, 0.27], [55, 0.25]], V[1]);                  // the far forearm on the sill
+    const Hd = arm([Sh[0] + dir * 0.04 * k, Sh[1] + 0.05 * k], [[150, 0.27], [-60, 0.25]], V[1], true); // raised: the toast
+    g += herMug(Hd[0] + dir * 0.03 * k, Hd[1] - 0.07 * k, 0.12 * k, {dir: -dir, tag: false, steamH: 26, band: V[12]});
+    head([Sh[0] + dir * 0.09 * k, Sh[1] - 0.19 * k], r * k, 'bun');
+  } else if (kind === 'point') {
+    const Sh = torso(0.0, 34, 0.52, 0.42, V[2]);
+    arm([Sh[0] - dir * 0.06 * k, Sh[1] + 0.07 * k], [[30, 0.27], [70, 0.24]], V[2]);
+    const Hd = arm([Sh[0] + dir * 0.05 * k, Sh[1] + 0.05 * k], [[112, 0.29], [8, 0.27]], V[2], true);
+    g += S(lineD([Hd, [Hd[0] + dir * 0.08 * k, Hd[1] - 0.02 * k]]), skin, 0.03 * k);
+    head([Sh[0] + dir * 0.12 * k, Sh[1] - 0.17 * k], r * k, 'cap');
+  } else if (kind === 'child') {
+    const Sh = torso(0.06, 14, 0.36, 0.28, V[3]);
+    arm([Sh[0] - dir * 0.03 * k, Sh[1] + 0.04 * k], [[118, 0.2], [10, 0.18]], V[3], true, 0.085);
+    arm([Sh[0] + dir * 0.03 * k, Sh[1] + 0.04 * k], [[132, 0.2], [6, 0.18]], V[3], true, 0.085);
+    head([Sh[0] + dir * 0.05 * k, Sh[1] - 0.16 * k], r * 0.92 * k, 'beanie');
+  } else if (kind === 'reach') {
+    const Sh = torso(0.04, 30, 0.54, 0.44, V[1]);
+    arm([Sh[0] - dir * 0.04 * k, Sh[1] + 0.06 * k], [[96, 0.29], [14, 0.27]], V[1]);
+    arm([Sh[0] + dir * 0.06 * k, Sh[1] + 0.05 * k], [[118, 0.29], [10, 0.27]], V[1]);
+    head([Sh[0] + dir * 0.12 * k, Sh[1] - 0.18 * k], r * k, 'tousled');
+  } else if (kind === 'mittens') {
+    // a string from the casement's tip out to a hook, two knitted mittens pegged on it in the warm air, her hand on one
+    const a = [o.wx - dir * 0.05 * k, o.wy + 0.12 * k], b = [o.wx + dir * 0.95 * k, o.wy + 0.16 * k];
+    g += S(smoothD([a, [(a[0] + b[0]) / 2, a[1] + 0.12 * k], b], false), V[1], Math.max(1, 0.01 * k));
+    const mit = (mx, my, rot, col) => G(P(smoothD([[mx - 0.05 * k, my], [mx - 0.06 * k, my + 0.11 * k], [mx - 0.03 * k, my + 0.19 * k], [mx + 0.04 * k, my + 0.19 * k], [mx + 0.06 * k, my + 0.1 * k], [mx + 0.09 * k, my + 0.07 * k], [mx + 0.085 * k, my + 0.04 * k], [mx + 0.05 * k, my + 0.05 * k], [mx + 0.05 * k, my]], true), col) + rect(mx - 0.055 * k, my - 0.01 * k, 0.11 * k, 0.04 * k, V[13]) + S(lineD([[mx - 0.045 * k, my + 0.09 * k], [mx + 0.045 * k, my + 0.09 * k]]), V[13], 0.012 * k, 'opacity="0.8"'), `transform="rotate(${rot} ${f1(mx)} ${f1(my)})"`);
+    g += mit(lerp(a[0], b[0], 0.45), lerp(a[1], b[1], 0.45) + 0.08 * k, 6, V[11]) + mit(lerp(a[0], b[0], 0.78), lerp(a[1], b[1], 0.78) + 0.07 * k, -5, V[10]);
+    const Sh = torso(0.0, 18, 0.5, 0.36, V[2]);
+    arm([Sh[0] - dir * 0.05 * k, Sh[1] + 0.06 * k], [[30, 0.27], [60, 0.24]], V[2]);
+    arm([Sh[0] + dir * 0.04 * k, Sh[1] + 0.05 * k], [[128, 0.28], [-6, 0.27]], V[2]);
+    head([Sh[0] + dir * 0.08 * k, Sh[1] - 0.18 * k], r * k, 'bob');
+  } else if (kind === 'cat') {
+    const c0 = [X(o.catAt || 0.3), sy - 0.01 * k];
+    g += P(smoothD([[c0[0] - 0.1 * k, c0[1]], [c0[0] - 0.11 * k, c0[1] - 0.13 * k], [c0[0] - 0.05 * k, c0[1] - 0.23 * k], [c0[0] + 0.02 * k, c0[1] - 0.24 * k], [c0[0] + 0.07 * k, c0[1] - 0.14 * k], [c0[0] + 0.1 * k, c0[1]]], true), V[0]);
+    const hc = [c0[0] + dir * 0.03 * k, c0[1] - 0.29 * k];
+    g += ell(hc[0], hc[1], 0.072 * k, 0.062 * k, V[0]);
+    g += P(polyD([[hc[0] - 0.062 * k, hc[1] - 0.02 * k], [hc[0] - 0.05 * k, hc[1] - 0.11 * k], [hc[0] - 0.012 * k, hc[1] - 0.05 * k]], 0.1), V[0]) + P(polyD([[hc[0] + 0.012 * k, hc[1] - 0.05 * k], [hc[0] + 0.05 * k, hc[1] - 0.11 * k], [hc[0] + 0.062 * k, hc[1] - 0.02 * k]], 0.1), V[0]);
+    g += S(smoothD([[c0[0] - dir * 0.08 * k, c0[1]], [c0[0] - dir * 0.13 * k, c0[1] + 0.08 * k], [c0[0] - dir * 0.1 * k, c0[1] + 0.2 * k], [c0[0] - dir * 0.14 * k, c0[1] + 0.28 * k]], false), V[0], 0.035 * k);
+    rims += S(smoothD([[hc[0] - 0.06 * k, hc[1] - 0.02 * k], [hc[0] - 0.05 * k, hc[1] - 0.1 * k]], false), rimC, Math.max(1, 0.014 * k), 'opacity="0.9"') + S(smoothD([[c0[0] - 0.105 * k, c0[1] - 0.11 * k], [c0[0] - 0.05 * k, c0[1] - 0.22 * k]], false), rimC, Math.max(1, 0.014 * k), 'opacity="0.8"');
+  } else if (kind === 'couple') {
+    const S2 = torso(-0.22, 8, 0.52, 0.36, V[2]);
+    head([S2[0] + dir * 0.03 * k, S2[1] - 0.19 * k], r * k, 'bob', V[1]);
+    const Sh = torso(0.06, 26, 0.52, 0.38, V[1]);
+    arm([Sh[0] + dir * 0.05 * k, Sh[1] + 0.05 * k], [[150, 0.27], [-28, 0.25]], V[1]);
+    arm([S2[0] + dir * 0.05 * k, S2[1] + 0.06 * k], [[70, 0.25], [20, 0.2]], V[2], false);
+    head([Sh[0] + dir * 0.1 * k, Sh[1] - 0.18 * k], r * k, 'tousled');
+  }
+  return G(g + rims);
+}
+
+// the front of a window's sill drawn again over whoever leans on it (the body stays inside, behind the sill)
+function sillFront(x, y, w, h) {
+  return hrect(x - w * 0.16, y + h - 1, w * 1.32, h * 0.07, V[6], 0.4) + P(smoothD([[x - w * 0.15, y + h], [x + w * 0.3, y + h - h * 0.035], [x + w * 0.8, y + h - h * 0.03], [x + w * 1.15, y + h]], true), V[13]) + rect(x - w * 0.16, y + h + h * 0.06, w * 1.32, h * 0.03, V[2], 'opacity="0.6"');
+}
+// warm air rising far away (not smoke): soft honey veils from a glowing root, widening and thinning into the night,
+// a faint shimmer inside
+function warmPlume(x, y, w, h, o = {}) {
+  const {lean = 0.04, op = 1, n = 12} = o;
+  let s = ell(x, y, w * 0.7, w * 0.16, C.honeyL, `opacity="${f1(0.8 * op)}" filter="url(#b8)"`);
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1), cy = y - t * h, cx = x + lean * t * h + Math.sin(t * 4.4) * w * 0.08;
+    const rx = w * (0.36 + 0.75 * t), ry = h / n * 1.1;
+    const col = t < 0.3 ? C.honeyL : t < 0.6 ? C.honey : '#f0dfc0';
+    s += P(blobD(cx, cy, rx, ry, 9, 0.16), col, `opacity="${f1(Math.min(0.9, op * 0.5 * Math.pow(1 - t, 1.35)))}" filter="url(#b14)"`);
+  }
+  for (let kk = 0; kk < 9; kk++) {
+    const x0 = x + rr(-w * 0.3, w * 0.3), t0 = rr(0.05, 0.5), len = rr(0.2, 0.35), pts = [];
+    for (let j = 0; j <= 6; j++) { const t = t0 + len * j / 6; pts.push([x0 + lean * t * h + Math.sin(j * 1.3 + kk) * w * 0.05 * (1 + t * 2), y - t * h]); }
+    s += S(smoothD(pts, false), C.honeyC, rr(1.2, 2), `opacity="${f1(op * 0.22 * (1 - t0))}" filter="url(#b2)"`);
+  }
+  return G(s);
+}
+
+// soft graphite hatching over a rectangle (a drawn wall in shade): loose diagonal strokes clipped to it
+function hatchRect(x1, y1, x2, y2, gap = 22, o = {}) {
+  const {op = 0.28, w = 2, ang = 1, skip = null} = o;
+  let s = '';
+  const h = y2 - y1;
+  for (let c = x1 - h; c < x2; c += gap * rr(0.8, 1.2)) {
+    let a = [c, y2], b = [c + h * ang, y1];
+    // clip to the rect's x range
+    const t0 = Math.max(0, (x1 - a[0]) / (b[0] - a[0])), t1 = Math.min(1, (x2 - a[0]) / (b[0] - a[0]));
+    if (t1 <= t0) continue;
+    const p = [lerp(a[0], b[0], t0), lerp(a[1], b[1], t0)], q = [lerp(a[0], b[0], t1), lerp(a[1], b[1], t1)];
+    if (skip && skip(p, q)) continue;
+    s += softPencil([p, q], w, {op: op * rr(0.7, 1.15), passes: 1});
+  }
+  return s;
+}
+
+// a big roof fan seen from a person's eye: its drum (ribbed, snow on the far rim), the dark blades turning (ghosts of
+// their motion), the warm light of the hall coming up between them, the guard grille over it all
+function roofFan(cx, cy, rx, ry, o = {}) {
+  const {dh = rx * 0.34, glow = 1, rot = 0.3} = o;
+  let s = '';
+  s += ell(cx, cy + dh + ry * 0.5, rx * 1.35, ry * 1.5, V[1], 'opacity="0.5" filter="url(#b14)"');
+  // the drum
+  s += P(polyD([[cx - rx * 1.06, cy], [cx + rx * 1.06, cy], [cx + rx * 1.06, cy + dh], [cx - rx * 1.06, cy + dh]], 0.5), V[2]);
+  s += ell(cx, cy + dh, rx * 1.06, ry * 1.06, V[2]);
+  for (let i = 1; i < 14; i++) { const a = Math.PI * i / 14, x = cx - Math.cos(a) * rx * 1.06, yb = cy + dh + Math.sin(a) * ry * 1.06; s += S(lineD([[x, cy + Math.sin(a) * ry * 1.06], [x, yb]]), V[1], 2.4, 'opacity="0.7"'); }
+  s += S(lineD([[cx - rx * 1.06, cy + dh * 0.45], [cx + rx * 1.06, cy + dh * 0.45]]), V[3], 3, 'opacity="0.8"');
+  // the rim, snow on its far half, melted where the warmth leaves
+  s += ell(cx, cy, rx * 1.08, ry * 1.08, V[4]);
+  s += P(smoothD([[cx - rx * 1.07, cy - 2], [cx - rx * 0.7, cy - ry * 1.02], [cx, cy - ry * 1.12], [cx + rx * 0.7, cy - ry * 1.02], [cx + rx * 1.07, cy - 2], [cx + rx * 0.8, cy - ry * 0.86], [cx, cy - ry * 0.96], [cx - rx * 0.8, cy - ry * 0.86]], true), V[12], 'opacity="0.85"');
+  // the mouth: dark, the warm light from inside coming up between the blades
+  s += ell(cx, cy, rx * 0.96, ry * 0.96, V[1]);
+  s += ell(cx, cy + ry * 0.1, rx * 0.86, ry * 0.8, C.honey, `opacity="${f1(0.55 * glow)}" filter="url(#b14)"`);
+  s += ell(cx, cy + ry * 0.05, rx * 0.5, ry * 0.42, C.honeyL, `opacity="${f1(0.55 * glow)}" filter="url(#b24)"`);
+  const blades = (r0, op) => { let g = ''; for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + r0; const p = (aa, k) => [cx + Math.cos(aa) * rx * k, cy + Math.sin(aa) * ry * k]; g += P(smoothD([p(a, 0.14), p(a + 0.3, 0.88), p(a + 0.62, 0.9), p(a + 0.36, 0.4)], true), V[1], `opacity="${op}"`); if (op > 0.8) g += S(smoothD([p(a, 0.16), p(a + 0.3, 0.86)], false), C.honeyL, 2.2, 'opacity="0.5"'); } return g; };
+  s += blades(rot + 0.32, 0.18) + blades(rot + 0.16, 0.3) + blades(rot, 0.92);
+  s += ell(cx, cy, rx * 0.15, ry * 0.15, V[0]) + ell(cx, cy - ry * 0.03, rx * 0.08, ry * 0.07, V[4]);
+  // the guard: rings and spokes, thin and dark over the light
+  for (const kk of [0.3, 0.52, 0.74, 0.95]) s += ell(cx, cy, rx * kk, ry * kk, 'none', `stroke="${V[0]}" stroke-width="${kk > 0.9 ? 4 : 2.4}" opacity="0.85"`);
+  for (let i = 0; i < 20; i++) { const a = i / 20 * Math.PI * 2; s += S(lineD([[cx + Math.cos(a) * rx * 0.15, cy + Math.sin(a) * ry * 0.15], [cx + Math.cos(a) * rx * 0.95, cy + Math.sin(a) * ry * 0.95]]), V[0], 2, 'opacity="0.75"'); }
+  return G(s);
+}
+// a snowflake drawn as a soft little star (near, in the warm column): six short arms and a bright core
+function flakeStar(x, y, r, op = 0.95, rot = 0) {
+  let s = '';
+  for (let i = 0; i < 3; i++) { const a = rot + i * Math.PI / 3; s += S(lineD([[x - Math.cos(a) * r, y - Math.sin(a) * r], [x + Math.cos(a) * r, y + Math.sin(a) * r]]), '#fbfcfd', Math.max(1.2, r * 0.28), `opacity="${f1(op)}"`); }
+  return s + ell(x, y, r * 0.38, r * 0.38, '#ffffff', `opacity="${f1(op)}"`);
+}
+
+// a fox curled up asleep (side-on, facing dir), its tail wrapped round its nose, the warm light behind it rimming its
+// back. (x, y) = the ground under its middle; s = px per metre
+function foxCurled(x, y, s, o = {}) {
+  const {dir = -1, body = V[7], dark = V[3], pale = V[13], rim = C.honeyL} = o;
+  const X = (m) => x + dir * m * s, Y = (m) => y - m * s;
+  let g = ell(x, y + 0.01 * s, 0.56 * s, 0.07 * s, V[1], 'opacity="0.45" filter="url(#b4)"');
+  // the body, a soft curled ball, the haunch rising at the back
+  g += P(smoothD([[X(-0.42), Y(0.04)], [X(-0.5), Y(0.2)], [X(-0.36), Y(0.36)], [X(-0.06), Y(0.42)], [X(0.22), Y(0.4)], [X(0.4), Y(0.3)], [X(0.46), Y(0.14)], [X(0.36), Y(0.02)], [X(0), Y(0)]], true), body);
+  g += P(smoothD([[X(-0.36), Y(0.08)], [X(-0.4), Y(0.2)], [X(-0.2), Y(0.3)], [X(0.04), Y(0.3)], [X(0.0), Y(0.12)]], true), dark, 'opacity="0.3"');
+  // the head resting on the front, the ears up, the snout along the tail, the eye shut
+  g += P(smoothD([[X(-0.18), Y(0.2)], [X(-0.24), Y(0.32)], [X(-0.36), Y(0.36)], [X(-0.5), Y(0.3)], [X(-0.62), Y(0.2)], [X(-0.5), Y(0.17)], [X(-0.34), Y(0.15)]], true), body);
+  g += P(polyD([[X(-0.3), Y(0.33)], [X(-0.27), Y(0.5)], [X(-0.38), Y(0.36)]], 0.2), body) + P(polyD([[X(-0.37), Y(0.35)], [X(-0.39), Y(0.5)], [X(-0.45), Y(0.33)]], 0.2), body);
+  g += P(polyD([[X(-0.285), Y(0.46)], [X(-0.27), Y(0.5)], [X(-0.3), Y(0.44)]], 0.1), V[1]) + P(polyD([[X(-0.385), Y(0.46)], [X(-0.39), Y(0.5)], [X(-0.405), Y(0.44)]], 0.1), V[1]);
+  g += P(smoothD([[X(-0.46), Y(0.2)], [X(-0.6), Y(0.2)], [X(-0.5), Y(0.24)]], true), pale, 'opacity="0.85"');
+  g += ell(X(-0.625), Y(0.205), 0.016 * s, 0.014 * s, V[0]);
+  g += S(smoothD([[X(-0.37), Y(0.27)], [X(-0.41), Y(0.255)], [X(-0.45), Y(0.265)]], false), V[1], Math.max(1.2, 0.012 * s));
+  // the bushy tail wrapped round the front, its white tip under the nose
+  g += P(smoothD([[X(0.36), Y(0.06)], [X(0.2), Y(-0.01)], [X(-0.2), Y(-0.02)], [X(-0.56), Y(0.02)], [X(-0.72), Y(0.1)], [X(-0.66), Y(0.16)], [X(-0.4), Y(0.13)], [X(-0.1), Y(0.12)], [X(0.2), Y(0.12)], [X(0.4), Y(0.16)]], true), body);
+  g += P(smoothD([[X(-0.56), Y(0.03)], [X(-0.72), Y(0.1)], [X(-0.66), Y(0.16)], [X(-0.52), Y(0.13)]], true), pale);
+  g += S(smoothD([[X(0.3), Y(0.06)], [X(-0.1), Y(0.04)], [X(-0.5), Y(0.06)]], false), dark, Math.max(1.4, 0.016 * s), 'opacity="0.5"');
+  // the rim: the warm air's light along its back and ears
+  g += S(smoothD([[X(-0.3), Y(0.37)], [X(-0.06), Y(0.43)], [X(0.22), Y(0.41)], [X(0.4), Y(0.31)], [X(0.46), Y(0.16)]], false), rim, Math.max(1.6, 0.02 * s), 'opacity="0.85"');
+  g += S(smoothD([[X(-0.275), Y(0.49)], [X(-0.3), Y(0.36)]], false), rim, Math.max(1.2, 0.012 * s), 'opacity="0.8"');
+  return G(g);
+}
+// a big round exhaust fan set in a wall, front-on: its square housing, the dark blades turning against the hall's warm
+// light, the guard rings and spokes; (cx, cy) its centre, R its radius
+function wallFan(cx, cy, R, o = {}) {
+  const {rot = 0.2, glow = 1} = o;
+  let s = hrect(cx - R * 1.18, cy - R * 1.18, R * 2.36, R * 2.36, V[1], 0.6) + hrect(cx - R * 1.1, cy - R * 1.1, R * 2.2, R * 2.2, V[2], 0.5);
+  for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) s += ell(cx + sx * R * 1.0, cy + sy * R * 1.0, R * 0.04, R * 0.04, V[5]);
+  s += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(R)}" fill="${V[0]}"/>`;
+  s += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(R * 0.92)}" fill="${C.honey}" opacity="${f1(0.75 * glow)}" filter="url(#b14)"/>`;
+  s += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(R * 0.5)}" fill="${C.honeyL}" opacity="${f1(0.7 * glow)}" filter="url(#b24)"/>`;
+  const blades = (r0, op) => { let g = ''; for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2 + r0; const p = (aa, kk) => [cx + Math.cos(aa) * R * kk, cy + Math.sin(aa) * R * kk]; g += P(smoothD([p(a, 0.16), p(a + 0.32, 0.9), p(a + 0.7, 0.92), p(a + 0.42, 0.42)], true), V[1], `opacity="${op}"`); if (op > 0.8) g += S(smoothD([p(a, 0.18), p(a + 0.32, 0.88)], false), C.honeyL, 2.4, 'opacity="0.5"'); } return g; };
+  s += blades(rot + 0.36, 0.16) + blades(rot + 0.18, 0.3) + blades(rot, 0.93);
+  s += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(R * 0.15)}" fill="${V[0]}"/>`;
+  for (const kk of [0.32, 0.56, 0.8]) s += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(R * kk)}" fill="none" stroke="${V[0]}" stroke-width="2.6" opacity="0.8"/>`;
+  for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; s += S(lineD([[cx + Math.cos(a) * R * 0.16, cy + Math.sin(a) * R * 0.16], [cx + Math.cos(a) * R, cy + Math.sin(a) * R]]), V[0], 2.2, 'opacity="0.75"'); }
+  s += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(R)}" fill="none" stroke="${V[3]}" stroke-width="6"/>`;
+  return G(s);
+}
+
+// your gloved hand holding your phone (POV, from the bottom left): the knit glove cradling it from behind, its four
+// fingertips curled over the right edge, the thumb over the left edge onto the screen, the coat's cuff, snow on the
+// knuckles. (x, y) = the phone's centre, s = the phone's height in px, rot = its tilt (deg)
+function gloveHandPhone(x, y, s, o = {}) {
+  const {rot = -9, glove = V[4], gloveD = V[3], gloveL = V[6], cuff = V[2], screen = '#d6e4ea', bubble = C.honeyL} = o;
+  const u = s / 100, X = (v) => x + v * u, Y = (v) => y + v * u;
+  let g = '';
+  // the coat sleeve and the knit cuff from the corner
+  g += limb([[X(-150), Y(190)], [X(-80), Y(110)], [X(-34), Y(66)]], [118 * u, 96 * u, 78 * u], cuff);
+  g += limb([[X(-50), Y(84)], [X(-30), Y(62)]], [74 * u, 70 * u], gloveD);
+  for (let i = -3; i <= 3; i++) g += S(lineD([[X(-48 + i * 8), Y(88 + i * 6)], [X(-30 + i * 8), Y(64 + i * 6)]]), V[2], 1.6 * u, 'opacity="0.6"');
+  // the palm and the heel of the hand behind the phone's lower half
+  g += P(smoothD([[X(-40), Y(70)], [X(-38), Y(20)], [X(-24), Y(-6)], [X(22), Y(-4)], [X(40), Y(16)], [X(42), Y(52)], [X(26), Y(74)], [X(-12), Y(82)]], true), glove);
+  // the phone
+  g += P(smoothD([[X(-30), Y(-50)], [X(28), Y(-50)], [X(31), Y(-46)], [X(31), Y(48)], [X(28), Y(51)], [X(-30), Y(51)], [X(-33), Y(48)], [X(-33), Y(-46)]], true, 0.4), V[0]);
+  g += P(polyD([[X(-28), Y(-45)], [X(26), Y(-45)], [X(26), Y(45)], [X(-28), Y(45)]], 0.2), screen);
+  g += rect(X(-32), Y(-60), 62 * u, 120 * u, screen, 'opacity="0.2" filter="url(#b14)"');
+  // the chat: two grey bubbles and your new one popping (the warm accent: your chat)
+  g += P(polyD([[X(-22), Y(-36)], [X(8), Y(-36)], [X(8), Y(-27)], [X(-22), Y(-27)]], 0.2), V[10]);
+  g += P(polyD([[X(-22), Y(-21)], [X(-4), Y(-21)], [X(-4), Y(-12)], [X(-22), Y(-12)]], 0.2), V[10]);
+  g += ell(X(6), Y(4), 26 * u, 14 * u, bubble, 'opacity="0.5" filter="url(#b8)"');
+  g += P(smoothD([[X(-8), Y(-4)], [X(20), Y(-4)], [X(22), Y(2)], [X(22), Y(13)], [X(19), Y(17)], [X(-6), Y(17)], [X(-9), Y(12)]], true), bubble);
+  g += P(polyD([[X(15), Y(16)], [X(23), Y(23)], [X(19), Y(15)]]), bubble);
+  for (const dx of [0, 6, 12]) g += ell(X(dx), Y(6.5), 2 * u, 2 * u, C.honeyD);
+  // four fingertips curled over the right edge
+  for (let i = 0; i < 4; i++) { const fy = -6 + i * 15; g += P(smoothD([[X(24), Y(fy)], [X(36), Y(fy - 2)], [X(40), Y(fy + 5)], [X(36), Y(fy + 12)], [X(24), Y(fy + 11)]], true), glove) + S(smoothD([[X(30), Y(fy - 1)], [X(38), Y(fy + 3)]], false), gloveL, 1.4 * u, 'opacity="0.7"'); }
+  // the thumb over the left edge onto the screen's lower corner
+  g += limb([[X(-44), Y(40)], [X(-30), Y(26)], [X(-16), Y(20)]], [17 * u, 14 * u, 12 * u], glove);
+  g += S(smoothD([[X(-42), Y(33)], [X(-28), Y(20)], [X(-16), Y(15)]], false), gloveL, 1.6 * u, 'opacity="0.75"');
+  // the screen's cool light on the glove's edges; a little snow on the knuckles and the cuff
+  g += S(smoothD([[X(36), Y(-8)], [X(41), Y(20)], [X(40), Y(46)]], false), '#cfe0e8', 1.6 * u, 'opacity="0.5"');
+  for (const [sx, sy, r] of [[38, -6, 2.4], [39, 9, 1.8], [40, 24, 2.2], [-40, 36, 2], [-52, 82, 2.6], [-38, 72, 1.8], [-60, 92, 2.2], [-26, 68, 1.6]]) g += P(blobD(X(sx), Y(sy), r * u, r * 0.7 * u, 6, 0.3), '#f4f6f8', 'opacity="0.95"');
+  return G(g, `transform="rotate(${rot} ${f1(x)} ${f1(y)})"`);
+}
+
+// her at her open window, leaning out on the sill, front-on, raising her mug to you in the street (the toast): her
+// shape dark against the warm room, a warm rim. (cx, sy) = the sill's centre; s = px per metre
+function herToast(cx, sy, s, o = {}) {
+  const k = s * 1.2, body = o.body || V[2], hair = o.hair || V[0], skin = o.skin || V[5], rimC = C.honeyL;
+  const X = (m) => cx + m * k, Y = (m) => sy - m * k;
+  let g = '';
+  // the torso over the sill, leaning toward us a little; her sweater
+  g += P(smoothD([[X(-0.2), Y(0.0)], [X(0.2), Y(0.0)], [X(0.24), Y(0.32)], [X(0.22), Y(0.48)], [X(0.08), Y(0.53)], [X(-0.08), Y(0.53)], [X(-0.22), Y(0.48)], [X(-0.24), Y(0.32)]], true), body);
+  g += P(smoothD([[X(-0.07), Y(0.52)], [X(0.07), Y(0.52)], [X(0.06), Y(0.46)], [X(-0.06), Y(0.46)]], true), V[3]);
+  // the far forearm resting on the sill
+  g += limb([[X(-0.2), Y(0.44)], [X(-0.3), Y(0.2)], [X(-0.1), Y(0.04)]], [0.1 * k, 0.085 * k, 0.07 * k], body);
+  // the near arm raised: the mug lifted high to you
+  const sh = [X(0.19), Y(0.47)], el = [X(0.38), Y(0.62)], wr = [X(0.36), Y(0.86)];
+  g += limb([sh, el, wr], [0.1 * k, 0.085 * k, 0.07 * k], body);
+  g += mitt(el, wr, 0.1 * k, skin);
+  g += herMug(wr[0] + 0.01 * k, wr[1] - 0.09 * k, 0.15 * k, {dir: 1, tag: false, steamH: 34, band: V[12]});
+  // the head and her bob, a soft smile turned down to you
+  const hc = [X(0.01), Y(0.69)];
+  g += limb([[hc[0], Y(0.52)], [hc[0], Y(0.58)]], [0.07 * k, 0.065 * k], skin);
+  g += ell(hc[0], hc[1], 0.1 * k, 0.122 * k, skin);
+  g += P(smoothD([[hc[0] - 0.13 * k, hc[1] + 0.02 * k], [hc[0] - 0.125 * k, hc[1] - 0.09 * k], [hc[0] - 0.05 * k, hc[1] - 0.15 * k], [hc[0] + 0.05 * k, hc[1] - 0.15 * k], [hc[0] + 0.125 * k, hc[1] - 0.09 * k], [hc[0] + 0.13 * k, hc[1] + 0.02 * k], [hc[0] + 0.14 * k, hc[1] + 0.1 * k], [hc[0] + 0.09 * k, hc[1] + 0.1 * k], [hc[0] + 0.085 * k, hc[1] - 0.04 * k], [hc[0] - 0.02 * k, hc[1] - 0.075 * k], [hc[0] - 0.085 * k, hc[1] - 0.03 * k], [hc[0] - 0.09 * k, hc[1] + 0.1 * k], [hc[0] - 0.14 * k, hc[1] + 0.1 * k]], true), hair);
+  g += ell(hc[0] - 0.035 * k, hc[1] + 0.005 * k, 0.008 * k, 0.01 * k, V[0]) + ell(hc[0] + 0.035 * k, hc[1] + 0.005 * k, 0.008 * k, 0.01 * k, V[0]);
+  g += S(smoothD([[hc[0] - 0.025 * k, hc[1] + 0.06 * k], [hc[0], hc[1] + 0.072 * k], [hc[0] + 0.025 * k, hc[1] + 0.06 * k]], false), V[1], Math.max(1.2, 0.008 * k), 'opacity="0.8"');
+  // the warm rim from the room behind her
+  g += S(smoothD([[hc[0] - 0.13 * k, hc[1] + 0.06 * k], [hc[0] - 0.12 * k, hc[1] - 0.09 * k], [hc[0] - 0.04 * k, hc[1] - 0.15 * k], [hc[0] + 0.06 * k, hc[1] - 0.15 * k], [hc[0] + 0.13 * k, hc[1] - 0.08 * k]], false), rimC, Math.max(1.6, 0.012 * k), 'opacity="0.9"');
+  g += S(smoothD([[X(-0.22), Y(0.47)], [X(-0.08), Y(0.53)]], false), rimC, Math.max(1.4, 0.01 * k), 'opacity="0.8"') + S(smoothD([[sh[0], sh[1]], [el[0], el[1]], [wr[0], wr[1]]], false, 0.6), rimC, Math.max(1.4, 0.01 * k), 'opacity="0.7" transform="translate(-3 0)"');
+  return G(g);
+}
+
+// ======================================================================================
+// ROUND 2 (new functions only; nothing above changes, so the frames judged THERE redraw exactly as they were)
+// ======================================================================================
+
+// mix two #rrggbb colours (t 0..1)
+function mixHex(a, b, t) {
+  const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const A = p(a), B = p(b), c = A.map((v, i) => Math.round(v + (B[i] - v) * clamp(t, 0, 1)));
+  return '#' + c.map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+// the heat's colour along the hot aisle: deep honey near us, white-hot at the core (t 0 near .. 1 the core)
+function heatCol(t) {
+  return t < 0.3 ? mixHex(C.honeyD, C.honey, t / 0.3) : t < 0.62 ? mixHex(C.honey, C.honeyL, (t - 0.3) / 0.32) :
+    t < 0.85 ? mixHex(C.honeyL, C.honeyC, (t - 0.62) / 0.23) : mixHex(C.honeyC, '#fffdf6', (t - 0.85) / 0.15);
+}
+
+// one wall of the hot aisle: the machines' backs as dark faces, each a grille of slits glowing with the heat inside
+// (an oven's look: the light comes OUT of the slits), honey near us to white-hot at the core. Draws the cabinets whose
+// z lies in [za, zb); t runs over the whole aisle (z0..z1). Returns {base, glow, core}: the glow goes in a blurred group.
+function slitWall(cam, X, rh, za, zb, z0, z1, o = {}) {
+  const step = o.step || 0.72, n = o.n || 15;
+  let base = '', glow = '', core = '';
+  for (let z = z0; z < z1 - 0.6; z += step) {
+    if (z < za || z >= zb) continue;
+    const zz = z + step - 0.06, t = clamp((z - z0) / (z1 - z0), 0, 1), k = Math.pow(t, 0.8);
+    base += poly3(cam, [[X, 0, z], [X, 0, zz], [X, rh, zz], [X, rh, z]], V[0], '', 0.3);
+    const face = k < 0.55 ? mixHex(V[1], C.honeyW, k / 0.55 * 0.55) : mixHex(mixHex(V[1], C.honeyW, 0.55), C.honeyD, (k - 0.55) / 0.45 * 0.8);
+    base += poly3(cam, [[X, 0.1, z + 0.05], [X, 0.1, zz - 0.05], [X, rh - 0.08, zz - 0.05], [X, rh - 0.08, z + 0.05]], face, '', 0.3);
+    const col = heatCol(k), gcol = heatCol(Math.max(0, k - 0.18));
+    for (let i = 0; i < n; i++) {
+      const yy = 0.26 + i * (rh - 0.5) / (n - 1);
+      const a = cam.p(X, yy, z + 0.1), b = cam.p(X, yy, zz - 0.1);
+      const wc = Math.max(0.9, cam.sz(0.034, z));
+      glow += S(lineD([a, b]), gcol, wc * 3.4, `opacity="${f1(0.42 + 0.3 * k)}"`);
+      core += S(lineD([a, b]), col, wc, `opacity="${f1(0.88 + 0.12 * k)}"`);
+    }
+    // the cabinet's edge (a dark stile between the backs)
+    base += S(lineD([cam.p(X, 0, z), cam.p(X, rh, z)]), V[0], Math.max(0.8, cam.sz(0.05, z)), 'opacity="0.9"');
+  }
+  return {base, glow, core};
+}
+
+// heat haze: displacement filters that bend straight lines (stronger with distance); used as filter="url(#hzN)"
+function hazeDefs() {
+  const f = (id, sc, fx, fy, sd) => `<filter id="${id}" filterUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><feTurbulence type="fractalNoise" baseFrequency="${fx} ${fy}" numOctaves="1" seed="${sd}" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="${sc}" xChannelSelector="R" yChannelSelector="G"/></filter>`;
+  return f('hz1', 14, 0.004, 0.016, 5) + f('hz2', 24, 0.004, 0.016, 5) + f('hz3', 34, 0.004, 0.018, 5) + f('hz4', 44, 0.004, 0.02, 5) + f('hz5', 52, 0.004, 0.022, 5);
+}
+
+// an open hand at the end of a forearm (from e to w): a palm and spread fingers, length l (the palm facing out)
+function openHand(e, w, l, fill, o = {}) {
+  const {spread = 1, thumbSide = 1} = o;
+  const dx = w[0] - e[0], dy = w[1] - e[1], ln = Math.hypot(dx, dy) || 1, ux = dx / ln, uy = dy / ln, nx = -uy, ny = ux;
+  const pc = [w[0] + ux * l * 0.3, w[1] + uy * l * 0.3];
+  let g = P(blobD(pc[0], pc[1], l * 0.27, l * 0.27, 8, 0.08), fill);
+  for (let i = 0; i < 4; i++) {
+    const a = (i - 1.5) * 0.2 * spread, cx = Math.cos(a), sn = Math.sin(a);
+    const dux = ux * cx + nx * sn, duy = uy * cx + ny * sn;
+    const r0 = [pc[0] + nx * (i - 1.5) * l * 0.13 + ux * l * 0.14, pc[1] + ny * (i - 1.5) * l * 0.13 + uy * l * 0.14];
+    const fl = l * (i === 0 || i === 3 ? 0.4 : 0.48);
+    g += limb([r0, [r0[0] + dux * fl, r0[1] + duy * fl]], [l * 0.12, l * 0.1], fill);
+  }
+  const tr = [pc[0] + nx * thumbSide * l * 0.24, pc[1] + ny * thumbSide * l * 0.24];
+  g += limb([tr, [tr[0] + (nx * thumbSide * 0.8 + ux * 0.6) * l * 0.36, tr[1] + (ny * thumbSide * 0.8 + uy * 0.6) * l * 0.36]], [l * 0.13, l * 0.1], fill);
+  return g;
+}
+
+// B3: HER, too hot. Front view, near: her coat flung open (the warm-lit lining showing), one hand holding the coat's
+// edge out wide, the other fanning her face with her beanie, her hair lifting in the hot draught, the walls' heat on
+// both her sides. (x, y) = between her feet; h = her height in px
+function herHot(x, y, h, o = {}) {
+  const {coat = V[2], coatL = V[3], knit = V[9], hair = V[1], skin = V[8], leg = V[1], boot = V[0], lining = C.honeyW,
+    rim = C.honeyL, hatCol = V[7], lift = 1, tilt = 6} = o;
+  const u = h / 100, X = (v) => x + v * u, Y = (v) => y - v * u, pt = (a, b) => [X(a), Y(b)];
+  let g = '';
+  // the coat's back, seen inside between the flung-open fronts (its lining, warm in the heat)
+  g += P(smoothD([pt(-10.4, 81.8), pt(-11.6, 72), pt(-11, 58), pt(-12.4, 42), pt(-14.2, 25.6), pt(0, 24.4), pt(14.2, 25.6), pt(12.4, 42), pt(11, 58), pt(11.6, 72), pt(10.4, 81.8), pt(0, 83)], true), mixHex(V[1], lining, 0.45));
+  // the legs (planted a little apart) and the boots
+  for (const sd of [-1, 1]) {
+    const fx = sd * 4.2;
+    g += limb([[X(sd * 3.6), Y(49)], [X(fx * 0.8 + sd * 1.2), Y(26)], [X(fx), Y(3.4)]], [6.6 * u, 5.2 * u, 4.2 * u], leg);
+    g += P(smoothD([pt(fx - 3.2, 4.6), pt(fx + 3.2, 4.6), pt(fx + 3.6, 0), pt(fx - 3.6, 0)], true), boot);
+  }
+  // the sweater, the body inside the open coat
+  g += P(smoothD([pt(-8.8, 81.4), pt(-9.6, 72), pt(-8.4, 60), pt(-8.8, 49.4), pt(-4, 47.8), pt(4, 47.8), pt(8.8, 49.4), pt(8.4, 60), pt(9.6, 72), pt(8.8, 81.4), pt(4, 83), pt(0, 83.4), pt(-4, 83)], true), knit);
+  g += P(smoothD([pt(-8.6, 80), pt(-9.4, 72), pt(-8.2, 60), pt(-8.6, 50), pt(-6.4, 49), pt(-6.6, 62), pt(-7.2, 76)], true), rim, 'opacity="0.35"');
+  g += P(smoothD([pt(8.6, 80), pt(9.4, 72), pt(8.2, 60), pt(8.6, 50), pt(6.4, 49), pt(6.6, 62), pt(7.2, 76)], true), rim, 'opacity="0.35"');
+  // the scarf pulled loose, both ends hanging
+  g += P(smoothD([pt(-5.4, 80.4), pt(5.4, 80.4), pt(5.6, 85.4), pt(-5.6, 85.4)], true), V[8]);
+  g += P(smoothD([pt(-3.4, 81), pt(-4.4, 67), pt(-1.8, 66.4), pt(-1, 80.6)], true), V[8]) + P(smoothD([pt(1.6, 81), pt(3.2, 65), pt(5.8, 65.6), pt(4.4, 80.6)], true), V[8]);
+  // the coat's two fronts flung wide: the left one (screen) held out at arm's length by its edge, the right one
+  // swinging open in the hot draught; their linings face us, lit by the walls' heat
+  const fL = [pt(-4.6, 82.4), pt(-10.6, 82), pt(-12, 74), pt(-13, 60), pt(-15.4, 44), pt(-19.6, 25.6), pt(-25.6, 24.6), pt(-30.4, 31), pt(-27.6, 40), pt(-25.4, 48.6), pt(-17, 62), pt(-8.6, 74)];
+  const fR = [pt(4.6, 82.4), pt(10.6, 82), pt(12, 74), pt(12.8, 60), pt(14.4, 44), pt(16.6, 25.6), pt(21.4, 24.8), pt(24.6, 30), pt(21.6, 44), pt(16.4, 58), pt(8.6, 74)];
+  g += P(smoothD(fL, true, 0.9), coat) + P(smoothD(fR, true, 0.9), coat);
+  g += P(smoothD([pt(-7.8, 77), pt(-16, 62.4), pt(-24.4, 48.4), pt(-26.8, 40.4), pt(-29.2, 31.6), pt(-25.8, 26.6), pt(-21.4, 27.4), pt(-20, 40), pt(-17.6, 50), pt(-12.4, 64)], true, 0.9), lining);
+  g += P(smoothD([pt(7.8, 77), pt(15.2, 59), pt(20.4, 44.4), pt(23.4, 30.6), pt(20.6, 26.6), pt(17.6, 27.6), pt(16, 42), pt(13.2, 58)], true, 0.9), lining);
+  g += S(smoothD([pt(-8, 76.4), pt(-16.4, 62), pt(-24.8, 48.2), pt(-27.4, 40), pt(-29.6, 31.4)], false), rim, 0.9 * u, 'opacity="0.75"');
+  g += S(smoothD([pt(8, 76.4), pt(15.6, 58.6), pt(20.8, 44.2), pt(23.8, 30.4)], false), rim, 0.8 * u, 'opacity="0.6"');
+  // the left arm (screen) out and down, its hand holding the coat's edge out wide
+  const sL = pt(-9.6, 79.4), eL = pt(-17.4, 64.6), wL = pt(-24.2, 50.6);
+  g += limb([sL, eL, wL], [6.6 * u, 5.2 * u, 4.4 * u], coat) + S(smoothD([sL, eL, wL], false), rim, 0.8 * u, 'opacity="0.55" transform="translate(-2 0)"');
+  g += mitt(eL, wL, 6.4 * u, skin);
+  // the right arm (screen) raised, its hand by her face fanning with the beanie; the swept air of the last stroke
+  const sR = pt(9.6, 79.4), eR = pt(19.4, 79.6), wR = pt(14.2, 89.2);
+  g += limb([sR, eR, wR], [6.6 * u, 5.2 * u, 4.4 * u], coat) + S(smoothD([sR, eR, wR], false), rim, 0.8 * u, 'opacity="0.55" transform="translate(2 0)"');
+  const hat = (hb, ang, op) => `<g transform="rotate(${ang} ${f1(hb[0])} ${f1(hb[1])})" opacity="${op}">` +
+    P(smoothD([[hb[0] - 4.4 * u, hb[1] + 3.4 * u], [hb[0] - 4.8 * u, hb[1] - 2.4 * u], [hb[0] - 1.6 * u, hb[1] - 6 * u], [hb[0] + 3.4 * u, hb[1] - 5.2 * u], [hb[0] + 5.6 * u, hb[1] - 0.6 * u], [hb[0] + 4.8 * u, hb[1] + 3.6 * u]], true), hatCol) +
+    P(smoothD([[hb[0] - 4.6 * u, hb[1] + 1.6 * u], [hb[0] + 5.2 * u, hb[1] + 1.8 * u], [hb[0] + 4.8 * u, hb[1] + 4.6 * u], [hb[0] - 4.4 * u, hb[1] + 4.4 * u]], true), V[9]) +
+    ell(hb[0] + 1.4 * u, hb[1] - 7.4 * u, 2.3 * u, 2.1 * u, V[11]) + '</g>';
+  // the stroke before (a ghost further out), the air it swept toward her face, then the beanie now, by her cheek
+  g += hat(pt(21.6, 95), 36, 0.5);
+  for (const [r0, op] of [[0, 0.75], [3.2, 0.55], [6.4, 0.35]]) g += S(smoothD([pt(25.6 + r0 * 0.2, 99 + r0), pt(21.4, 103.6 + r0 * 0.7), pt(15.4, 104 + r0 * 0.5)], false), mixHex(V[9], C.honeyD, 0.3), 1.3 * u, `opacity="${op}" filter="url(#b1)"`);
+  g += hat(pt(13.4, 95.2), -14, 1);
+  g += mitt(eR, wR, 6.2 * u, skin);
+  // the head (tipped a little away from the fan), the face hot ("phew": eyes shut, mouth open), the bob lifting
+  const nk = [X(0), Y(84.6)];
+  let hd = limb([[X(0), Y(83.6)], [X(0), Y(88)]], [4.2 * u, 4 * u], skin);
+  hd += P(smoothD([pt(-5.2, 93), pt(-4.8, 97.4), pt(0, 99), pt(4.8, 97.4), pt(5.2, 93), pt(4.6, 88), pt(2.6, 85.2), pt(0, 84.6), pt(-2.6, 85.2), pt(-4.6, 88)], true), skin);
+  for (const sd of [-1, 1]) hd += S(smoothD([pt(sd * 2.8, 92.6), pt(sd * 1.9, 92.1), pt(sd * 1, 92.6)], false), V[1], 0.55 * u, 'opacity="0.85"');
+  hd += ell(X(0), Y(88.2), 1.1 * u, 1.3 * u, V[1], 'opacity="0.85"');
+  hd += ell(X(-3), Y(90.4), 1.3 * u, 0.7 * u, C.honey, 'opacity="0.4"') + ell(X(3), Y(90.4), 1.3 * u, 0.7 * u, C.honey, 'opacity="0.4"');
+  hd += P(smoothD([pt(-6, 91), pt(-5.6, 97), pt(-2.6, 100.4), pt(1.6, 100.6), pt(5.4, 98.6), pt(6.2, 92), pt(4.6, 95.2), pt(1.6, 96), pt(-1.6, 95.6), pt(-4.4, 94.6)], true), hair);
+  for (const sd of [-1, 1]) hd += P(smoothD([pt(sd * 6.2, 94), pt(sd * 4.9, 93.4), pt(sd * 4.8, 88.4), pt(sd * 5.2, 85.2 + lift * 2), pt(sd * (7.2 + lift * 3), 85.4 + lift * 4), pt(sd * (7.6 + lift * 1.6), 89 + lift * 1.4)], true), hair);
+  for (const sd of [-1, 1]) hd += S(smoothD([pt(sd * 5, 99), pt(sd * 7.2, 94.4), pt(sd * (7.6 + lift * 2.4), 88.4 + lift * 3)], false), rim, 0.9 * u, 'opacity="0.85"');
+  g += `<g transform="rotate(${tilt} ${f1(nk[0])} ${f1(nk[1])})">${hd}</g>`;
+  // the walls' heat on her shoulders
+  for (const sd of [-1, 1]) g += S(smoothD([pt(sd * 6.4, 82.6), pt(sd * 10.4, 81.6), pt(sd * 11.6, 76)], false), rim, 0.8 * u, 'opacity="0.7"');
+  return G(g);
+}
+
+// B4: HER, astonished. Side view facing dir: a step back (the weight on the back foot, leaning away), both hands up
+// with open palms, her face tipped up to the top of the wall; the blaze's warm light on her front.
+function herRecoil(x, y, h, o = {}) {
+  const {dir = -1, coat = V[2], coatL = V[3], hair = V[1], hairL = V[3], skin = V[8], hand = V[8], leg = V[1], boot = V[0],
+    scarf = V[8], rim = C.honeyL, lean = -8, tilt = 32, step = [-11, 6]} = o;
+  const u = h / 100, sx = (v) => x + v * u * dir, Y = (v) => y - v * u, pt = (a, b) => [sx(a), Y(b)];
+  let back = '', body = '', front = '', hd = '';
+  // legs: the back one planted far behind (the weight on it), the front one forward, its knee soft
+  for (const [k, fx] of [[0, step[0]], [1, step[1]]]) {
+    const col = k === 0 ? V[0] : leg;
+    body += limb([[sx(0.5 + fx * 0.22), Y(30)], [sx(fx * 0.66 + 0.5), Y(14.6)], [sx(fx), Y(3)]], [5.6 * u, 4.6 * u, 3.8 * u], col);
+    body += P(smoothD([pt(fx - 2.4, 4.6), pt(fx + 2, 4.8), pt(fx + 6, 1.8), pt(fx + 6.2, 0), pt(fx - 2.6, 0)], true), boot);
+  }
+  // the coat (side), its hem swinging back with the step
+  const coatPts = [[-4.6, 82.5], [-6.4, 78], [-6.6, 66], [-6.2, 55], [-8.4, 40], [-11.4, 26.4], [0, 24.6], [8.2, 25.8], [6.8, 40], [6.6, 54], [7.4, 66], [6.4, 79], [3.4, 82.8], [0, 83.6]];
+  body += P(smoothD(coatPts.map(([a, b]) => pt(a, b)), true), coat);
+  body += P(smoothD([pt(1, 82), pt(6, 78), pt(6.8, 66), pt(6, 54), pt(6.4, 40), pt(7.6, 26.4), pt(4.8, 25.8), pt(4.2, 40), pt(3.6, 60), pt(2.6, 78)], true), coatL, 'opacity="0.5"');
+  // the blaze's light down her front (the edge toward the wall)
+  body += S(smoothD([pt(6.6, 79), pt(7.4, 66), pt(6.6, 54), pt(6.9, 40), pt(8, 26.6)], false), rim, 1.1 * u, 'opacity="0.8"');
+  // both arms up: the far one behind (dark), the near one in front; open hands, palms toward the wall
+  const L1 = 17.5 * u, L2 = 16 * u;
+  const arm = (i, a1, a2) => {
+    const S0 = i === 0 ? pt(-1.2, 79) : pt(0.6, 79);
+    const q = chain(S0, [[a1, L1], [a2, L2]], dir);
+    let g = limb(q, [6.4 * u, 5 * u, 4.2 * u], i === 0 ? V[0] : coat);
+    if (i === 1) g += S(smoothD([q[0], q[1], q[2]], false), rim, 0.9 * u, `opacity="0.75" transform="translate(${f1(dir * 1.6)} 0)"`);
+    g += openHand(q[1], q[2], 7.4 * u, i === 0 ? mixHex(hand, V[0], 0.35) : hand, {spread: 1.1, thumbSide: i === 0 ? -dir : dir});
+    return g;
+  };
+  back += arm(0, 118, 40);
+  front += arm(1, 100, 55);
+  // the scarf (side)
+  const sc = P(smoothD([pt(-4.6, 80.6), pt(4.4, 81), pt(4.8, 86), pt(-4.2, 86.4)], true), scarf) + P(smoothD([pt(-3.4, 81), pt(-7.4, 71.6), pt(-5.4, 70.6), pt(-1.6, 80)], true), scarf);
+  // the head, tipped up: the face open (eye wide, mouth an "o"), the bob swinging back
+  hd += limb([[sx(1.2), Y(84)], [sx(1.2), Y(88)]], [4.2 * u, 4 * u], skin);
+  hd += P(smoothD([pt(-3.4, 96), pt(0.6, 98.4), pt(4.4, 97), pt(5.8, 93.4), pt(6.2, 91.4), pt(7.3, 90.2), pt(6.2, 89.2), pt(6.3, 87.8), pt(5.4, 86.6), pt(4.4, 85.2), pt(1.6, 85), pt(-2.6, 86.6)], true), skin);
+  hd += ell(sx(4.2), Y(92.4), 0.8 * u, 0.95 * u, V[0]) + ell(sx(5.4), Y(87.4), 0.7 * u, 0.9 * u, V[1]);
+  hd += S(smoothD([pt(3.2, 94.4), pt(4.4, 95), pt(5.4, 94.6)], false), V[2], 0.5 * u, 'opacity="0.8"');
+  hd += S(smoothD([pt(5.6, 97.4), pt(6.4, 94), pt(7.4, 90.4), pt(6.3, 87.8), pt(5.4, 86.4)], false), rim, 0.8 * u, 'opacity="0.85"');
+  hd += P(smoothD([pt(-5.8, 87), pt(-8.4, 89.6), pt(-7.4, 94.6), pt(-4.4, 98.8), pt(0.4, 100.2), pt(4.6, 98.8), pt(6.4, 95.8), pt(4.8, 94.6), pt(2.4, 95), pt(1, 92.6), pt(0, 88), pt(-1.6, 85.6), pt(-3.6, 85.6)], true), hair);
+  hd += P(smoothD([pt(-3, 98.8), pt(1.6, 99.6), pt(4.4, 98.2), pt(1.4, 98)], true), hairL, 'opacity="0.6"');
+  hd += S(smoothD([pt(0.4, 100.2), pt(4.6, 98.8), pt(6.4, 95.8)], false), rim, 0.9 * u, 'opacity="0.9"');
+  const nk = pt(1.2, 85);
+  const head = `<g transform="rotate(${f1(-tilt * dir)} ${f1(nk[0])} ${f1(nk[1])})">${hd}</g>`;
+  const out = back + body + sc + head + front;
+  return G(out, `transform="rotate(${f1(lean * dir)} ${f1(x)} ${f1(y)})"`);
+}
+
+// B4: a kettle catching the blaze inside the open computer: a warm-lit steel jug, its lid, base and handle dark, its
+// water gauge glowing. (x, y) = its base centre; s = its height; spout to the left (dir 1)
+function kettleLit(x, y, s, o = {}) {
+  const {dir = 1, body = '#b77632', lit = C.honeyL, shade = C.honeyW, dark = '#2a2119', gauge = C.honeyC} = o;
+  const u = s / 100, X = (v) => x + v * u * dir, Y = (v) => y - v * u;
+  let g = '';
+  g += P(polyD([[X(-34), Y(0)], [X(34), Y(0)], [X(32), Y(9)], [X(-32), Y(9)]], 0.3), dark);
+  g += P(polyD([[X(-27), Y(58)], [X(-44), Y(80)], [X(-47), Y(77)], [X(-30), Y(44)]], 0.3), body);
+  g += S(smoothD([[X(26), Y(70)], [X(44), Y(66)], [X(46), Y(40)], [X(30), Y(26)]], false), dark, 7 * u);
+  g += P(smoothD([[X(-31), Y(9)], [X(-27), Y(60)], [X(-22), Y(84)], [X(0), Y(90)], [X(20), Y(84)], [X(26), Y(60)], [X(31), Y(9)]], true), body);
+  g += P(smoothD([[X(8), Y(9)], [X(14), Y(60)], [X(14), Y(84)], [X(20), Y(84)], [X(26), Y(60)], [X(31), Y(9)]], true), shade, 'opacity="0.75"');
+  g += P(smoothD([[X(-28), Y(12)], [X(-25), Y(58)], [X(-19), Y(80)], [X(-14), Y(80)], [X(-19), Y(56)], [X(-21), Y(12)]], true), lit, 'opacity="0.85"');
+  g += P(smoothD([[X(-22), Y(84)], [X(-14), Y(94)], [X(0), Y(97)], [X(14), Y(94)], [X(20), Y(84)], [X(0), Y(90)]], true), dark);
+  g += P(polyD([[X(-5), Y(18)], [X(5), Y(18)], [X(5), Y(64)], [X(-5), Y(64)]], 0.3), gauge);
+  return G(g);
+}
+
+// a jet of steam off a spout: a thin tapered wisp curling up (crisp near the spout, thinning out as it rises)
+function steamJet(x, y, L, o = {}) {
+  const {dir = -1, w = L * 0.09, op = 0.85, col = '#f7f8fa', ph = 0} = o;
+  const pts = [];
+  for (let i = 0; i <= 8; i++) {
+    const t = i / 8;
+    const side = dir * (t < 0.25 ? t * 0.5 : 0.125 - (t - 0.25) * 0.25) * L + Math.sin(t * 5.2 + ph) * L * 0.07 * t;
+    pts.push([x + side, y - t * L]);
+  }
+  const ws = pts.map((_, i) => w * (0.45 + i / 8 * 1.5));
+  return limb(pts, ws, col, `opacity="${f1(op)}" filter="url(#b1)" mask="url(#jetfade)"`);
+}
+
+// the rolling cloud over the boiling computer: ONE mass of billows (each lit on top, cool in its folds below, lumpy at
+// its edge like a cauliflower), a big one rising into the hall's light, one rolling over the edge toward her, small
+// curls tipping over the front; the blaze's warm light on its underside. (cx, by) = the base's centre on the computer's
+// top; w = the base's width; h = the height it billows to
+function rollCloud(cx, by, w, h, o = {}) {
+  const {col = '#f7f8f9', shade = V[12], deep = V[11], warm = C.honeyL} = o;
+  // back (high) to front (low): each later billow overlaps the one before, its shaded underside making the fold
+  const bil = [[-0.05, 0.8, 0.2], [-0.2, 0.52, 0.32], [0.2, 0.22, 0.24], [0.42, 0.3, 0.14], [-0.4, 0.2, 0.2], [0.44, 0.15, 0.19], [0.04, 0.16, 0.26]];
+  let g = '';
+  bil.forEach(([kx, ky, kr], i) => {
+    const x = cx + kx * w, y = by - ky * h, r = kr * w;
+    let sh = P(blobD(x, y, r, r * 0.84, 10, 0.08), shade);
+    let lt = P(blobD(x - r * 0.1, y - r * 0.16, r * 0.84, r * 0.66, 10, 0.08), col);
+    for (let j = 0; j < 6; j++) {
+      const a = Math.PI * (1.05 + j * 0.18), br = r * (0.28 + 0.12 * Math.sin(i * 2.3 + j * 1.9) ** 2);
+      const bx = x + Math.cos(a) * r * 0.84, byy = y + Math.sin(a) * r * 0.7;
+      sh += P(blobD(bx, byy, br, br * 0.86, 8, 0.1), shade);
+      lt += P(blobD(bx - br * 0.12, byy - br * 0.16, br * 0.8, br * 0.66, 8, 0.1), col);
+    }
+    g += G(sh, 'filter="url(#b1)"') + G(lt, 'filter="url(#b4)"');
+    g += P(blobD(x + r * 0.15, y + r * 0.62, r * 0.7, r * 0.2, 8, 0.1), deep, 'opacity="0.55" filter="url(#b4)"');
+  });
+  // curls tipping over the front edge, and the blaze's warm light on the underside
+  for (const [kx, kr] of [[-0.47, 0.065], [0.49, 0.06], [-0.12, 0.05]]) g += P(blobD(cx + kx * w, by + w * 0.02, w * kr, w * kr * 0.8, 8, 0.1), col, 'filter="url(#b1)"');
+  g += P(blobD(cx, by - 0.05 * h, w * 0.5, h * 0.12, 9, 0.12), warm, 'opacity="0.75" filter="url(#b8)"');
+  for (const [kx, kr] of [[-0.47, 0.065], [0.49, 0.06], [-0.12, 0.05]]) g += P(blobD(cx + kx * w, by + w * 0.035, w * kr, w * kr * 0.45, 8, 0.1), warm, 'opacity="0.6" filter="url(#b4)"');
+  return G(g);
+}

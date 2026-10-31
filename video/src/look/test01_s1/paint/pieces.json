@@ -1,0 +1,130 @@
+{
+ "boat": {
+  "box": [
+   879,
+   912,
+   201,
+   388
+  ],
+  "file": "boat.t01piece.png",
+  "seconds": 4.54,
+  "stats": {
+   "lost": 26,
+   "mypaint_s": 0.48,
+   "strokes": {
+    "edge": 26,
+    "face": 98,
+    "leaf": 351
+   }
+  }
+ },
+ "bridge": {
+  "box": [
+   0,
+   875,
+   1080,
+   375
+  ],
+  "file": "bridge.t01piece.png",
+  "seconds": 4.87,
+  "stats": {
+   "lost": 54,
+   "mypaint_s": 0.99,
+   "strokes": {
+    "edge": 54,
+    "face": 91,
+    "stone": 157
+   }
+  }
+ },
+ "far": {
+  "box": [
+   0,
+   432,
+   1080,
+   791
+  ],
+  "file": "far.t01piece.png",
+  "seconds": 7.05,
+  "stats": {
+   "lost": 151,
+   "mypaint_s": 1.08,
+   "strokes": {
+    "edge": 151,
+    "face": 448,
+    "leaf": 457
+   }
+  }
+ },
+ "glow": {
+  "box": [
+   411,
+   1040,
+   212,
+   225
+  ],
+  "file": "glow.t01piece.png",
+  "seconds": 0.71,
+  "stats": {}
+ },
+ "near": {
+  "box": [
+   193,
+   1698,
+   736,
+   222
+  ],
+  "file": "near.t01piece.png",
+  "seconds": 0.39,
+  "stats": {}
+ },
+ "rail": {
+  "box": [
+   0,
+   632,
+   1080,
+   436
+  ],
+  "file": "rail.t01piece.png",
+  "seconds": 0.16,
+  "stats": {}
+ },
+ "sky": {
+  "box": [
+   0,
+   0,
+   1080,
+   1240
+  ],
+  "file": "sky.t01piece.png",
+  "seconds": 12.51,
+  "stats": {}
+ },
+ "twin": {
+  "box": [
+   0,
+   1149,
+   1080,
+   771
+  ],
+  "file": "twin.t01piece.png",
+  "seconds": 11.16,
+  "stats": {}
+ },
+ "water": {
+  "box": [
+   0,
+   1150,
+   1080,
+   770
+  ],
+  "file": "water.t01piece.png",
+  "seconds": 3.38,
+  "stats": {
+   "mypaint_s": 1.54,
+   "strokes": {
+    "ripple": 520
+   }
+  }
+ }
+}

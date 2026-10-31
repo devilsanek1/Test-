@@ -412,6 +412,11 @@ Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Taste sign
 Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Motion
 
 ## Process and communication
+- **A still must be cheap and fast to make:** one picture is minutes and a few dollars of work, never hours and a hundred;
+  a frame is composed from a reusable kit (world pieces, people, light, paint) rather than new engine code each time,
+  and every step has a time and cost budget that stops it and shows the owner what exists. — ("Okay that's ridiculous
+  it's been almost 2 hours to produce a single image and like 100 dollars of credits like wages going on", on process
+  test 01, 2026-10-31.)
 - **Before an iteration's stills go to the owner, the orchestrator looks at them beside the owner's references:** not
   clearly at their level, iterate first; a quick look, never a panel. — (people rounds he called "incoherent" and
   "garbage", 2026-10-30.)

@@ -62,21 +62,35 @@ function homeView(o = {}) {
     g += S(lineD([cam.p(10.5, h + 0.25, z1), cam.p(10.5, h + 0.25, z2)]), V[12], 2.2, 'opacity="0.85"');
     g += facadeX(cam, 10.4, z1, z2, 0, 3.2, V[3]);
     seed(seedN);
-    for (let fl = 0; fl < Math.floor((h - 4) / 3.2); fl++) {
-      const y1 = 4.1 + fl * 3.2;
-      for (let zz = z1 + 1.1; zz < z2 - 1.3; zz += rr(2.3, 3.0)) {
+    // every floor's windows, most of them warm (the homes the heat reaches, warming in a wave from the branches)
+    for (let y1 = 4.0; y1 + 1.8 < h - 0.6; y1 += 3.1) {
+      for (let zz = z1 + 1.0; zz < z2 - 1.2; zz += mode === 'vision' ? rr(1.75, 2.0) : rr(2.2, 2.7)) {
         const lit = rnd() < litP;
-        const pts = q3(cam, [[10.4, y1, zz], [10.4, y1, zz + 1.2], [10.4, y1 + 1.8, zz + 1.2], [10.4, y1 + 1.8, zz]]);
-        if (lit) { g += P(polyD(pts, 0.3), C.honey, `opacity="${f1(rr(0.55, 0.85))}"`); }
+        const pts = q3(cam, [[10.4, y1, zz], [10.4, y1, zz + 1.1], [10.4, y1 + 1.8, zz + 1.1], [10.4, y1 + 1.8, zz]]);
+        if (lit) { const hot = mode === 'vision' && rnd() < 0.3; g += P(polyD(pts, 0.3), hot ? C.honeyL : C.honey, `opacity="${f1(rr(0.7, 0.95))}"`); }
         else g += P(polyD(pts, 0.3), V[1]);
       }
     }
-    for (const zz of [z1 + 2.5, (z1 + z2) / 2 + rr(-2, 2)]) { const a = cam.p(11.2, h + 1.1, zz), b = cam.p(11.2, h + 3.4, zz), w = cam.sz(0.85, zz); g += hrect(a[0] - w / 2, b[1], w, a[1] - b[1], V[1], 0.4) + ell(a[0], b[1], w * 0.6, w * 0.25, V[13]); }
-    // its door (where the heat's branch turns in)
-    const dz = z1 + 2.2; g += facadeX(cam, 10.4, dz, dz + 1.4, 0, 2.6, V[1]);
+    // the ground floor's shop windows, lit low, their light on the snow
+    if (mode === 'vision') for (let zz = z1 + 1.6; zz < z2 - 2.2; zz += rr(4.2, 5.2)) {
+      const pts = q3(cam, [[10.4, 0.6, zz], [10.4, 0.6, zz + 2.2], [10.4, 2.5, zz + 2.2], [10.4, 2.5, zz]]);
+      g += P(polyD(pts, 0.3), C.honey, 'opacity="0.75"');
+      const f0 = cam.p(9.6, 0, zz + 1.1); g += ell(f0[0], f0[1], cam.sz(1.6, zz), cam.sz(0.35, zz), C.honey, 'opacity="0.22" filter="url(#b8)"');
+    }
+    for (const zz of [z1 + 2.5, (z1 + z2) / 2 + rr(-2, 2)]) { const a = cam.p(11.2, h + 1.1, zz), b = cam.p(11.2, h + 3.4, zz), w = cam.sz(0.85, zz); if (b[1] > 616) g += hrect(a[0] - w / 2, b[1], w, a[1] - b[1], V[1], 0.4) + ell(a[0], b[1], w * 0.6, w * 0.25, V[13]); }
+    // its doors (where the heat's branches turn in)
+    for (const dz of (mode === 'vision' && z1 < 20 ? [z1 + 3.4, z1 + 11.4, z1 + 18.6] : [z1 + 2.2])) g += facadeX(cam, 10.4, dz, dz + 1.4, 0, 2.6, V[1]) + facadeX(cam, 10.4, dz + 0.15, dz + 1.25, 2.0, 2.5, C.honey, 'opacity="0.8"');
     return g;
   };
-  const litP = mode === 'vision' ? 0.86 : 0.42;
+  const litP = mode === 'vision' ? 0.96 : 0.42;
+  // the city behind the row (the next street's taller blocks), their upper floors' windows over the row's roofs
+  if (mode === 'vision') {
+    seed(36);
+    for (const [z1, z2, h, X] of [[46, 64, 25, 26], [64, 88, 27, 26], [88, 120, 28, 26]]) {
+      s += facadeX(cam, X, z1, z2, 0, h, V[2]) + poly3(cam, [[X, h, z1], [X, h, z2], [X + 2, h + 2.6, z2], [X + 2, h + 2.6, z1]], V[1]);
+      for (let y1 = 13; y1 + 1.6 < h - 0.6; y1 += 3.0) for (let zz = z1 + 1; zz < z2 - 1.2; zz += 2.4) if (rnd() < 0.9) s += P(polyD(q3(cam, [[X, y1, zz], [X, y1, zz + 1.1], [X, y1 + 1.6, zz + 1.1], [X, y1 + 1.6, zz]]), 0.3), C.honey, `opacity="${f1(rr(0.55, 0.9))}"`);
+    }
+  }
   s += block(52, 67, 15.5, V[3], 32, litP) + block(41.5, 51.6, 16.6, V[2], 33, litP);
   // a lower old house nearer (its roof stays under the band), cut by the right edge
   s += block(17, 38.5, 10.2, V[3], 34, litP);
@@ -95,35 +109,39 @@ function homeView(o = {}) {
   }
   // ---- the hall of giant computers at the quay's end (the vision), or the empty lot (the plan) ----
   const hz1 = 70;
+  if (mode === 'vision') { seed(29); s += P(polyD([[300, 1112], [300, 1096], [380, 1092], [390, 1084], [470, 1086], [480, 1094], [560, 1092], [570, 1082], [660, 1084], [670, 1094], [760, 1096], [760, 1112]], 0.6), V[5]); for (let i = 0; i < 90; i++) s += rect(rr(304, 756), rr(1088, 1110), rr(2.2, 3.4), rr(2, 3), C.honey, `opacity="${f1(rr(0.55, 0.98))}"`); s += ell(530, 1098, 260, 24, C.honey, 'opacity="0.16" filter="url(#b14)"'); }
   if (mode === 'vision') {
     let g = '';
-    // the snow melted round its foot: a dark wet ring
-    g += P(polyD([cam.p(-9, 0, hz1 - 3), cam.p(8.5, 0, hz1 - 3), cam.p(8.5, 0, hz1), cam.p(-9, 0, hz1)], 1), V[3]);
-    g += faceZ(cam, hz1, -8.5, 8, 0, 14.5, V[1]);
-    g += facadeX(cam, 8, hz1, hz1 + 30, 0, 14.5, V[0]);
-    // its face: covered in the small cool lights of the giant computers inside, in rack-like columns (it reads as a
-    // computer the size of a building), a faint cool glow over it
-    g += faceZ(cam, hz1 - 0.02, -8.5, 8, 0, 14.5, '#dceef4', 'opacity="0.12" filter="url(#b4)"');
-    for (let x = -8.1; x < 7.7; x += 0.42) {
-      if (Math.abs(x) < 4.4 && true) { /* the door's columns are drawn below */ }
-      if (((x + 8.1) / 0.42) % 5 > 3.6) continue;               // a gap between racks
-      for (let y = 0.6; y < 14.1; y += 0.46) {
-        if (Math.abs(x) < 4.3 && y < 8.9) continue;              // the door
-        if (rnd() < 0.3) continue;
-        const pp = cam.p(x, y, hz1 - 0.03);
-        g += ell(pp[0], pp[1], 1.25, 1.25, '#eaf7fb', `opacity="${f1(rr(0.45, 0.95))}"`);
+    seed(71);
+    // the hall of giant computers is a plan: its walls and roof only drawn, in soft pencil; the computers inside painted
+    // (four floors of them, their small cool lights), the big door open on them, the night showing through the walls
+    const hzF = hz1, hzB = hz1 + 30, Xl = -8.5, Xr = 8, Ht = 14.5;
+    for (let fl = 0; fl < 4; fl++) {
+      const y0 = fl * 3.5 + 0.1, y1 = y0 + 2.5;
+      for (let x = Xl + 0.4; x < Xr - 0.5; x += 0.95) {
+        if (fl === 0 && Math.abs(x + 0.1) < 4.6) continue;
+        const zr = hzF + 3, a = cam.p(x, y1, zr), b = cam.p(x + 0.7, y0, zr);
+        g += rect(a[0], a[1], b[0] - a[0], b[1] - a[1], V[1], 'opacity="0.92"');
+        for (let yy = y0 + 0.25; yy < y1 - 0.15; yy += 0.32) { const p = cam.p(x + 0.18 + (rnd() < 0.5 ? 0 : 0.3), yy, zr - 0.01); g += ell(p[0], p[1], 1.4, 1.4, '#e8f6fb', `opacity="${f1(rr(0.6, 1))}"`); }
       }
+      const fy = cam.p(0, y0 - 0.1, hzF + 3)[1];
+      g += softPencil([[cam.p(Xl, 0, hzF + 3)[0], fy], [cam.p(Xr, 0, hzF + 3)[0], fy]], 1.6, {op: 0.4, passes: 1});
     }
-    // the big door, open on rows of giant computers (cool light, small lights)
-    const d1 = cam.p(-4.2, 0, hz1), d2 = cam.p(4.2, 8.6, hz1);
-    g += rect(d1[0] - 22, d2[1] - 16, d2[0] - d1[0] + 44, d1[1] - d2[1] + 22, '#eaf4f7', 'opacity="0.4" filter="url(#b14)"');
-    g += hrect(d1[0], d2[1], d2[0] - d1[0], d1[1] - d2[1], '#d6e6ec', 0.4);
-    for (let i = 0; i < 6; i++) { const xx = d1[0] + 9 + i * (d2[0] - d1[0] - 18) / 5, hh = (d1[1] - d2[1]) * (0.74 - Math.abs(i - 2.5) * 0.06), ww = 11; g += rect(xx - ww / 2, d1[1] - hh, ww, hh, V[1]); for (let k = 0; k < 8; k++) g += ell(xx + rr(-2, 2), d1[1] - hh + 5 + k * hh / 9, 1.3, 1.3, '#f6fdff'); }
-    g += P(polyD([[d1[0], d1[1]], [d2[0], d1[1]], [d2[0] + 70, d1[1] + 40], [d1[0] - 70, d1[1] + 40]]), '#dfeef3', 'opacity="0.28" filter="url(#b8)"');
-    // steam rolling off its roof into the snowing night, warm at its root
-    const r1 = cam.p(-4, 14.5, hz1 + 6), r2 = cam.p(3.6, 14.5, hz1 + 12);
-    g += steam(r1[0], r1[1], 220, 360, {warm: true, op: 0.85, lean: 0.1, n: 10, col: V[12], root: 0.25});
-    g += steam(r2[0], r2[1], 170, 290, {warm: true, op: 0.75, lean: 0.2, n: 9, col: V[12], root: 0.25});
+    // the big door open on the machines (cool light inside), its light on the snow
+    const d1 = cam.p(-4.2, 0, hzF), d2 = cam.p(4.2, 8.6, hzF);
+    g += rect(d1[0] - 22, d2[1] - 16, d2[0] - d1[0] + 44, d1[1] - d2[1] + 22, '#eaf4f7', 'opacity="0.3" filter="url(#b14)"');
+    g += hrect(d1[0], d2[1], d2[0] - d1[0], d1[1] - d2[1], '#cfe1e8', 0.4, 'opacity="0.55"');
+    for (let i = 0; i < 6; i++) { const xx = d1[0] + 9 + i * (d2[0] - d1[0] - 18) / 5, hh = (d1[1] - d2[1]) * 0.62, ww = 11; g += rect(xx - ww / 2, d1[1] - hh, ww, hh, V[1]); for (let kk = 0; kk < 7; kk++) g += ell(xx + rr(-2, 2), d1[1] - hh + 5 + kk * hh / 8, 1.3, 1.3, '#f6fdff'); }
+    g += P(polyD([[d1[0], d1[1]], [d2[0], d1[1]], [d2[0] + 70, d1[1] + 40], [d1[0] - 70, d1[1] + 40]]), '#dfeef3', 'opacity="0.24" filter="url(#b8)"');
+    // the drawn walls: the front, the far side going back, the roof's edges, the door, overshooting corners
+    const fr = [cam.p(Xl, 0, hzF), cam.p(Xr, 0, hzF), cam.p(Xr, Ht, hzF), cam.p(Xl, Ht, hzF)];
+    g += softPencil([fr[0], fr[3]], 3.6, {over: 10, op: 0.95}) + softPencil([fr[3], fr[2]], 3.6, {over: 12, op: 0.95}) + softPencil([fr[2], fr[1]], 3.6, {over: 10, op: 0.95});
+    g += softPencil([[fr[0][0] - 30, fr[0][1] + 1], [fr[1][0] + 30, fr[1][1] - 1]], 2.4, {op: 0.6});
+    g += softPencil([cam.p(Xr, Ht, hzF), cam.p(Xr, Ht, hzB)], 2.8, {op: 0.8, over: 6}) + softPencil([cam.p(Xr, 0, hzF), cam.p(Xr, 0, hzB)], 2.2, {op: 0.55}) + softPencil([cam.p(Xr, Ht, hzB), cam.p(Xr, 0, hzB)], 2.2, {op: 0.55});
+    g += softPencil([cam.p(Xl, Ht, hzF), cam.p(Xl, Ht, hzB), cam.p(Xr, Ht, hzB)], 2, {op: 0.45});
+    g += softPencil([d1, [d1[0], d2[1]], d2, [d2[0], d1[1]]], 3.2, {over: 6, op: 0.95});
+    g += softPencil([[d1[0] - 20, d2[1] - 10], [d2[0] + 60, d2[1] - 10]], 2, {op: 0.55});
+    g += pencilHatch([cam.p(Xr, Ht, hzF), cam.p(Xr, Ht, hzB), cam.p(Xr, 0, hzB), cam.p(Xr, 0, hzF)], 7, {op: 0.3, w: 1.6});
     s += g;
   } else {
     s += P(polyD([cam.p(-9, 0, hz1), cam.p(8.5, 0, hz1), cam.p(8.5, 0, 150), cam.p(-9, 0, 150)], 1), V[10]);
@@ -151,7 +169,7 @@ function homeView(o = {}) {
   s += seam(0.085, C.honeyL, '', 0.55);
   for (let i = 0; i < pts.length; i++) { if (rnd() < 0.78) continue; const [x, z] = pts[i]; const p = cam.p(x + rr(-0.1, 0.1), 0, z), w = cam.sz(rr(0.08, 0.18), z) * clamp(z / 6, 0.5, 1); s += P(blobD(p[0], p[1], w, w * 0.28, 7, 0.45, rr(0, 3)), V[2], 'opacity="0.85"'); }
   // thin branches of melt to the far blocks' doors (the homes it reaches)
-  for (const [zb, ok] of [[43.7, true], [53.6, true]]) {
+  for (const [zb, ok] of [[21.1, mode === 'vision'], [29.1, mode === 'vision'], [36.3, mode === 'vision'], [43.7, true], [53.6, true]]) {
     if (!ok || zb > zEnd) continue;
     const a = cam.p(lineX, 0, zb - 1.2), m = cam.p(4.5, 0, zb + 0.4), b = cam.p(10.2, 0, zb + 0.9);
     s += S(smoothD([a, m, b], false), V[3], cam.sz(0.26, zb), 'opacity="0.9"') + S(smoothD([a, m, b], false), C.honey, cam.sz(0.07, zb), 'opacity="0.85"');
@@ -272,45 +290,149 @@ function hallAisle(o = {}) {
   return {s, cam, ax, rh, z0, z1};
 }
 
-// ---------- B2: a cathedral of computers ----------
+// ---------- B2: a cathedral of computers. From a low eye just inside the hall's door (snow blown in over its sill,
+// her cart's tracks through it), the aisle runs away between two walls of giant computers that climb out of sight, each
+// with its rows of small cool lights; far at the end a door stands open on the snowy night, the brightest thing in the
+// hall; she walks small toward it, pushing her cart ----------
 FRAMES.B2 = () => {
-  const h = hallAisle({seed: 21, z1: 52});
-  let s = h.s;
-  const cam = h.cam;
-  // the technician walking small down the aisle, pushing a cart
-  const f = cam.p(0.35, 0, 15), hp = cam.sz(1.7, 15);
-  s += ell(f[0], f[1] + 1, hp * 0.22, hp * 0.04, V[6], 'opacity="0.6"');
-  s += person(f[0], f[1], hp, {pose: 'walk', coat: V[3], dark: V[1], hair: V[1], skin: V[6], scarf: V[8]});
-  const c1 = cam.p(0.9, 0, 15.4), c2 = cam.p(1.5, 1.0, 15.4);
-  s += hrect(c1[0], c2[1], c2[0] - c1[0], c1[1] - c2[1] - 3, V[4], 0.4) + rect(c1[0] - 4, c2[1], 4, (c1[1] - c2[1]) * 0.6, V[3]);
-  // snow blown in over the threshold behind us: drifts on the floor, flakes in the near air
-  s += P(smoothD([[-20, 1700], [160, 1668], [360, 1690], [520, 1676], [700, 1694], [900, 1664], [1100, 1688], [1100, 1940], [-20, 1940]], true), V[12]);
-  s += P(smoothD([[-20, 1780], [240, 1754], [540, 1774], [820, 1748], [1100, 1770], [1100, 1940], [-20, 1940]], true), V[11], 'opacity="0.8"');
-  for (const x of [430, 470, 610, 650]) s += S(lineD([[x + (x - 540) * 0.6, 1940], [x, 1690]]), V[9], 6, 'opacity="0.7"');
-  s += snowfall(70, 1100, 1920, {rmax: 6}) + snowfall(40, 600, 1100, {rmax: 3, op: 0.6});
+  seed(21);
+  const cam = Cam(900, 540, 1290, 0.5);
+  const ax = 1.55, rh = 4.8, z0 = 0.7, z1 = 24;
+  let s = '';
+  s += `<linearGradient id="b2g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1920"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.16" stop-color="${C.paper}"/><stop offset="0.315" stop-color="${C.paper}"/><stop offset="0.39" stop-color="${V[7]}"/><stop offset="0.6" stop-color="${V[4]}"/><stop offset="1" stop-color="${V[3]}"/></linearGradient><rect x="0" y="0" width="${W}" height="${H}" fill="url(#b2g)"/>`;
+  // the far wall and its door, open on the snowy night under a lamp: the light at the end of the nave
+  s += faceZ(cam, z1, -ax - 0.2, ax + 0.2, 0, rh + 2, V[4]);
+  const d1 = cam.p(-1.2, 0, z1), d2 = cam.p(1.2, 3.3, z1);
+  s += rect(d1[0] - 130, d2[1] - 150, d2[0] - d1[0] + 260, d1[1] - d2[1] + 230, '#f4f7f8', 'opacity="0.6" filter="url(#b40)"');
+  s += rect(d1[0] - 40, d2[1] - 40, d2[0] - d1[0] + 80, d1[1] - d2[1] + 60, '#ffffff', 'opacity="0.5" filter="url(#b14)"');
+  s += hrect(d1[0], d2[1], d2[0] - d1[0], d1[1] - d2[1], '#f7f9fa', 0.4);
+  s += rect(d1[0], d1[1] - (d1[1] - d2[1]) * 0.34, d2[0] - d1[0], (d1[1] - d2[1]) * 0.34, '#e9eef1');
+  s += P(polyD([[d1[0] + 6, d1[1] - (d1[1] - d2[1]) * 0.36], [d1[0] + 20, d2[1] + 20], [d1[0] + 28, d1[1] - (d1[1] - d2[1]) * 0.36]], 0.4), V[9]);
+  for (let i = 0; i < 16; i++) s += ell(rr(d1[0] + 3, d2[0] - 3), rr(d2[1] + 3, d1[1] - 6), 1.3, 1.3, V[8], 'opacity="0.8"');
+  // the light it throws down the aisle: a long pale sheen on the floor toward us, and on the machines' edges
+  s += P(polyD([cam.p(-1.0, 0, z1), cam.p(1.0, 0, z1), cam.p(1.25, 0, 3), cam.p(-1.25, 0, 3)]), '#eef3f5', 'opacity="0.22" filter="url(#b14)"');
+  s += P(polyD([cam.p(-0.45, 0, z1), cam.p(0.45, 0, z1), cam.p(0.6, 0, 5), cam.p(-0.6, 0, 5)]), '#f3f6f7', 'opacity="0.2" filter="url(#b8)"');
+  // the floor, a step down from the light: raised tiles, darker toward us
+  s += P(polyD([cam.p(-ax, 0, z0), cam.p(-ax, 0, z1), cam.p(ax, 0, z1), cam.p(ax, 0, z0)]), V[5], 'opacity="0.75"');
+  for (let z = z0 + 0.3; z < z1; z *= 1.2) s += S(lineD([cam.p(-ax, 0, z), cam.p(ax, 0, z)]), V[3], 1.4, 'opacity="0.7"');
+  for (const x of [-ax / 2, 0, ax / 2]) s += S(lineD([cam.p(x, 0, z0), cam.p(x, 0, z1)]), V[3], 1.4, 'opacity="0.7"');
+  // the two walls of giant computers, climbing out of sight: each cabinet a dark door with its rows of small cool
+  // lights (regular: two per tray), the door's light catching their edges
+  for (const side of [-1, 1]) {
+    const X = side * ax;
+    for (let z = z0; z < z1 - 0.5; z += 0.7) {
+      const zz = z + 0.64;
+      s += poly3(cam, [[X, 0, z], [X, 0, zz], [X, rh, zz], [X, rh, z]], V[1], '', 0.3);
+      s += poly3(cam, [[X, 0.08, z + 0.05], [X, 0.08, zz - 0.05], [X, rh - 0.08, zz - 0.05], [X, rh - 0.08, z + 0.05]], V[2], '', 0.3);
+      const k = clamp(1.2 - z / 30, 0.5, 1);
+      for (let yy = 0.22; yy < rh - 0.12; yy += 0.15) for (const dzz of [0.12, 0.2]) {
+        const p = cam.p(X, yy, z + dzz), r = Math.max(0.9, cam.sz(0.016, z));
+        s += ell(p[0], p[1], r, r, '#bfe6f2', `opacity="${f1(0.85 * k)}"`);
+      }
+      s += S(lineD([cam.p(X, 0, zz), cam.p(X, rh, zz)]), '#e4eef1', Math.max(0.8, cam.sz(0.012, z)), `opacity="${f1(0.4 * (z / z1))}"`);
+    }
+    // the cable tray along the tops
+    s += S(lineD([cam.p(side * (ax - 0.25), rh + 0.25, 3.5), cam.p(side * (ax - 0.25), rh + 0.25, z1)]), V[1], 9, 'opacity="0.85"');
+    s += P(polyD(q3(cam, [[side * ax * 0.98, 0, z0], [side * ax * 0.98, 0, z1], [side * ax * 0.6, 0, z1], [side * ax * 0.6, 0, z0]])), '#bfe6f2', 'opacity="0.08" filter="url(#b8)"');
+  }
+  // the high hall above them, lost in its light (the machines climb into it)
+  s += `<linearGradient id="b2up" gradientUnits="userSpaceOnUse" x1="0" y1="590" x2="0" y2="760"><stop offset="0" stop-color="${C.paper}" stop-opacity="1"/><stop offset="0.4" stop-color="${C.paper}" stop-opacity="0.5"/><stop offset="1" stop-color="${C.paper}" stop-opacity="0"/></linearGradient><rect x="0" y="0" width="${W}" height="760" fill="url(#b2up)"/>`;
+  // her, small, walking toward the light, pushing her cart; its wet tracks behind her
+  const zf = 9.5, f = cam.p(1.0, 0, zf), hp = cam.sz(1.7, zf);
+  const c1 = cam.p(0.64, 0, zf + 0.9), c2 = cam.p(1.36, 1.0, zf + 0.9);
+  s += hrect(c1[0], c2[1], c2[0] - c1[0], c1[1] - c2[1] - 4, V[2], 0.4) + rect(c1[0], c2[1], c2[0] - c1[0], 4, V[4]) + rect(c1[0] + 4, c2[1] + 10, c2[0] - c1[0] - 8, 3, V[4], 'opacity="0.8"');
+  s += ell(f[0], f[1] + 1, hp * 0.2, hp * 0.035, V[3], 'opacity="0.6"');
+  s += her(f[0], f[1], hp, {view: 'back', arms: [[14, 18], [14, 18]], coat: V[1], coatL: V[3], hair: V[0], skin: V[6], scarf: V[8], step: [1.5, 4]});
+  for (const tx of [0.78, 1.3]) s += S(smoothD([cam.p(tx, 0, zf + 0.6), cam.p(tx - 0.3, 0, 4), cam.p(tx - 0.5, 0, 1.6)], false), V[2], 3, 'opacity="0.6"');
+  // the threshold behind us: the door's steel sill across the bottom, the snow blown in over it in a drift (in the
+  // hall's cool shadow, never as bright as the far door), her cart's tracks and her footprints through it
+  s += P(smoothD([[-30, 1706], [140, 1692], [300, 1706], [470, 1688], [650, 1704], [820, 1686], [960, 1700], [1110, 1690], [1110, 1940], [-30, 1940]], true), V[7]);
+  s += P(smoothD([[-30, 1748], [200, 1732], [450, 1750], [700, 1734], [950, 1748], [1110, 1736], [1110, 1940], [-30, 1940]], true), V[8]);
+  for (let i = 0; i < 10; i++) s += P(blobD(rr(0, W), rr(1700, 1770), rr(40, 100), rr(6, 12), 8, 0.35), V[9], 'opacity="0.5"');
+  for (const tx of [0.78, 1.3]) { const a = cam.p(tx - 0.5, 0, 1.6), b = [a[0] + (a[0] - 540) * 0.5, 1900]; s += S(lineD([a, b]), V[6], 9, 'opacity="0.8"'); }
+  for (let i = 0; i < 5; i++) { const p = [700 + (i % 2) * 34, 1700 + i * 44]; s += ell(p[0], p[1], 14 + i * 2, 6 + i, V[7], 'opacity="0.8"'); }
+  s += rect(0, 1872, W, 48, V[3]) + rect(0, 1872, W, 5, V[8]);
+  s += P(smoothD([[-30, 1878], [200, 1862], [480, 1876], [760, 1860], [1110, 1872], [1110, 1890], [-30, 1890]], true), V[9]);
+  // a few flakes blowing in over the sill, in the near air only
+  for (let i = 0; i < 26; i++) { const x = rr(0, W), y = rr(1560, 1880); s += ell(x, y, rr(2.4, 5), rr(2.4, 5), '#f4f6f8', `opacity="${f1(rr(0.5, 0.9))}"`); }
   s += caption([{t: 'giant computers,', x: 520, y: 400, size: 112}, {t: 'data centers.', x: 560, y: 528, size: 112}]);
   return svgPage(s);
 };
 
-// ---------- B3: too hot for snow ----------
+// ---------- B3: too hot for snow (round 2). The hot aisle behind the machines: both walls are their backs, dark faces
+// whose grille slits glow with the heat inside like an oven's, deep honey near us to white-hot where the aisle meets; the
+// glow spills onto the floor and onto her; far down the aisle the air bends in the haze. She stands near us in the
+// middle, her coat flung open, fanning herself with her beanie, her hair lifting in the hot draught; the flakes blown in
+// behind us shrink and turn to drops before they reach the machines ----------
 FRAMES.B3 = () => {
-  const h = hallAisle({seed: 23, hot: true, z1: 30, ax: 1.5, farDoor: false, hz: 1060});
-  let s = h.s;
-  const cam = h.cam;
-  // the air shimmering up to the vents: soft warm haze rising off both walls
-  for (let i = 0; i < 18; i++) { const sx = rnd() < 0.5 ? -1 : 1, z = rr(4, 22), a = cam.p(sx * 1.25, rr(0.8, 2.2), z), w = cam.sz(rr(0.25, 0.5), z), hh = cam.sz(rr(1.2, 2.4), z); s += P(blobD(a[0], a[1] - hh / 2, w, hh / 2, 8, 0.3), C.honeyC, 'opacity="0.22" filter="url(#b8)"'); }
-  // the vents in the ceiling, past the band
-  for (let z = 9; z < 28; z += 4.5) { const a = cam.p(-0.7, 8.4, z), b = cam.p(0.7, 8.4, z + 1.2); s += hrect(a[0], b[1], b[0] - a[0], Math.max(4, a[1] - b[1]), V[6], 0.5); }
-  // the technician in the middle of the hot aisle, pulling off her beanie, her hair lifting
-  const f = cam.p(0.1, 0, 7.4), hp = cam.sz(1.7, 7.4);
-  s += ell(f[0], f[1] + 2, hp * 0.22, hp * 0.04, C.honeyD, 'opacity="0.45"');
-  s += person(f[0], f[1], hp, {pose: 'beanie', coat: V[2], dark: V[1], hair: V[1], skin: V[7], scarf: V[9], rim: C.honeyL});
-  // her hair lifting in the hot draught: a few loose strands rising
-  s += S(smoothD([[f[0] - 4, f[1] - hp * 0.97], [f[0] - 10, f[1] - hp * 1.04], [f[0] - 6, f[1] - hp * 1.09]], false), V[1], 3) + S(smoothD([[f[0] + 5, f[1] - hp * 0.98], [f[0] + 9, f[1] - hp * 1.05], [f[0] + 3, f[1] - hp * 1.1]], false), V[1], 3);
-  // snowflakes blown in behind us turn to drops and little puffs before they reach the machines
-  for (let i = 0; i < 16; i++) { const x = rr(60, 1020), y = rr(640, 1250); const melt = y > 900; s += melt ? ell(x, y, 2.4, 3.4, '#f1f3f6', 'opacity="0.8"') + ell(x, y - 8, 9, 6, '#ffffff', 'opacity="0.35" filter="url(#b4)"') : ell(x, y, 3.2, 3.2, '#ffffff', 'opacity="0.9"'); }
+  seed(23);
+  const cam = Cam(950, 540, 1060, 1.7);
+  const ax = 1.5, rh = 2.9, z0 = 1.25, z1 = 30;
+  let s = '';
+  s += `<linearGradient id="b3g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1100"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.28" stop-color="${C.paper}"/><stop offset="0.55" stop-color="${C.paper}"/><stop offset="0.66" stop-color="#e3c9a3"/><stop offset="1" stop-color="${V[6]}"/></linearGradient><rect x="0" y="0" width="${W}" height="${H}" fill="url(#b3g)"/>`;
+  // the upper walls over the racks, warm-dark (all below the band)
+  s += `<linearGradient id="b3w" gradientUnits="userSpaceOnUse" x1="0" y1="560" x2="0" y2="1000"><stop offset="0" stop-color="${C.paper}"/><stop offset="0.3" stop-color="#d9c3a2"/><stop offset="1" stop-color="${V[5]}"/></linearGradient>`;
+  for (const sx of [-1, 1]) s += P(polyD([cam.p(sx * ax, rh, z0), cam.p(sx * ax, rh, z1), cam.p(sx * ax, 7, z1), cam.p(sx * ax, 7, z0)], 1), 'url(#b3w)', 'opacity="0.9"');
+  // far away everything sits in the bending air (the haze filters bend the straight lines more with distance)
+  const hz = {hz1: '', hz2: '', hz3: '', hz4: '', hz5: ''};
+  const cuts = [[5.5, 8, 'hz1'], [8, 11, 'hz2'], [11, 15, 'hz3'], [15, 20, 'hz4'], [20, z1, 'hz5']];
+  const hzOf = (z) => { for (const [a, b, k] of cuts) if (z >= a && z < b) return k; return ''; };
+  let vents = '';
+  const ventPts = [];
+  for (let z = 9; z < 28; z += 3.6) { const a = cam.p(-0.7, 6.9, z), b = cam.p(0.7, 6.9, z + 1.0); if (b[1] < 650) continue; ventPts.push([(a[0] + b[0]) / 2, b[1]]); vents += hrect(a[0], b[1], b[0] - a[0], Math.max(5, a[1] - b[1]), V[2], 0.5) + rect(a[0] + 3, b[1] + 1, b[0] - a[0] - 6, 2, C.honeyL, 'opacity="0.5"'); }
+  // the core: where the aisle meets, white-hot
+  const vp = cam.p(0, 1.3, z1);
+  const farWall = G(faceZ(cam, z1, -ax - 0.1, ax + 0.1, 0, 7, C.honeyC), 'filter="url(#hz5)"');
+  // the floor: dark tiles, the core's light running down the middle of it
+  s += P(polyD([cam.p(-ax, 0, z0), cam.p(-ax, 0, z1), cam.p(ax, 0, z1), cam.p(ax, 0, z0)]), V[3]);
+  s += P(polyD([cam.p(-0.5, 0, z1), cam.p(0.5, 0, z1), cam.p(0.7, 0, z0), cam.p(-0.7, 0, z0)]), C.honey, 'opacity="0.2" filter="url(#b24)"');
+  for (let z = z0; z < z1; z *= 1.16) { const ln = S(lineD([cam.p(-ax, 0, z), cam.p(ax, 0, z)]), V[1], 1.6, 'opacity="0.7"'); const k = z > 11 ? hzOf(z) : ''; if (k) hz[k] += ln; else s += ln; }
+  for (const x of [-ax / 2, 0, ax / 2]) { s += S(lineD([cam.p(x, 0, z0), cam.p(x, 0, 11)]), V[1], 1.4, 'opacity="0.6"'); for (const [a, b, k] of cuts.slice(2)) hz[k] += S(lineD([cam.p(x, 0, a), cam.p(x, 0, b)]), V[1], 1.3, 'opacity="0.6"'); }
+  // the glow the walls throw on the floor along their feet (honey near us, paler toward the core)
+  for (const side of [-1, 1]) {
+    s += P(polyD(q3(cam, [[side * ax * 0.99, 0, z0], [side * ax * 0.99, 0, z1], [side * ax * 0.62, 0, z1], [side * ax * 0.62, 0, z0]])), C.honeyD, 'opacity="0.3" filter="url(#b14)"');
+    s += P(polyD(q3(cam, [[side * ax * 0.99, 0, z0], [side * ax * 0.99, 0, z1], [side * ax * 0.84, 0, z1], [side * ax * 0.84, 0, z0]])), C.honey, 'opacity="0.42" filter="url(#b8)"');
+  }
+  // the two walls: the machines' backs, dark, their slits glowing (near, mid, far: the far ones in the bending air)
+  const slices = cuts.slice().reverse().map(([a, b, k]) => [a, b, k, a < 11 ? 'b4' : 'b2']).concat([[z0, 5.5, '', 'b8']]);
+  hz.hz3 += vents;
+  let nearWalls = '';
+  for (const [za, zb, k, bl] of slices) {
+    let g = '';
+    for (const side of [-1, 1]) { const w = slitWall(cam, side * ax, rh, za, zb, z0, z1); g += w.base + G(w.glow, `filter="url(#${bl})"`) + w.core; }
+    if (k) hz[k] += g; else nearWalls += g;
+  }
+  // the white-hot core behind the far machines, so their dark edges shiver against it; a veil of hot air over them
+  s += farWall + ell(vp[0], vp[1], 170, 220, C.honeyC, 'opacity="0.9" filter="url(#b40)"') + ell(vp[0], vp[1], 70, 110, '#fffaf0', 'opacity="0.95" filter="url(#b14)"');
+  for (const k of ['hz5', 'hz4', 'hz3', 'hz2', 'hz1']) s += G(hz[k], `filter="url(#${k})"`);
+  s += ell(vp[0], vp[1], 120, 150, '#fffaf0', 'opacity="0.42" filter="url(#b40)"');
+  s += nearWalls;
+  // the heat lifting off the backs in soft warm veils, up toward the vents
+  for (const side of [-1, 1]) {
+    const X = side * ax;
+    for (let i = 0; i < 9; i++) {
+      const z = z0 + 1 + i * 2.2, base = cam.p(X * 0.92, rh, z), up = cam.sz(3.6, z);
+      s += P(blobD(base[0] - side * up * 0.08, base[1] - up * 0.45, cam.sz(0.5, z), up * 0.5, 9, 0.25), C.honeyC, 'opacity="0.2" filter="url(#b14)"');
+    }
+  }
+  for (const [vx, vy] of ventPts) s += steam(vx, vy + 34, 90, 70, {n: 4, col: C.honeyC, op: 0.35, warm: false});
+  // her, near, in the middle of the aisle: coat flung open, fanning herself with her beanie, the walls' heat on her
+  const zf = 2.6, f = cam.p(-0.28, 0, zf), hp = cam.sz(1.7, zf);
+  s += ell(f[0], f[1] + 4, hp * 0.26, hp * 0.04, C.honeyD, 'opacity="0.45" filter="url(#b4)"') + ell(f[0], f[1] + 3, hp * 0.16, hp * 0.025, V[0], 'opacity="0.6"');
+  s += herHot(f[0], f[1], hp, {coat: V[2], knit: V[10], hair: V[1], skin: V[8], hatCol: V[6]});
+  // the flakes blown in behind us: big and white at the edges, shrinking and wet as they go in, drops and little
+  // puffs before they reach the machines
+  for (let i = 0; i < 46; i++) {
+    const ang = rr(0, Math.PI * 2), d = rr(0.15, 1), x = 540 + Math.cos(ang) * d * 600, y = 1240 + Math.sin(ang) * d * 760;
+    if (y < 650 || y > 1900 || x < 0 || x > W) continue;
+    if (d > 0.68) s += flakeStar(x, y, rr(5, 8), 0.95, rr(0, 1));
+    else if (d > 0.42) s += ell(x, y, 3.4, 3.4, '#f6f7f8', 'opacity="0.85"') + ell(x + 1, y + 1, 1.2, 1.2, C.honeyL, 'opacity="0.8"');
+    else s += P(smoothD([[x, y - 6], [x + 3, y + 1], [x, y + 4], [x - 3, y + 1]], true), '#f3efe6', 'opacity="0.85"') + ell(x, y - 12, 8, 6, '#ffffff', 'opacity="0.3" filter="url(#b4)"');
+  }
+  // the hall's top dissolves into the band's calm light (nothing in the band but the words)
+  s += `<linearGradient id="b3up" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="720"><stop offset="0" stop-color="${C.paperT}" stop-opacity="1"/><stop offset="0.82" stop-color="${C.paper}" stop-opacity="1"/><stop offset="1" stop-color="${C.paper}" stop-opacity="0"/></linearGradient><rect x="0" y="0" width="${W}" height="720" fill="url(#b3up)"/>`;
   s += caption([{t: 'really', x: 340, y: 380, size: 112}, {t: 'hot.', x: 600, y: 520, lit: true, size: 170}]);
-  return svgPage(s);
+  return svgPage(s, hazeDefs());
 };
 
 // ---------- B4: forty kettles in one ----------
@@ -343,25 +465,66 @@ function kettleCabinet(x, y, w, h, opts = {}) {
   return s;
 }
 FRAMES.B4 = () => {
+  // closer and lower: one giant computer's door swung wide toward us, its inside BLAZING honey with the boiling: forty
+  // kettles in eight rows of five catching the light, a jet of steam curling up off every spout and all of it rolling
+  // out over the top in one cloud; the row around it and the floor stay cool. She steps back from it, both hands up, her
+  // face tipped up to the top of the wall (round 2)
   seed(41);
-  const cam = Cam(950, 540, 1080, 1.7);
+  const cam = Cam(800, 520, 1387, 0.8);
+  const zc = 2.9, Xl = -0.75, Xr = 0.85, Ht = 3.0;
   let s = '';
-  // the cold aisle behind: the ceiling (the band), the rows receding to the right, dark with small lights
-  s += `<linearGradient id="ceil4" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1100"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.27" stop-color="${C.paper}"/><stop offset="0.56" stop-color="${C.paper}"/><stop offset="0.75" stop-color="${V[11]}"/><stop offset="1" stop-color="${V[9]}"/></linearGradient><rect x="0" y="0" width="${W}" height="${H}" fill="url(#ceil4)"/>`;
-  s += rect(0, 1080, W, 840, V[9]);
-  for (let i = 0; i < 9; i++) { const x = 820 + i * 34, hh = 380 - i * 22; s += rackFront(x, 1080 - hh * 0.62, 30, hh, {lights: true, density: 0.6}); }
-  for (let i = 0; i < 6; i++) { const x = 40 - i * 4 + i * 26, hh = 330 - i * 26; s += rackFront(x - 10, 1080 - hh * 0.62, 24, hh, {lights: true, density: 0.5}); }
-  // the floor's tiles
-  for (let k = 0; k < 8; k++) s += S(lineD([[0, 1120 + k * k * 9], [W, 1120 + k * k * 9]]), V[10], 1.5, 'opacity="0.8"');
-  // the open giant computer: forty kettles
-  s += kettleCabinet(330, 700, 470, 760);
-  // its glow on the floor in front (the heat)
-  s += ell(565, 1490, 330, 46, C.honey, 'opacity="0.25" filter="url(#b14)"');
-  // the technician leaning back to take it in (a step behind, to the right)
-  s += person(905, 1478, 330, {pose: 'awe', coat: V[3], dark: V[1], hair: V[1], skin: V[7], scarf: V[9], dir: -1, rim: C.honeyL});
-  s += snowfall(18, 640, 1500, {rmax: 3, op: 0.5});
+  s += `<linearGradient id="ceil4" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1920"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.15" stop-color="${C.paper}"/><stop offset="0.32" stop-color="${C.paper}"/><stop offset="0.45" stop-color="${V[10]}"/><stop offset="0.72" stop-color="${V[8]}"/><stop offset="1" stop-color="${V[6]}"/></linearGradient><rect x="0" y="0" width="${W}" height="${H}" fill="url(#ceil4)"/>`;
+  // the row of computers going on behind her (right), dark, their small cool lights; the floor's tiles
+  for (let i = 6; i >= 0; i--) { const z = 6.5 + i * 1.6, X1 = 1.9 + i * 0.25; const a = cam.p(X1, 2.4, z), b = cam.p(X1 + 0.6, 0, z); s += rackFront(a[0], a[1], b[0] - a[0], b[1] - a[1], {density: 0.7, body: V[3], door: V[4]}); }
+  s += P(blobD(840, 1180, 330, 520, 10, 0.12), V[10], 'opacity="0.5" filter="url(#b40)"');
+  s += P(polyD([[0, 1600], [W, 1600], [W, H], [0, H]]), V[7], 'opacity="0.5"');
+  for (const z of [1.6, 2.1, 2.9, 4.2, 6.4]) s += S(lineD([cam.p(-4, 0, z), cam.p(6, 0, z)]), V[6], 1.6, 'opacity="0.7"');
+  for (const X of [-1.2, -0.4, 0.4, 1.2, 2.0, 2.8]) s += S(lineD([cam.p(X, 0, 1.2), cam.p(X, 0, 9)]), V[6], 1.4, 'opacity="0.6"');
+  // the open computer: its body, and its inside blazing honey with the boiling (a bloom only at the opening)
+  const tl = cam.p(Xl, Ht, zc), br = cam.p(Xr, 0, zc), w = br[0] - tl[0], h = br[1] - tl[1];
+  s += rect(tl[0] - 22, tl[1] - 26, w + 44, h + 36, C.honey, 'opacity="0.4" filter="url(#b24)"');
+  s += hrect(tl[0] - 16, tl[1] - 18, w + 32, h + 22, V[0], 1);
+  s += `<radialGradient id="k4in" gradientUnits="userSpaceOnUse" cx="${f1(tl[0] + w / 2)}" cy="${f1(tl[1] + h * 0.42)}" r="${f1(h * 0.66)}"><stop offset="0" stop-color="${C.honeyC}"/><stop offset="0.45" stop-color="${C.honeyL}"/><stop offset="1" stop-color="${C.honey}"/></radialGradient>`;
+  s += hrect(tl[0], tl[1], w, h, 'url(#k4in)', 0.8);
+  // eight shelves of five kettles, the shelves and the kettles catching the blaze, their water gauges glowing
+  const rows = 8, cols = 5, ch = h / rows, cw = w / cols;
+  const spouts = [];
+  for (let r = 0; r < rows; r++) {
+    const sy = tl[1] + (r + 1) * ch;
+    s += rect(tl[0] + 4, sy - 8, w - 8, 9, C.honeyW) + rect(tl[0] + 4, sy - 8, w - 8, 2.4, C.honeyC, 'opacity="0.9"');
+    for (let c = 0; c < cols; c++) {
+      const kx = tl[0] + (c + 0.56) * cw + rr(-2, 2), ks = ch * 0.74;
+      s += ell(kx + ks * 0.05, sy - 9, ks * 0.4, ks * 0.06, C.honeyW, 'opacity="0.6" filter="url(#b2)"');
+      s += kettleLit(kx, sy - 8, ks);
+      spouts.push([kx - 0.47 * ks, sy - 8 - 0.79 * ks, r, c]);
+    }
+  }
+  // the boil: a jet of steam curling up off every spout (up the gaps between the kettles, the bodies crisp)
+  for (const [sx, sy, r, c] of spouts) s += steamJet(sx, sy, ch * (r === 0 ? 1.15 : 0.95), {dir: -1, ph: r * 1.7 + c * 2.3, op: 0.95, w: ch * 0.1});
+  s += ell(tl[0] + w / 2, br[1] + 10, w * 0.8, 40, C.honey, 'opacity="0.28" filter="url(#b14)"');
+  // the door swung wide toward us on its left hinge: its inner face dark, perforated, its lights dead
+  const ang = 115 * Math.PI / 180, dw = 1.6;
+  const fe = [Xl + dw * Math.cos(ang), zc - dw * Math.sin(ang)];
+  const dq = (t, Y) => cam.p(Xl + (fe[0] - Xl) * t, Y, zc + (fe[1] - zc) * t);
+  const Dh = 2.45;
+  s += P(polyD([dq(0, Dh + 0.02), dq(1, Dh + 0.02), dq(1, -0.02), dq(0, -0.02)], 0.6), V[1]);
+  s += P(polyD([dq(0.03, Dh - 0.06), dq(0.97, Dh - 0.06), dq(0.97, 0.06), dq(0.03, 0.06)], 0.6), V[4]);
+  s += P(polyD([dq(0.03, Dh - 0.06), dq(0.4, Dh - 0.06), dq(0.4, 0.06), dq(0.03, 0.06)], 0.6), C.honey, 'opacity="0.16"');
+  for (let i = 1; i < 18; i++) for (let k = 1; k < 16; k++) { const t = i / 18, Y = k * Dh / 16, p = dq(t, Y), zz = zc + (fe[1] - zc) * t; s += ell(p[0], p[1], Math.max(1, cam.sz(0.012, zz)), Math.max(1, cam.sz(0.012, zz)), V[2], 'opacity="0.8"'); }
+  s += S(lineD([dq(0, Dh), dq(1, Dh)]), V[6], 4, 'opacity="0.9"') + S(lineD([dq(0, 0), dq(1, 0)]), V[1], 3);
+  { const hA = dq(0.86, 1.15), hB = dq(0.86, 1.55); s += S(lineD([hA, hB]), V[8], Math.max(4, cam.sz(0.03, 1.8)), 'opacity="0.9"'); }
+  // her, a step back from it, both hands up, her face tipped up to the top of the wall; the blaze's light on her front
+  const fz = 3.3, f = cam.p(1.36, 0, fz), hp = cam.sz(1.7, fz);
+  s += ell(f[0] + hp * 0.03, f[1] + 3, hp * 0.24, hp * 0.035, V[4], 'opacity="0.6"');
+  s += herRecoil(f[0], f[1], hp, {dir: -1, coat: V[2], coatL: V[3], hair: V[1], skin: mixHex(V[8], C.honeyL, 0.3), hand: mixHex(V[8], C.honeyL, 0.4), scarf: V[8], rim: C.honeyL});
+  // the high hall's light over it all (the band stays calm)
+  s += `<linearGradient id="b4up" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="700"><stop offset="0" stop-color="${C.paperT}" stop-opacity="1"/><stop offset="0.86" stop-color="${C.paper}" stop-opacity="1"/><stop offset="1" stop-color="${C.paper}" stop-opacity="0"/></linearGradient><rect x="0" y="0" width="${W}" height="700" fill="url(#b4up)"/>`;
+  // the forty jets gather into ONE cloud rolling out over the computer's top, lit warm from below by the blaze, its
+  // crown melting into the high hall's light under the words
+  s += G(rollCloud(tl[0] + w / 2, tl[1] - 26, w * 0.98, 230), 'mask="url(#cloudfade)"');
   s += caption([{t: '40', x: 470, y: 500, lit: true, size: 250}, {t: 'kettles,', x: 760, y: 572, size: 112}]);
-  return svgPage(s);
+  const jetDefs = `<linearGradient id="cfg" gradientUnits="userSpaceOnUse" x1="0" y1="505" x2="0" y2="615"><stop offset="0" stop-color="#000000"/><stop offset="1" stop-color="#ffffff"/></linearGradient><mask id="cloudfade" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><rect x="0" y="0" width="${W}" height="${H}" fill="url(#cfg)"/></mask>` + `<linearGradient id="jetg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#d8d8d8"/><stop offset="1" stop-color="#000000"/></linearGradient><mask id="jetfade" maskContentUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" fill="url(#jetg)"/></mask>`;
+  return svgPage(s, jetDefs);
 };
 
 // ======================================================================================
@@ -461,21 +624,49 @@ FRAMES.B11 = () => {
   return svgPage(s);
 };
 
-// ---------- B5: one cup (her toast to the forty kettles) ----------
+// ---------- B5 (reworked in round 1): one cup, raised. Close on the open computer: its forty kettles boiling in rows
+// that run out of the frame on every side, their steam rolling up into one cloud; in front, her hand comes in and
+// raises ONE mug to them, a toast (her mug: it comes back in her window at the end) ----------
 FRAMES.B5 = () => {
-  seed(51);
+  seed(52);
   let s = '';
-  s += `<linearGradient id="ceil5" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1100"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.27" stop-color="${C.paper}"/><stop offset="0.55" stop-color="${C.paper}"/><stop offset="0.75" stop-color="${V[11]}"/><stop offset="1" stop-color="${V[9]}"/></linearGradient><rect x="0" y="0" width="${W}" height="${H}" fill="url(#ceil5)"/>`;
-  // the aisle behind her: dark computers with small lights receding left
-  for (let i = 0; i < 7; i++) { const hh = 420 - i * 40; s += rackFront(20 + i * 52, 1120 - hh * 0.66, 46, hh, {density: 0.6}); }
-  s += rect(0, 1110, W, 810, V[10]);
-  for (let k = 0; k < 7; k++) s += S(lineD([[0, 1140 + k * k * 11], [W, 1140 + k * k * 11]]), V[9], 1.4, 'opacity="0.8"');
-  // the open cabinet of forty kettles (right), steaming; its warmth on the floor
-  s += kettleCabinet(500, 690, 500, 790, {open: false});
-  s += ell(740, 1500, 330, 40, C.honey, 'opacity="0.22" filter="url(#b14)"');
-  // her, seated on a stool, raising ONE mug to the wall of kettles (a toast)
-  s += ell(300, 1572, 170, 22, V[7], 'opacity="0.6"');
-  s += personProfile(250, 1570, 980, {pose: 'sit-toast', mug: true, coat: V[4], coatL: V[5], hair: V[1], skin: V[9], boot: V[2], rim: C.honeyL});
+  s += `<linearGradient id="c5" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1920"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.16" stop-color="${C.paper}"/><stop offset="0.36" stop-color="${C.paper}"/><stop offset="0.5" stop-color="${V[12]}"/><stop offset="1" stop-color="${V[10]}"/></linearGradient><rect x="0" y="0" width="${W}" height="${H}" fill="url(#c5)"/>`;
+  // the wall of kettles inside the computer: shelves and kettles in rows, softened (they sit back), running out of the
+  // frame; the water gauges glowing; every spout puffing
+  let wall = '';
+  const cw = 212, rh = 196, x0 = -70, y0 = 700;
+  for (let r = 0; r < 7; r++) {
+    const sy = y0 + r * rh;
+    wall += rect(-20, sy + 2, W + 40, 12, V[6]) + rect(-20, sy + 14, W + 40, 5, V[4], 'opacity="0.6"');
+    for (let c = 0; c < 6; c++) {
+      const kx = x0 + c * cw + (r % 2) * 18 + rr(-4, 4);
+      wall += kettle(kx, sy + 2, 150, {steamOn: false, body: V[11], shade: V[9], dark: V[6], gauge: C.honey});
+      wall += steam(kx - 66, sy - 128, 70, 150, {n: 5, col: '#f7f8f9', op: 0.95, lean: -0.14, sharp: true});
+    }
+  }
+  s += G(wall, 'opacity="0.78" filter="url(#b2)"');
+  // the haze of their boiling over the wall, and the one cloud rolling up out of the top
+  s += rect(0, 640, W, 1280, V[12], 'opacity="0.22"');
+  s += steam(540, 860, 1300, 260, {n: 9, col: '#f3f4f6', op: 0.9, root: 0.2});
+  s += steam(200, 900, 700, 240, {n: 7, col: '#f4f5f7', op: 0.7});
+  s += steam(880, 900, 700, 240, {n: 7, col: '#f4f5f7', op: 0.7, lean: 0.1});
+  s += rect(0, 600, W, 120, '#f1f1f0', 'opacity="0.55" filter="url(#b24)"');
+  // her sleeve and hand from the right, raising the one mug (tilted a little toward them: cheers)
+  const mx = 480, my = 1200, mw = 300;
+  let hand = '';
+  hand += limb([[1200, 1700], [1040, 1500], [900, 1360]], [230, 180, 130], V[2]);
+  hand += S(smoothD([[1170, 1590], [1030, 1440], [930, 1360]], false), V[4], 8, 'opacity="0.55"');
+  // the knit cuff of her sweater
+  hand += limb([[928, 1386], [880, 1338]], [128, 118], V[9]);
+  for (let i = -3; i <= 3; i++) hand += S(lineD([[916 + i * 15, 1396 + i * 13], [880 + i * 15, 1360 + i * 13]]), V[8], 3, 'opacity="0.75"');
+  // the back of her hand round the handle, the fingers curled into its loop, the thumb laid along its top
+  hand += P(smoothD([[884, 1350], [902, 1290], [880, 1214], [832, 1170], [790, 1166], [756, 1186], [744, 1226], [748, 1270], [764, 1310], [800, 1344], [846, 1360]], true), V[8]);
+  for (const [cx2, cy2] of [[748, 1212], [745, 1248], [752, 1284], [770, 1314]]) hand += S(smoothD([[cx2 + 22, cy2 - 8], [cx2 + 6, cy2], [cx2 + 22, cy2 + 10]], false), V[6], 3.4, 'opacity="0.75"');
+  hand += limb([[846, 1182], [790, 1144], [742, 1128]], [40, 32, 26], V[8]);
+  hand += S(smoothD([[856, 1176], [796, 1136], [742, 1118]], false), C.honeyL, 4, 'opacity="0.6"');
+  hand += S(smoothD([[896, 1300], [892, 1240], [866, 1196]], false), C.honeyL, 4, 'opacity="0.4"');
+  s += G(herMug(mx, my, mw, {dir: 1, steamH: 12}) + hand, `transform="rotate(-7 ${mx} ${my})"`);
+  s += ell(mx - 20, my - 190, 150, 40, C.honeyL, 'opacity="0.35" filter="url(#b14)"');
   s += caption([{t: "That's a lot", x: 500, y: 400, size: 112}, {t: 'of tea.', x: 640, y: 522, size: 112}]);
   return svgPage(s);
 };
@@ -500,180 +691,213 @@ FRAMES.B6 = () => {
   for (const [y1, col] of [[1420, V[3]], [1640, V[2]]]) s += P(polyD([[0, y1], [W, y1 - 12], [W, H], [0, H]], 2), col);
   for (let i = 0; i < 9; i++) { const y = rr(1380, 1880); s += P(blobD(rr(0, W), y, rr(40, 130) * (y / 1300), rr(6, 14) * (y / 1300), 8, 0.3), V[6], 'opacity="0.4"'); }
   // one far fan at the roof's far edge, small, breathing faintly (the row goes on)
-  { const cx = 900, cy = 1352, rx = 74, ry = rx * 0.26; s += ell(cx, cy + rx * 0.42, rx * 1.06, ry * 1.06, V[2]) + P(polyD([[cx - rx * 1.06, cy], [cx + rx * 1.06, cy], [cx + rx * 1.06, cy + rx * 0.42], [cx - rx * 1.06, cy + rx * 0.42]], 0.4), V[2]) + fan(cx, cy, rx, ry, {ring: V[4], inner: V[1], blade: V[7]}); s += warmAir(cx, cy - 4, rx * 1.2, 230, {op: 0.5, n: 6}); }
-  // THE near fan: big, its housing, its blades turning, its mouth glowing with the heat
-  const cx = 470, cy = 1572, rx = 330, ry = rx * 0.27, dh = rx * 0.4;
-  s += ell(cx, cy + dh + ry * 0.4, rx * 1.4, ry * 1.6, V[1], 'opacity="0.75"');
-  s += P(polyD([[cx - rx * 1.06, cy], [cx + rx * 1.06, cy], [cx + rx * 1.06, cy + dh], [cx - rx * 1.06, cy + dh]], 0.6), V[2]);
-  s += ell(cx, cy + dh, rx * 1.06, ry * 1.06, V[2]);
-  s += S(lineD([[cx - rx * 1.06, cy + dh * 0.5], [cx + rx * 1.06, cy + dh * 0.5]]), V[3], 2, 'opacity="0.7"');
-  s += hotFan(cx, cy, rx, ry, {ring: V[4], blade: V[1]});
+  s += roofFan(900, 1350, 76, 76 * 0.26, {dh: 24, glow: 0.7});
+  s += warmAir(900, 1342, 90, 220, {op: 0.45, n: 6});
+  // THE near fan: big, its drum, its blades turning, the hall's warmth coming up between them
+  const cx = 470, cy = 1572, rx = 330, ry = rx * 0.27;
+  s += roofFan(cx, cy, rx, ry, {dh: rx * 0.36, rot: 0.25});
   // the warm air: honey at the mouth, a clear warm shimmer climbing, thinning to nothing in the dark
-  const top = 690, hh = cy - top;
-  s += warmAir(cx, cy - ry * 0.6, rx * 1.15, hh, {op: 1.0, lean: 0.02, n: 11, root: C.honey});
-  // the snow lifted inside it: bright, clear streaks curving up, the higher the fainter; everywhere else it falls
-  for (let i = 0; i < 80; i++) {
-    const t = Math.pow(rnd(), 0.85), y = cy - ry - 16 - t * (hh - 70);
-    const half = rx * (0.6 + 0.5 * t), x = cx + rr(-half, half) * 0.9;
-    s += flakeMove(x, y, rr(2.8, 4.6) * (1.1 - t * 0.35), rr(18, 34) * (1.1 - t * 0.4), -1, 0.97 - t * 0.6, rr(-8, 8));
+  const top = 700, hh = cy - top;
+  s += warmAir(cx, cy - ry * 0.4, rx * 1.1, hh, {op: 0.8, lean: 0.02, n: 11, root: C.honey});
+  // the snow lifted inside it: soft stars rising with faint trails below them, the higher the fainter, melting away
+  // near the top; everywhere else it falls, with faint trails above
+  for (let i = 0; i < 64; i++) {
+    const t = Math.pow(rnd(), 0.9), y = cy - ry - 30 - t * (hh - 90);
+    const half = rx * (0.55 + 0.5 * t), x = cx + rr(-half, half) * 0.86;
+    const r = rr(4.5, 8) * (1.15 - t * 0.55), op = 0.98 - t * 0.62;
+    s += S(lineD([[x, y + r], [x + rr(-4, 4), y + r + rr(26, 52) * (1.1 - t * 0.5)]]), '#f4f6f8', r * 0.7, `opacity="${f1(op * 0.28)}" filter="url(#b2)"`);
+    s += flakeStar(x, y, r, op, rr(0, 1));
   }
-  // her, small beside the fan, looking up as the warmth goes; the warm air tugging her coat
-  s += ell(866, 1514, 50, 9, V[2], 'opacity="0.6"');
-  s += fig(866, 1510, 178, {view: 'back', arms: [[10, 4], [8, 6]], coat: V[1], coatL: V[3], hair: V[0], skin: V[5], scarf: V[8], rim: C.honeyL, rimSide: -1, hairLift: 0.35});
+  // her, small beside the fan, looking up as the warmth goes, a hand lifted to feel it pass
+  s += ell(862, 1516, 46, 8, V[2], 'opacity="0.6"');
+  s += her(862, 1512, 186, {view: 'back', arms: [[10, 6], [44, 70]], coat: V[1], coatL: V[3], hair: V[0], skin: V[6], scarf: V[8], rim: C.honeyL, rimSide: -1, lift: 0.3});
   // the snow falling where the heat isn't (kept out of the warm column)
-  { let g = ''; for (let i = 0; i < 210; i++) { const x = rr(0, W), y = rr(610, 1920); const t = clamp((cy - y) / hh, 0, 1), half = rx * (0.6 + 0.5 * t) + 34; if (y < cy && y > top - 40 && Math.abs(x - cx) < half) continue; const r = rr(1.4, 3.8); g += ell(x, y, r, r * rr(0.85, 1.1), '#f4f5f7', `opacity="${f1(rr(0.35, 0.8))}"`); } s += g; }
+  { let g = ''; for (let i = 0; i < 230; i++) { const x = rr(0, W), y = rr(610, 1920); const t = clamp((cy - y) / hh, 0, 1), half = rx * (0.6 + 0.5 * t) + 40; if (y < cy && y > top - 40 && Math.abs(x - cx) < half) continue; const r = rr(1.4, 3.8); g += S(lineD([[x, y - r], [x, y - r - rr(8, 20)]]), '#f4f5f7', r * 0.6, 'opacity="0.18"') + ell(x, y, r, r * rr(0.85, 1.1), '#f4f5f7', `opacity="${f1(rr(0.35, 0.8))}"`); } s += g; }
   s += caption([{t: 'big fans', x: 380, y: 400, size: 112}, {t: 'blow that heat outside.', x: 545, y: 522, size: 100}]);
   return svgPage(s);
 };
 
 // ======================================================================================
 // B10: cool in, honey out. Inside the drawn hall on the snowy lot: its walls and roof are only pencil lines, so the
-// night, the falling snow and the city's warm windows show through them; the machines inside are painted. The nearest
-// stands open: a cold, frosted pipe brings cool water in at its foot, winds over every shelf of chips and leaves warm at
-// its top; every machine's warm pipe joins one big warm pipe that runs out through the drawn wall toward the city.
+// night, the falling snow and the city's warm windows show through them. Near us, one giant computer stands open, its
+// door swung wide: a cold pipe, frosted white, comes in at its foot and winds back and forth over every shelf of chips,
+// going wet, then warm, and leaves at its top with a breath of steam, through the valve under her hand, into the big
+// warm pipe that runs out through the drawn wall toward the city's windows.
 // ======================================================================================
 FRAMES.B10 = () => {
   seed(101);
-  const cam = Cam(950, 540, 1080, 1.7);
+  const cam = Cam(900, 540, 1150, 1.6);
   let s = '';
-  s += `<linearGradient id="sky10" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1082"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.27" stop-color="${C.paper}"/><stop offset="0.55" stop-color="${C.paper}"/><stop offset="0.7" stop-color="${V[10]}"/><stop offset="1" stop-color="${V[7]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1082" fill="url(#sky10)"/>`;
-  // seen through the drawn walls: the harbour and the icebreaker far left, the city's blocks and warm windows right
-  s += P(polyD([[0, 1082], [0, 1050], [200, 1046], [380, 1056], [380, 1082]], 1), V[5]);
-  s += faceZ(cam, 70, -40, -22, 0, 12, V[11]) + faceZ(cam, 70, -40, -20, -1, 4, V[2]);
-  for (let i = 0; i < 4; i++) { const x1 = 18 + i * 13; s += faceZ(cam, 64, x1, x1 + 12, 0, 15 + rr(-2, 2), V[2 + (i % 2)]); for (let k = 0; k < 12; k++) { const p = cam.p(x1 + rr(1, 11), rr(3, 13), 64); s += rect(p[0], p[1], 4, 6, rnd() < 0.65 ? C.honey : V[1], 'opacity="0.9"'); } }
-  // the snowy lot (the hall's floor) with the pencil floor lines
-  s += P(polyD([[0, 1080], [W, 1080], [W, H], [0, H]]), V[8]);
-  for (const [y1, col] of [[1250, V[7]], [1460, V[6]], [1700, V[5]]]) s += P(polyD([[0, y1], [W, y1 - 10], [W, H], [0, H]], 2), col);
+  s += `<linearGradient id="sky10" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1152"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.25" stop-color="${C.paper}"/><stop offset="0.52" stop-color="${C.paper}"/><stop offset="0.6" stop-color="${V[9]}"/><stop offset="0.78" stop-color="${V[5]}"/><stop offset="1" stop-color="${V[6]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1152" fill="url(#sky10)"/>`;
+  // seen through the drawn walls: the harbour's ice (left), and across the lot the city's old blocks, their windows warm
+  s += P(polyD([[0, 1152], [0, 1120], [380, 1126], [380, 1152]], 0.6), V[8]);
+  const city = [[560, 1152], [560, 1060], [640, 1060], [640, 1040], [760, 1040], [760, 1066], [860, 1066], [860, 1030], [980, 1030], [980, 1056], [1080, 1056], [1080, 1152]];
+  s += P(polyD(city, 0.8), V[3]) + P(polyD([[552, 1062], [600, 1034], [648, 1062]], 0.5), V[2]) + P(polyD([[852, 1032], [920, 1004], [988, 1032]], 0.5), V[2]);
+  for (let i = 0; i < 70; i++) { const x = rr(566, 1074); const top = x < 640 ? 1068 : x < 760 ? 1048 : x < 860 ? 1074 : x < 980 ? 1038 : 1064; if (rnd() < 0.82) s += rect(x, rr(top, 1140), 5, 8, C.honey, `opacity="${f1(rr(0.65, 1))}"`); }
+  s += ell(820, 1090, 300, 50, C.honey, 'opacity="0.14" filter="url(#b24)"');
+  // the floor: the lot's snow inside the drawing, the floor's pencil grid
+  s += P(polyD([[0, 1150], [W, 1150], [W, H], [0, H]]), V[8]);
+  for (const [y1, col] of [[1300, V[7]], [1520, V[6]], [1760, V[5]]]) s += P(polyD([[0, y1], [W, y1 - 8], [W, H], [0, H]], 2), col);
   seed(102);
-  for (let z = 5; z < 60; z *= 1.32) s += pencil([cam.p(-9, 0, z), cam.p(9, 0, z)], 1.6, {col: V[11], op: 0.5});
-  for (const x of [-9, 9]) s += pencil([cam.p(x, 0, 3.4), cam.p(x, 0, 60)], 2.6, {op: 0.8});
+  for (let z = 3.2; z < 40; z *= 1.3) s += softPencil([cam.p(-8, 0, z), cam.p(8, 0, z)], 1.6, {op: 0.3, passes: 1});
   // the drawn walls and roof: pencil only (the night shows through)
-  const H1 = 10;
-  for (const x of [-9, 9]) { s += pencil([cam.p(x, H1, 5.2), cam.p(x, H1, 60)], 3, {op: 0.85}); for (let z = 8; z < 60; z *= 1.35) s += pencil([cam.p(x, 0, z), cam.p(x, H1, z)], 1.8, {op: 0.55}); }
-  s += pencil([cam.p(-9, 0, 60), cam.p(-9, H1, 60), cam.p(9, H1, 60), cam.p(9, 0, 60)], 2.4, {op: 0.7});
-  for (let z = 9; z < 60; z *= 1.4) s += pencil([cam.p(-9, H1, z), cam.p(9, H1, z)], 1.6, {op: 0.45});
-  // rows of giant computers behind, front-on, each with its pipes: cool in low, warm out high
-  for (const z of [26, 19, 14, 10]) for (const x1 of [-6.6, -3.2, 0.8, 4.2]) {
-    if (z === 10 && x1 < 0) continue;
-    const w = 1.5, hh = 2.8;
-    s += faceZ(cam, z, x1, x1 + w, 0, hh, V[1]);
-    s += faceZ(cam, z - 0.01, x1 + 0.12, x1 + w - 0.12, 0.1, hh - 0.1, V[2]);
-    for (let k = 0; k < 6; k++) { const p = cam.p(x1 + 0.3, 0.4 + k * 0.4, z - 0.02); s += ell(p[0], p[1], 1.3, 1.3, '#e8f6fb', 'opacity="0.8"'); }
-    const lo = [cam.p(x1 + w / 2, 0.3, z - 0.05), cam.p(x1 + w / 2, -0.01, z - 0.05)], hi = [cam.p(x1 + w / 2, hh, z - 0.05), cam.p(x1 + w / 2, 3.7, z - 0.05)];
-    s += S(lineD(lo), C.cool, cam.sz(0.16, z)) + S(lineD(hi), C.honey, cam.sz(0.16, z));
+  const H1 = 8.5;
+  for (const x of [-7, 7]) {
+    s += softPencil([cam.p(x, 0, 3.0), cam.p(x, 0, 40)], 2.6, {op: 0.65});
+    s += softPencil([cam.p(x, H1, 6.4), cam.p(x, H1, 40)], 3, {op: 0.7});
+    for (let z = 6; z < 40; z *= 1.45) s += softPencil([cam.p(x, 0, z), cam.p(x, H1, z)], 2, {op: 0.42, over: 6});
   }
-  // the big warm pipe overhead collecting them, running toward us and then out through the drawn wall (right)
-  const pipe = [cam.p(0, 3.8, 27), cam.p(0, 3.8, 6.4), cam.p(9.6, 3.8, 6.4), cam.p(16, 3.8, 6.4)];
-  s += S(lineD(pipe), C.honeyD, 30) + S(lineD(pipe), C.honey, 19) + S(lineD(pipe), C.honeyL, 6, 'opacity="0.8"');
-  s += steam(cam.p(9, 3.8, 6.4)[0], cam.p(9, 3.8, 6.4)[1] - 16, 70, 110, {n: 4, warm: true, col: V[13], op: 0.6});
-  // the cool supply pipe low along the floor, frosted
-  const sup = [cam.p(-9.5, 0.25, 4.6), cam.p(-1.9, 0.25, 4.6), cam.p(-1.9, 0.25, 27)];
-  s += S(lineD(sup), C.coolD, 26) + S(lineD(sup), C.cool, 16);
-  for (let i = 0; i < 18; i++) { const p = cam.p(rr(-9, -2.2), 0.25, 4.6); s += ell(p[0] + rr(-3, 3), p[1] + rr(-8, 8), rr(2.5, 5), rr(2, 4), '#ffffff', 'opacity="0.85"'); }
-  // THE ONE OPEN: near, front-on, its door off: the cool pipe comes in at its foot, winds over each shelf of chips,
-  // and leaves warm at its top (a breath of steam), up into the big pipe
-  const zN = 4.6, x0 = -1.7, x1n = 0.0, yT = 2.9;
-  const tl = cam.p(x0, yT, zN), br = cam.p(x1n, 0, zN), w = br[0] - tl[0], hh = br[1] - tl[1];
-  s += hrect(tl[0] - 14, tl[1] - 14, w + 28, hh + 18, V[0], 1) + hrect(tl[0], tl[1], w, hh, V[3], 0.8);
-  const rows = 6, pp = [[tl[0] - 60, br[1] - 22], [tl[0] + 24, br[1] - 22]];
+  s += softPencil([cam.p(-7, 0, 40), cam.p(-7, H1, 40), cam.p(7, H1, 40), cam.p(7, 0, 40)], 2.4, {op: 0.55});
+  for (let z = 8; z < 40; z *= 1.5) s += softPencil([cam.p(-7, H1, z), cam.p(7, H1, z)], 1.6, {op: 0.3, passes: 1});
+  // the back rows: a few machines, quiet, their small lights and their pipes
+  for (const [z, xs] of [[16, [-4.6, -2.8, 1.4, 3.2]], [11, [-4.4, 2.6]]]) for (const x1 of xs) {
+    s += faceZ(cam, z, x1, x1 + 1.2, 0, 2.3, V[3]) + faceZ(cam, z - 0.01, x1 + 0.1, x1 + 1.1, 0.1, 2.2, V[4]);
+    for (let k = 0; k < 5; k++) { const p = cam.p(x1 + 0.3, 0.4 + k * 0.4, z - 0.02); s += ell(p[0], p[1], 1.4, 1.4, '#e8f6fb', 'opacity="0.7"'); }
+    s += S(lineD([cam.p(x1 + 0.6, 2.3, z - 0.05), cam.p(x1 + 0.6, 3.3, z - 0.05)]), C.honey, cam.sz(0.12, z), 'opacity="0.75"');
+  }
+  // the big warm pipe overhead, collecting them, running out through the drawn wall on the right toward the city
+  const bp = [cam.p(-4, 2.6, 16), cam.p(0.0, 2.6, 16), cam.p(0.0, 2.6, 2.8), cam.p(2.0, 2.6, 2.8), cam.p(5.0, 2.6, 4.4), cam.p(12, 2.6, 9)];
+  s += S(lineD(bp), C.honeyD, 28) + S(lineD(bp), C.honey, 18) + S(lineD(bp), C.honeyL, 5, 'opacity="0.8"');
+  { const p = cam.p(4.2, 2.6, 4.0); s += ell(p[0], p[1], 60, 40, C.honeyL, 'opacity="0.3" filter="url(#b14)"'); }
+  // THE ONE OPEN: near, its door swung wide toward us, its six shelves of chips; the cold pipe comes in frosted at its
+  // foot and winds over every shelf, going wet, then warm, and leaves at its top with a breath of steam
+  const zN = 2.6, X0 = -1.25, X1n = -0.3, Ht = 1.8;
+  const tl = cam.p(X0, Ht, zN), br = cam.p(X1n, 0, zN), w = br[0] - tl[0], hh = br[1] - tl[1];
+  const ang = 112 * Math.PI / 180, dw = 0.95, fe = [X0 + dw * Math.cos(ang), zN - dw * Math.sin(ang)];
+  const dq = (t, Y) => cam.p(X0 + (fe[0] - X0) * t, Y, zN + (fe[1] - zN) * t);
+  s += hrect(tl[0] - 16, tl[1] - 16, w + 32, hh + 20, V[0], 1) + hrect(tl[0], tl[1], w, hh, V[2], 0.8);
+  const rows = 5, shelfY = (r) => br[1] - 30 - r * (hh - 70) / (rows - 1);
   for (let r = 0; r < rows; r++) {
-    const sy = br[1] - 40 - r * (hh - 70) / (rows - 1);
-    s += hrect(tl[0] + 14, sy - 44, w - 28, 36, V[1], 0.5);
-    for (let k = 0; k < 3; k++) s += hrect(tl[0] + 30 + k * (w - 60) / 3, sy - 38, (w - 60) / 3 - 14, 22, V[5], 0.4);
-    const left = r % 2 === 0;
-    pp.push([left ? tl[0] + 24 : tl[0] + w - 24, sy - 26]);
-    pp.push([left ? tl[0] + w - 24 : tl[0] + 24, sy - 26]);
+    const sy = shelfY(r);
+    s += hrect(tl[0] + 10, sy - 50, w - 20, 40, V[1], 0.5);
+    for (let k = 0; k < 4; k++) s += hrect(tl[0] + 22 + k * (w - 44) / 4, sy - 42, (w - 44) / 4 - 10, 22, V[4], 0.4) + rect(tl[0] + 26 + k * (w - 44) / 4, sy - 38, 4, 4, '#dff2f8', 'opacity="0.8"');
   }
-  pp.push([tl[0] + w - 24, tl[1] - 40], [cam.p(0, 3.8, zN)[0], cam.p(0, 3.8, zN)[1]]);
-  for (let i = 0; i < pp.length - 1; i++) {
-    const t = i / (pp.length - 2);
-    const col = t < 0.2 ? C.cool : t < 0.42 ? '#cfd3c4' : t < 0.6 ? C.honeyL : C.honey;
-    const dk = t < 0.2 ? C.coolD : t < 0.42 ? V[8] : C.honeyD;
-    s += S(lineD([pp[i], pp[i + 1]]), dk, 24) + S(lineD([pp[i], pp[i + 1]]), col, 15);
+  // the pipe's path: in from the left along the floor, up into the foot, back and forth over each shelf, out at the top
+  const path = [[-60, br[1] + 34], [tl[0] - 30, br[1] + 34], [tl[0] + 26, br[1] - 14]];
+  for (let r = 0; r < rows; r++) { const y = shelfY(r) - 30; const left = r % 2 === 0; path.push(left ? [tl[0] + 26, y] : [tl[0] + w - 26, y]); path.push(left ? [tl[0] + w - 26, y] : [tl[0] + 26, y]); }
+  const ex = cam.p(X1n + 0.02, 1.62, zN), vv = cam.p(0.02, 1.62, zN), up = cam.p(0.02, 2.6, 2.8);
+  path.push([tl[0] + w - 26, ex[1]], [ex[0] + 16, ex[1]], [vv[0], vv[1]], [up[0], up[1]]);
+  for (let i = 0; i < path.length - 1; i++) {
+    const t = i / (path.length - 2);
+    const col = t < 0.28 ? '#dfe4e8' : t < 0.5 ? V[9] : t < 0.7 ? C.honeyL : C.honey;
+    const dk = t < 0.5 ? V[5] : C.honeyD;
+    s += S(lineD([path[i], path[i + 1]]), dk, 26) + S(lineD([path[i], path[i + 1]]), col, 16);
+    if (t >= 0.5) s += S(lineD([path[i], path[i + 1]]), C.honeyL, 5, 'opacity="0.7"');
   }
-  for (let i = 0; i < 8; i++) s += ell(tl[0] - 10 + rr(-50, 10), br[1] - 22 + rr(-10, 10), rr(2.5, 5), rr(2, 4), '#ffffff', 'opacity="0.85"');
-  s += steam(tl[0] + w - 24, tl[1] - 50, 60, 90, {n: 4, warm: true, col: V[13], op: 0.7});
-  for (let i = 0; i < 10; i++) s += ell(tl[0] - 6, tl[1] + 20 + i * hh / 10, 2, 2, '#e8f6fb');
-  // her, beside it, in profile, a hand on its valve (scale, and life)
-  s += ell(cam.p(0.9, 0, 5.4)[0], cam.p(0.9, 0, 5.4)[1], 70, 12, V[4], 'opacity="0.6"');
-  s += personProfile(cam.p(0.95, 0, 5.4)[0], cam.p(0.95, 0, 5.4)[1], cam.sz(1.7, 5.4), {pose: 'stand-valve', dir: -1, coat: V[1], coatL: V[3], hair: V[0], skin: V[7], rim: C.honeyL});
-  s += snowfall(200, 0, 1920);
+  // frost on the cold pipe: a white crust, crystals, a few icicles; drops where it turns wet; heat shimmer where warm
+  for (let i = 0; i < 3; i++) { const a2 = path[i], b2 = path[i + 1]; for (let k = 0; k < 16; k++) { const t = rnd(), x = lerp(a2[0], b2[0], t), y = lerp(a2[1], b2[1], t); s += ell(x + rr(-6, 6), y - rr(6, 12), rr(3, 6), rr(2, 4), '#ffffff', 'opacity="0.9"'); if (rnd() < 0.3) s += P(polyD([[x - 3, y + 10], [x + 3, y + 10], [x, y + rr(20, 34)]], 0.2), '#eef4f7', 'opacity="0.9"'); } }
+  for (let i = 0; i < 9; i++) { const p = path[3 + (i % 4)]; s += ell(p[0] + rr(-60, 60), p[1] + rr(10, 20), 2.4, 3.6, '#e8eef2', 'opacity="0.8"'); }
+  s += steam(ex[0] + 26, ex[1] - 18, 80, 130, {n: 5, warm: true, col: V[13], op: 0.8, lean: 0.05});
+  // the door swung wide (left), its inner face perforated
+  s += P(polyD([dq(0, Ht + 0.02), dq(1, Ht + 0.02), dq(1, -0.02), dq(0, -0.02)], 0.6), V[1]) + P(polyD([dq(0.04, Ht - 0.06), dq(0.96, Ht - 0.06), dq(0.96, 0.06), dq(0.04, 0.06)], 0.6), V[3]);
+  for (let i = 1; i < 12; i++) for (let k = 1; k < 14; k++) { const p = dq(i / 12, k * Ht / 14), zz = zN + (fe[1] - zN) * i / 12; s += ell(p[0], p[1], Math.max(1, cam.sz(0.01, zz)), Math.max(1, cam.sz(0.01, zz)), V[1], 'opacity="0.8"'); }
+  // the valve on the warm pipe where it leaves, a wheel; her hand on it
+  const vx = vv[0], vy = vv[1];
+  s += ell(vx, vy, 34, 34, V[0]) + ell(vx, vy, 26, 26, C.honeyD) + ell(vx, vy, 8, 8, V[0]);
+  for (let i = 0; i < 4; i++) { const a2 = i * Math.PI / 2 + 0.4; s += S(lineD([[vx, vy], [vx + Math.cos(a2) * 26, vy + Math.sin(a2) * 26]]), V[0], 5); }
+  s += ell(vx, vy, 60, 60, C.honeyL, 'opacity="0.3" filter="url(#b14)"');
+  // her, near, in profile, her hand on the valve, lit by the warm pipe
+  const fz = 2.35, f = cam.p(0.5, 0, fz), hp = cam.sz(1.7, fz);
+  s += ell(f[0] - 10, f[1] + 4, hp * 0.16, hp * 0.03, V[3], 'opacity="0.6"');
+  s += her(f[0], f[1], hp, {view: 'side', dir: -1, step: [3, 4], arms: [[-6, 10], [95, 53]], coat: V[2], coatL: V[4], hair: V[1], hairL: C.honeyD, skin: V[8], scarf: V[9], rim: C.honeyL, lean: 3});
+  s += S(smoothD([[f[0] - hp * 0.06, f[1] - hp * 0.78], [f[0] - hp * 0.07, f[1] - hp * 0.6], [f[0] - hp * 0.075, f[1] - hp * 0.4]], false), C.honeyL, 3, 'opacity="0.55"');
+  s += snowfall(220, 0, 1920);
   s += caption([{t: 'with water', x: 420, y: 400, size: 112}, {t: 'in pipes.', x: 640, y: 522, lit: true, size: 150}]);
   return svgPage(s);
 };
 
 // ======================================================================================
-// B12: your chat, a warm window. On the street below her window: your gloved hand holds your phone (bottom left), your
-// chat bubble popping; at your feet the warm line runs in the snow to her door; above, her window a step warmer, and
-// her in it raising her mug; far down the quay, the hall's lights.
+// B12: your chat, a warm window. On the street below her old house, near: your gloved hand holds your phone (bottom
+// left), your chat bubble popping; from your feet the warm line runs through the snow to her door; above, her window a
+// step warmer, flung open, and her leaning out on the sill raising her mug to you (the mug from the forty kettles: the
+// toast, now hers); down the quay to the left, the row's warm windows and, at its end, the hall still drawn in pencil.
 // ======================================================================================
 FRAMES.B12 = () => {
   seed(121);
-  const cam = Cam(1000, 560, 1150, 1.7);
+  const cam = Cam(1000, 130, 1290, 1.7);
   let s = '';
-  s += `<linearGradient id="sky12" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1152"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.25" stop-color="${C.paper}"/><stop offset="0.52" stop-color="${C.paper}"/><stop offset="0.66" stop-color="${V[10]}"/><stop offset="0.85" stop-color="${V[7]}"/><stop offset="1" stop-color="${V[8]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1152" fill="url(#sky12)"/>`;
-  // far down the quay (left): the hall's lit door and its steam, the icebreaker's pale decks, the harbour
-  const hd = cam.p(-9, 0, 120), hd2 = cam.p(-3, 9, 120);
-  s += hrect(hd[0] - 8, hd2[1], hd2[0] - hd[0] + 50, hd[1] - hd2[1], V[2], 0.5);
-  s += rect(hd[0] + 10, hd[1] - 24, 22, 24, '#dcebf0') + steam(hd[0] + 20, hd2[1], 90, 200, {n: 7, warm: true, col: V[11], op: 0.75, root: 0.25, lean: 0.1});
-  s += faceZ(cam, 80, -36, -18, 4.6, 12, V[11]) + faceZ(cam, 80, -36, -16, -1, 4.6, V[1]);
-  s += P(polyD([[0, 1150], [cam.p(-9, 0, 120)[0], 1152], cam.p(-9, 0, 6), [0, 1700]]), V[9]);
-  // the street's snow
-  s += P(polyD([cam.p(-9, 0, 2.6), cam.p(-9, 0, 140), cam.p(12, 0, 140), cam.p(12, 0, 2.6)]), V[8]);
-  for (const [z1, z2, col] of [[2.6, 4, V[4]], [4, 6.5, V[5]], [6.5, 11, V[6]], [11, 22, V[7]]]) s += P(polyD([cam.p(-9, 0, z1), cam.p(-9, 0, z2), cam.p(12, 0, z2), cam.p(12, 0, z1)], 1.5), col);
-  s += P(polyD([[0, 1790], [W, 1780], [W, H], [0, H]]), V[4]);
-  // the row of blocks on the right receding toward the quay's end (warm windows), and HER house front-on, near
-  for (const [z1, z2, hgt] of [[40, 70, 16.5], [24, 39.6, 15]]) {
-    s += facadeX(cam, 12, z1, z2, 0, hgt, V[2]) + poly3(cam, [[12, hgt, z1], [12, hgt, z2], [13.6, hgt + 2.4, z2], [13.6, hgt + 2.4, z1]], V[1]);
-    for (let fl = 0; fl < 4; fl++) for (let zz = z1 + 1.2; zz < z2 - 1.3; zz += 2.7) { const q = q3(cam, [[12, 4 + fl * 3.2, zz], [12, 4 + fl * 3.2, zz + 1.2], [12, 5.8 + fl * 3.2, zz + 1.2], [12, 5.8 + fl * 3.2, zz]]); s += P(polyD(q, 0.3), rnd() < 0.72 ? C.honey : V[1], 'opacity="0.85"'); }
+  s += `<linearGradient id="sky12" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1292"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.24" stop-color="${C.paper}"/><stop offset="0.47" stop-color="${C.paper}"/><stop offset="0.54" stop-color="${V[10]}"/><stop offset="0.72" stop-color="${V[6]}"/><stop offset="1" stop-color="${V[7]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1292" fill="url(#sky12)"/>`;
+  // the snow of the street and the quay, everywhere under the night (darker toward us)
+  s += P(polyD([[0, 1288], [W, 1288], [W, H], [0, H]]), V[8]);
+  for (const [z1, col] of [[30, V[7]], [12, V[6]], [6, V[5]], [3.2, V[4]]]) { const y = cam.p(0, 0, z1)[1]; s += P(smoothD([[-20, y], [300, y - 6], [700, y + 4], [1100, y - 4], [1100, H + 20], [-20, H + 20]], true), col); }
+  s += P(polyD([cam.p(-9, 0.1, 8), cam.p(-9, 0.1, 160), cam.p(-8, 0.9, 160), cam.p(-8, 0.9, 8)], 1), V[10]);
+  // the quay's end, far: the hall still a pencil drawing, its computers' small lights painted inside; the harbour
+  s += P(polyD([[0, 1290], [0, 1276], [60, 1280], [60, 1290]], 0.4), V[9]);
+  { const z = 140, a = cam.p(-7, 0, z), b = cam.p(3.5, 14, z); seed(5); for (let r = 0; r < 4; r++) for (let i = 0; i < 9; i++) if (rnd() < 0.8) s += rect(a[0] + 3 + i * (b[0] - a[0] - 6) / 9, b[1] + 6 + r * (a[1] - b[1] - 10) / 4, 2.2, 2.2, '#e6f4f8'); s += softPencil([[a[0], a[1]], [a[0], b[1]], [b[0], b[1]], [b[0], a[1]]], 2, {op: 0.9, passes: 2}); s += rect(a[0] + (b[0] - a[0]) * 0.3, a[1] - 18, (b[0] - a[0]) * 0.4, 18, '#dcebf0', 'opacity="0.8"'); s += ell((a[0] + b[0]) / 2, a[1] - 6, 70, 18, '#eaf4f7', 'opacity="0.3" filter="url(#b8)"'); }
+  seed(121);
+  // the row along the quay, receding to its end: shoulder to shoulder, roofs under the band, their windows warm
+  const RX = 4.0;
+  for (const [z1, z2, hgt, col] of [[40.4, 110, 19, V[2]], [18.2, 40, 11.5, V[3]]]) {
+    s += facadeX(cam, RX, z1, z2, 0, hgt, col);
+    s += poly3(cam, [[RX, hgt, z1], [RX, hgt, z2], [RX + 1.6, hgt + 1.6, z2], [RX + 1.6, hgt + 1.6, z1]], V[1]);
+    s += S(lineD([cam.p(RX + 0.05, hgt + 0.08, z1), cam.p(RX + 0.05, hgt + 0.08, z2)]), V[12], 2.4, 'opacity="0.85"');
+    for (let y1 = 3.6; y1 + 1.7 < hgt - 0.5; y1 += 3.1) for (let zz = z1 + 0.9; zz < z2 - 1.2; zz += 1.9) { const q = q3(cam, [[RX, y1, zz], [RX, y1, zz + 1.1], [RX, y1 + 1.7, zz + 1.1], [RX, y1 + 1.7, zz]]); s += P(polyD(q, 0.3), rnd() < 0.88 ? C.honey : V[1], 'opacity="0.88"'); }
+    for (let zz = z1 + 1.4; zz < z2 - 2; zz += 4.6) { const q = q3(cam, [[RX, 0.5, zz], [RX, 0.5, zz + 2], [RX, 2.4, zz + 2], [RX, 2.4, zz]]); s += P(polyD(q, 0.3), C.honey, 'opacity="0.7"'); }
   }
-  // her house: an old three-storey Helsinki house, front-on, its steep roof under the band, a chimney with snow
-  const hz = 19.5, hx1 = 1.2, hx2 = 12, hgt = 10.6;
-  s += faceZ(cam, hz, hx1, hx2, 0, hgt, V[3]);
-  s += poly3(cam, [[hx1 - 0.3, hgt, hz], [hx2 + 0.3, hgt, hz], [hx2 - 1.2, hgt + 2.6, hz + 2.5], [hx1 + 1.2, hgt + 2.6, hz + 2.5]], V[1]);
-  s += S(lineD([cam.p(hx1 - 0.2, hgt + 0.2, hz), cam.p(hx2 + 0.2, hgt + 0.2, hz)]), V[12], 4);
-  { const a = cam.p(9.6, hgt + 1.6, hz + 1.2), b = cam.p(9.6, hgt + 4, hz + 1.2), w = cam.sz(0.9, hz); s += hrect(a[0] - w / 2, b[1], w, a[1] - b[1], V[1], 0.4) + ell(a[0], b[1], w * 0.6, w * 0.25, V[13]); }
-  s += faceZ(cam, hz - 0.01, hx1, hx2, 0, 2.8, V[4]);   // the granite base
-  // its windows: the upper ones lit or dark; THE window (first floor, left of the door) a step warmer, her in it
-  for (const [wx, wyy, lit] of [[2.3, 7.4, true], [5.4, 7.4, false], [8.6, 7.4, true], [8.6, 3.9, false]]) { const a = cam.p(wx, wyy + 1.9, hz - 0.02), b = cam.p(wx + 1.3, wyy, hz - 0.02); s += win(a[0], a[1], b[0] - a[0], b[1] - a[1], {lit, glow: 0.5, core: false}); }
-  const wa = cam.p(2.3, 3.9 + 2.1, hz - 0.02), wb = cam.p(4.0, 3.9, hz - 0.02);
-  s += win(wa[0], wa[1], wb[0] - wa[0], wb[1] - wa[1], {lit: true, glow: 2.6, warm: C.honeyL});
-  // the radiator under its sill (warm fins), and her inside raising her mug (the toast from the kettle aisle, now hers)
-  for (let i = 0; i < 6; i++) s += rect(wa[0] + 8 + i * 13, wb[1] - 34, 7, 26, C.honeyD, 'opacity="0.9"');
-  s += personProfile(wa[0] + (wb[0] - wa[0]) * 0.32, wb[1] + 6, (wb[1] - wa[1]) * 1.05, {pose: 'stand-toast', mug: true, coat: V[3], coatL: V[3], hair: V[2], skin: V[4], boot: V[3]});
-  // her door, where the warm line turns in
-  const da = cam.p(6.2, 2.6, hz - 0.02), db = cam.p(7.6, 0, hz - 0.02);
-  s += hrect(da[0], da[1], db[0] - da[0], db[1] - da[1], V[1], 0.5) + rect(da[0] + 4, da[1] + 4, db[0] - da[0] - 8, 16, C.honey, 'opacity="0.7"');
+  // HER HOUSE, near, front-on: a rough granite base, a snowy cornice; her door with its lit transom; her window above,
+  // flung open, a step warmer
+  const hz = 7.6, hx1 = RX, hx2 = 16, hT = 6.4;
+  // its side wall along the quay (the row's first house), its windows warm, its cornice
+  s += facadeX(cam, RX, hz, 18, 0, hT, V[2]) + facadeX(cam, RX, hz, 18, 0, 1.2, V[3]);
+  for (const y1 of [3.9]) for (let zz = hz + 1.2; zz < 17; zz += 2.1) s += P(polyD(q3(cam, [[RX, y1, zz], [RX, y1, zz + 1.1], [RX, y1 + 1.8, zz + 1.1], [RX, y1 + 1.8, zz]]), 0.3), C.honey, 'opacity="0.85"');
+  for (let zz = hz + 1.6; zz < 16.5; zz += 3.6) s += P(polyD(q3(cam, [[RX, 0.6, zz], [RX, 0.6, zz + 1.6], [RX, 2.4, zz + 1.6], [RX, 2.4, zz]]), 0.3), C.honey, 'opacity="0.7"');
+  s += S(lineD([cam.p(RX + 0.03, hT + 0.07, hz), cam.p(RX + 0.03, hT + 0.07, 18)]), V[12], 4);
+  s += faceZ(cam, hz, hx1, hx2, 0, hT, V[3]);
+  s += faceZ(cam, hz - 0.01, hx1, hx2, 0, 1.2, V[4]);
+  for (let yy = 0.3; yy < 1.2; yy += 0.42) s += S(lineD([cam.p(hx1, yy, hz - 0.02), cam.p(hx2, yy, hz - 0.02)]), V[3], 2, 'opacity="0.7"');
+  s += S(lineD([cam.p(hx1, 3.45, hz - 0.02), cam.p(hx2, 3.45, hz - 0.02)]), V[5], 5, 'opacity="0.8"');
+  s += faceZ(cam, hz - 0.02, hx1 - 0.15, hx2, hT - 0.3, hT + 0.05, V[5]) + S(lineD([cam.p(hx1 - 0.15, hT + 0.07, hz - 0.03), cam.p(hx2, hT + 0.07, hz - 0.03)]), V[12], 6);
+  { const a = cam.p(7.4, 2.9, hz - 0.03), b = cam.p(8.7, 1.4, hz - 0.03); s += win(a[0], a[1], b[0] - a[0], b[1] - a[1], {lit: true, glow: 0.5, core: false}); }
+  const da = cam.p(4.35, 2.7, hz - 0.03), db = cam.p(5.45, 0, hz - 0.03);
+  s += hrect(da[0], da[1], db[0] - da[0], db[1] - da[1], V[1], 0.5) + rect(da[0] + 6, da[1] + 6, db[0] - da[0] - 12, 22, C.honey, 'opacity="0.8"');
+  s += ell((da[0] + db[0]) / 2, db[1] + 6, 90, 14, C.honey, 'opacity="0.3" filter="url(#b8)"');
+  const wa = cam.p(5.0, 6.0, hz - 0.03), wb = cam.p(6.75, 3.85, hz - 0.03);
+  const wx = wa[0], wy = wa[1], ww = wb[0] - wa[0], wh = wb[1] - wa[1];
+  s += ell(wx + ww / 2, wy + wh * 0.55, ww * 1.15, wh * 0.85, C.honeyL, 'opacity="0.34" filter="url(#b24)"');
+  s += openWin(wx, wy, ww, wh, {open: true, spill: 1.3, room: C.honeyL, leafL: 0.24, leafR: 0.24});
+  s += rect(wx + ww * 0.1, wy + wh * 0.8, ww * 0.8, wh * 0.16, C.honeyD, 'opacity="0.55"');
+  s += herToast(wx + ww * 0.48, wy + wh, cam.sz(1, hz), {body: V[2], skin: V[5]});
+  s += sillFront(wx, wy, ww, wh);
   // the warm line in the snow from your feet to her door (the melt, the warm showing through)
-  s += meltSeam([[150, 1940], [250, 1730], [410, 1530], [560, 1385], [640, 1300], cam.p(6.9, 0, hz - 0.3)], [78, 18]);
-  // your gloved hand and your phone, from the bottom left, your chat bubble popping (the screen's cool light)
-  s += phoneHand(300, 1360, 270);
+  s += meltSeam([[150, 1940], [260, 1790], [420, 1660], [580, 1574], [(da[0] + db[0]) / 2, db[1] + 4]], [84, 20]);
+  // your gloved hand and your phone, your chat bubble popping (the screen's cool light)
+  s += gloveHandPhone(300, 1540, 330, {rot: -8});
   s += snowfall(220, 0, 1920);
-  s += caption([{t: 'heat', x: 290, y: 430, lit: true, size: 170}, {t: 'an apartment', x: 660, y: 470, size: 104}, {t: 'in Helsinki.', x: 690, y: 572, size: 104}]);
+  s += caption([{t: 'could soon', x: 130, y: 352, size: 104, anchor: 'start'}, {t: 'heat', x: 286, y: 476, lit: true, size: 156, anchor: 'start'}, {t: 'an apartment', x: 930, y: 560, size: 100, anchor: 'end'}]);
   return svgPage(s);
 };
 
 // ======================================================================================
-// THE LOT VIEW (B7, B8: one view, one change; reworked in round 1). At the quay's end, a person's eye: on the right the
-// last old block, its windows flung open, its people leaning out toward the warmth thrown away across the ice; ahead the
-// empty lot by the water, its snow untouched behind a ploughed bank; the city's warm line comes from under our feet and
-// stops in a burst at the bank. B8: the plan pencils itself onto the lot (a hall, its big door faintly warm, a dashed
-// pipe across the gap, the year pinned on the drawing).
+// THE LOT VIEW (B7, B8: one view, one change). At the quay's end, a person's eye. On the right, the last Jugendstil
+// house before the water, its windows flung open on warm rooms and its people leaning out toward the warmth thrown away
+// far across the ice; ahead, the empty lot by the water, its snow untouched beyond a ploughed bank; across the harbour,
+// Helsinki's own lights. The city's warm line comes racing from under our feet and stops in a burst where the
+// untouched snow begins. B8: the plan pencils itself onto the lot (a hall standing there, its big door faintly warm, a
+// dashed pipe across the gap, the year pinned on the drawing).
 // ======================================================================================
 function lotView(o = {}) {
   seed(81);
   const cam = Cam(1000, 540, 1250, 1.7);
   const plan = !!o.plan;
   let s = '';
-  // the night sky under the band (the band itself stays the light calm field)
-  s += `<linearGradient id="sky8" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1254"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.24" stop-color="${C.paper}"/><stop offset="0.47" stop-color="${C.paper}"/><stop offset="0.53" stop-color="${V[10]}"/><stop offset="0.66" stop-color="${V[6]}"/><stop offset="0.9" stop-color="${V[5]}"/><stop offset="1" stop-color="${V[7]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1254" fill="url(#sky8)"/>`;
-  s += cloudBank(760, 90, V[8], 0.3, 6);
-  // the far shore across the harbour: a low belt of the city, its small warm windows
-  s += P(polyD([[0, 1254], [0, 1226], [60, 1224], [70, 1212], [130, 1213], [140, 1222], [250, 1220], [262, 1208], [330, 1209], [340, 1218], [470, 1218], [480, 1210], [560, 1211], [570, 1220], [700, 1219], [1080, 1222], [1080, 1254]], 0.8), V[3]);
-  for (let i = 0; i < 80; i++) s += rect(rr(4, 1070), rr(1214, 1246), rr(2, 3.4), rr(2, 3.2), C.honey, `opacity="${f1(rr(0.45, 0.95))}"`);
-  // across the ice, a data center throwing its heat into the night: warm air rising, thinning to nothing
-  s += hrect(96, 1210, 112, 30, V[1], 0.4) + rect(104, 1224, 96, 3, C.honey, 'opacity="0.55"');
-  s += warmAir(152, 1208, 100, 520, {lean: 0.04, op: 1.3});
+  // the night under the band (the band itself stays the light calm field)
+  s += `<linearGradient id="sky8" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1254"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.24" stop-color="${C.paper}"/><stop offset="0.47" stop-color="${C.paper}"/><stop offset="0.53" stop-color="${V[10]}"/><stop offset="0.64" stop-color="${V[6]}"/><stop offset="0.88" stop-color="${V[5]}"/><stop offset="1" stop-color="${V[7]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1254" fill="url(#sky8)"/>`;
+  s += cloudBank(780, 90, V[8], 0.28, 6);
+  // across the harbour: Helsinki, a long low belt of roofs, a dome, chimneys and cranes, its many small warm windows
+  let far = '';
+  const sk = [[0, 1214], [40, 1210], [44, 1196], [96, 1196], [100, 1206], [170, 1206], [176, 1190], [236, 1190], [240, 1202], [330, 1202], [336, 1186], [380, 1186], [384, 1198], [470, 1198], [474, 1206], [540, 1206], [546, 1192], [620, 1192], [626, 1200], [700, 1200], [706, 1184], [770, 1184], [774, 1196], [880, 1196], [886, 1204], [1080, 1204], [1080, 1256], [0, 1256]];
+  far += P(polyD(sk, 0.6), V[3]);
+  // the dome on its drum (the city's white church far off), a spire, two chimneys and a harbour crane
+  far += hrect(626, 1170, 46, 24, V[3], 0.4) + P(smoothD([[620, 1172], [630, 1150], [649, 1140], [668, 1150], [678, 1172]], true), V[4]) + S(lineD([[649, 1140], [649, 1126]]), V[4], 2.4);
+  far += S(lineD([[400, 1186], [400, 1150]]), V[3], 3) + S(lineD([[408, 1150], [372, 1150], [372, 1168]]), V[3], 2) + rect(812, 1168, 7, 28, V[3]) + rect(840, 1174, 6, 22, V[3]);
+  for (let i = 0; i < 280; i++) { const x = rr(4, 1076); const top = 1192 + (x % 140 < 70 ? 4 : 10); far += rect(x, rr(top, 1248), rr(2.6, 4.4), rr(2.4, 3.6), rnd() < 0.15 ? C.honeyL : C.honey, `opacity="${f1(rr(0.6, 1))}"`); }
+  s += ell(520, 1206, 620, 46, C.honey, 'opacity="0.12" filter="url(#b40)"');
+  s += far;
+  // the data center across the ice (far left): a low dark hall, its edge lit, throwing its warmth up into the night,
+  // where it thins to nothing (the heat they want, far out of reach)
+  s += hrect(70, 1204, 176, 40, V[1], 0.4) + rect(78, 1226, 160, 3, C.honey, 'opacity="0.55"');
+  for (const vx of [100, 140, 180, 220]) s += hrect(vx - 12, 1196, 24, 9, V[1], 0.3) + ell(vx, 1197, 10, 3, C.honeyL, 'opacity="0.9"');
+  s += warmPlume(160, 1196, 150, 560, {lean: 0.05, op: 1.3});
   // the harbour ice; the icebreakers' channel kept open along the far side
   s += P(polyD([[0, 1252], [W, 1252], [W, 1310], [0, 1310]]), V[10]);
   s += P(smoothD([[0, 1258], [300, 1256], [700, 1260], [1080, 1257], [1080, 1268], [700, 1272], [300, 1268], [0, 1270]], true), V[3], 'opacity="0.85"');
@@ -681,33 +905,43 @@ function lotView(o = {}) {
   // the quay's stone edge along the water, snow-capped bollards
   s += P(polyD([[0, 1306], [W, 1306], [W, 1316], [0, 1316]], 0.6), V[3]);
   for (const X of [-14, -9.5, -5]) { const a = cam.p(X, 0, 29), b = cam.p(X, 0.9, 29), w = cam.sz(0.45, 29); s += hrect(a[0] - w / 2, b[1], w, a[1] - b[1], V[1], 0.4) + ell(a[0], b[1], w * 0.75, w * 0.3, V[13]); }
-  // THE LOT: its snow untouched, smooth and pale (the missing piece's ground)
-  s += P(polyD([[0, 1315], [W, 1315], [W, 1446], [0, 1446]]), V[11]);
-  for (let i = 0; i < 7; i++) s += P(blobD(rr(30, 460), rr(1330, 1420), rr(60, 150), rr(4, 8), 8, 0.3), V[12], 'opacity="0.55"');
-  s += P(smoothD([[0, 1394], [160, 1382], [330, 1390], [470, 1380], [470, 1400], [300, 1408], [0, 1412]], true), V[10], 'opacity="0.35" filter="url(#b8)"');
-  // the last old house (right), front-on, two storeys and a steep snowy roof: its windows flung open on warm rooms
-  const bz = 8.9, bx1 = -0.6, bx2 = 6.4;
-  s += facadeX(cam, bx1, bz, 13, 0, 7, V[2]);
-  s += faceZ(cam, bz, bx1, bx2, 0, 7, V[3]);
-  s += faceZ(cam, bz - 0.01, bx1, bx2, 0, 3.3, V[4]);
-  for (let yy = 0.55; yy < 3.3; yy += 0.68) s += S(lineD([cam.p(bx1, yy, bz - 0.02), cam.p(bx2, yy, bz - 0.02)]), V[3], 1.8, 'opacity="0.7"');
-  s += faceZ(cam, bz - 0.02, bx1, bx2, 6.7, 7.05, V[5]) + S(lineD([cam.p(bx1 - 0.1, 7.08, bz - 0.03), cam.p(bx2, 7.08, bz - 0.03)]), V[12], 4);
-  s += poly3(cam, [[bx1 - 0.25, 7.05, bz], [bx2, 7.05, bz], [bx2, 8.1, bz + 2.2], [bx1 + 0.6, 8.1, bz + 2.2]], V[1]);
-  s += S(lineD([cam.p(bx1 + 0.5, 8.05, bz + 2.1), cam.p(bx2, 8.05, bz + 2.1)]), V[12], 3.4, 'opacity="0.85"');
-  { const a = cam.p(3.2, 7.9, bz + 1.6), b = cam.p(3.9, 8.35, bz + 1.6); s += hrect(a[0], b[1], b[0] - a[0], a[1] - b[1], V[1], 0.4) + ell((a[0] + b[0]) / 2, b[1], (b[0] - a[0]) * 0.65, 4, V[13]); }
-  const winAt = (X1, Y1, w = 1.25, h = 1.8) => { const a = cam.p(X1, Y1 + h, bz - 0.03), b = cam.p(X1 + w, Y1, bz - 0.03); return [a[0], a[1], b[0] - a[0], b[1] - a[1]]; };
-  const life = o.life || ['oldman', 'mug'];
-  [0.0, 2.3].forEach((X1, c) => {
-    const [x, y, w, h] = winAt(X1, 4.1), kind = life[c];
-    s += openWin(x, y, w, h, {open: true, spill: 1.1, leafL: 0.24, leafR: 0.24});
-    s += sillLife(kind, x, y, w, h, -1, {k: 1.5});
-  });
-  // the ground floor: a café window lit low with a child kneeling on its bench, the house door, its cat on the step
-  { const [x, y, w, h] = winAt(0.0, 0.9, 1.25, 1.75); s += openWin(x, y, w, h, {open: true, spill: 1, leafL: 0.24, leafR: 0.24}); s += sillLife('child', x, y, w, h, -1, {k: 1.45, out: -0.2}); }
-  { const a = cam.p(2.55, 2.7, bz - 0.03), b = cam.p(3.45, 0, bz - 0.03); s += hrect(a[0], a[1], b[0] - a[0], b[1] - a[1], V[1], 0.4) + hrect(a[0] + 5, a[1] + 5, b[0] - a[0] - 10, 22, C.honey, 0.3, 'opacity="0.85"'); s += ell((a[0] + b[0]) / 2, b[1] + 6, 70, 12, C.honey, 'opacity="0.3" filter="url(#b8)"');
-    s += sillLife('cat', a[0] - 40, b[1] - 120, 80, 120, -1, {k: 1.6}); }
+  // THE LOT: its snow untouched, smooth, pale, softly lit (the missing piece's ground): nothing has crossed it
+  s += P(polyD([[0, 1315], [W, 1315], [W, 1446], [0, 1446]]), V[12]);
+  for (let i = 0; i < 8; i++) s += P(blobD(rr(30, 430), rr(1330, 1420), rr(60, 150), rr(4, 9), 8, 0.3), V[13], 'opacity="0.7"');
+  s += P(smoothD([[0, 1396], [160, 1384], [330, 1392], [440, 1384], [440, 1402], [300, 1410], [0, 1414]], true), V[10], 'opacity="0.35" filter="url(#b8)"');
+  for (let i = 0; i < 26; i++) s += ell(rr(10, 430), rr(1322, 1436), 1.3, 1.3, '#ffffff', `opacity="${f1(rr(0.4, 0.9))}"`);
+  // THE HOUSE: the last Jugendstil house before the water, front-on: a rough granite base, plaster above, string
+  // courses, a cornice with snow, a steep roof with a lit dormer; its side wall turns back along the lot
+  const hz = 10.2, hx1 = -1.0, hx2 = 9.5, hTop = 7.2;
+  s += facadeX(cam, hx1, hz, 22, 0, hTop, V[2]);
+  { const a = cam.p(hx1, 3.0, 15), b = cam.p(hx1, 5.6, 15.9); s += P(polyD([a, [b[0], a[1] + 1], b, [a[0], b[1] - 1]], 0.4), C.honey, 'opacity="0.75"'); }
+  s += faceZ(cam, hz, hx1, hx2, 0, hTop, V[3]);
+  s += faceZ(cam, hz - 0.01, hx1, hx2, 0, 1.0, V[4]);
+  for (let yy = 0.25; yy < 1.0; yy += 0.36) s += S(lineD([cam.p(hx1, yy, hz - 0.02), cam.p(hx2, yy, hz - 0.02)]), V[3], 1.6, 'opacity="0.7"');
+  for (const yy of [3.65, 6.55]) s += S(lineD([cam.p(hx1, yy, hz - 0.02), cam.p(hx2, yy, hz - 0.02)]), V[5], 4, 'opacity="0.8"');
+  s += faceZ(cam, hz - 0.02, hx1 - 0.15, hx2, hTop - 0.3, hTop + 0.05, V[5]) + S(lineD([cam.p(hx1 - 0.15, hTop + 0.08, hz - 0.03), cam.p(hx2, hTop + 0.08, hz - 0.03)]), V[12], 4.4);
+  s += poly3(cam, [[hx1 - 0.3, hTop + 0.05, hz], [hx2, hTop + 0.05, hz], [hx2, 10, hz + 3.4], [hx1 + 0.8, 10, hz + 3.4]], V[1]);
+  s += S(lineD([cam.p(hx1 + 0.7, 9.95, hz + 3.3), cam.p(hx2, 9.95, hz + 3.3)]), V[12], 3.6, 'opacity="0.9"');
+  { const a = cam.p(2.0, 7.9, hz + 1.9), b = cam.p(3.2, 9.0, hz + 1.9); s += hrect(a[0] - 8, b[1] - 10, b[0] - a[0] + 16, a[1] - b[1] + 12, V[2], 0.4) + P(polyD([[a[0] - 14, b[1] - 8], [(a[0] + b[0]) / 2, b[1] - 30], [b[0] + 14, b[1] - 8]], 0.4), V[1]) + S(lineD([[a[0] - 14, b[1] - 9], [(a[0] + b[0]) / 2, b[1] - 31], [b[0] + 14, b[1] - 9]]), V[12], 3) + win(a[0], b[1], b[0] - a[0], a[1] - b[1], {lit: true, glow: 0.8, core: true}); }
+  { const a = cam.p(6.2, 9.0, hz + 2.8), b = cam.p(6.6, 9.75, hz + 2.8); s += hrect(a[0], b[1], b[0] - a[0], a[1] - b[1], V[1], 0.4) + ell((a[0] + b[0]) / 2, b[1], (b[0] - a[0]) * 0.7, 4, V[13]); }
+  const winAt = (X1, Y1, w = 1.35, h = 1.9) => { const a = cam.p(X1, Y1 + h, hz - 0.03), b = cam.p(X1 + w, Y1, hz - 0.03); return [a[0], a[1], b[0] - a[0], b[1] - a[1]]; };
+  const k = cam.sz(1, hz);
+  // the upper floor: three windows flung open, three people reaching for it; the ground floor: a child at the window
+  // bench, the arched door with its lit transom and the cat on the step, a young man reaching with both hands
+  const ups = o.ups || [['mug', -0.35], ['point', 1.85], ['mittens', 4.05]];
+  for (const [kind, X1] of ups) {
+    const [x, y, w, h] = winAt(X1, 4.3);
+    s += openWin(x, y, w, h, {open: true, spill: 1.2, leafL: 0.26, leafR: 0.22});
+    s += leanOut(kind, x + w * 0.56, y + h, k, -1, {wx: x, wy: y}) + sillFront(x, y, w, h);
+  }
+  { const [x, y, w, h] = winAt(-0.35, 0.95, 1.35, 1.75); s += openWin(x, y, w, h, {open: true, spill: 1.1, leafL: 0.26, leafR: 0.22}); s += leanOut('child', x + w * 0.62, y + h, k, -1) + sillFront(x, y, w, h) + leanOut('cat', x + w * 0.08, y + h, k, -1, {catAt: 0}); }
+  { const a = cam.p(1.95, 2.9, hz - 0.03), b = cam.p(3.15, 0, hz - 0.03); const dw = b[0] - a[0];
+    s += P(smoothD([[a[0], b[1]], [a[0], a[1] + dw * 0.3], [a[0] + dw * 0.5, a[1]], [b[0], a[1] + dw * 0.3], [b[0], b[1]]], true, 0.6), V[1]);
+    s += P(smoothD([[a[0] + 6, a[1] + dw * 0.36], [a[0] + dw * 0.5, a[1] + 8], [b[0] - 6, a[1] + dw * 0.36], [b[0] - 6, a[1] + dw * 0.5], [a[0] + 6, a[1] + dw * 0.5]], true, 0.6), C.honey, 'opacity="0.85"');
+    s += ell((a[0] + b[0]) / 2, b[1] + 6, 80, 12, C.honey, 'opacity="0.26" filter="url(#b8)"'); }
+  { const [x, y, w, h] = winAt(4.05, 0.95, 1.35, 1.75); s += openWin(x, y, w, h, {open: true, spill: 1.1, leafL: 0.24, leafR: 0.22}); s += leanOut('reach', x + w * 0.56, y + h, k, -1) + sillFront(x, y, w, h); }
   // the warm light the open windows throw on the snow at the house's foot
-  s += ell(800, 1462, 330, 40, C.honey, 'opacity="0.24" filter="url(#b24)"');
+  s += ell(790, 1440, 360, 44, C.honey, 'opacity="0.26" filter="url(#b24)"');
   // the ploughed bank where the street's trodden snow ends and the lot begins (the line meets it and stops)
   s += P(smoothD([[-20, 1452], [60, 1436], [180, 1432], [300, 1438], [400, 1434], [470, 1440], [560, 1436], [700, 1440], [860, 1434], [1100, 1440], [1100, 1466], [-20, 1466]], true), V[12]);
   s += P(smoothD([[-20, 1458], [200, 1450], [420, 1454], [640, 1449], [1100, 1454], [1100, 1480], [-20, 1480]], true), V[9]);
@@ -715,50 +949,58 @@ function lotView(o = {}) {
   s += P(polyD([[0, 1478], [W, 1478], [W, H], [0, H]]), V[6]);
   for (const [y1, col] of [[1560, V[5]], [1710, V[4]]]) s += P(smoothD([[0, y1], [300, y1 - 8], [700, y1 + 6], [1080, y1 - 4], [1080, H], [0, H]], true), col);
   for (let i = 0; i < 22; i++) { const x = rr(-20, 1060), y = rr(1490, 1900); s += S(lineD([[x, y], [x + rr(-30, 30), y + rr(40, 120)]]), V[rnd() < 0.5 ? 7 : 3], rr(3, 7), 'opacity="0.35"'); }
-  for (let i = 0; i < 9; i++) { const p = [300 + i * 14 + (i % 2) * 10, 1890 - i * 48]; s += ell(p[0], p[1], 9 - i * 0.5, 4 - i * 0.2, V[3], 'opacity="0.7"'); }
-  // the city's warm line from under our feet to the bank, where it stops
-  const end = [396, 1446];
-  s += meltSeam([[540, 1950], [522, 1800], [480, 1650], [430, 1530], end], [74, 15]);
-  s += lineBurst(end[0], end[1] - 4, plan ? 0.6 : 1.05);
+  for (let i = 0; i < 9; i++) { const p = [640 + i * 12 - (i % 2) * 18, 1890 - i * 46]; s += ell(p[0], p[1], 9 - i * 0.5, 4 - i * 0.2, V[3], 'opacity="0.7"'); }
+  // the city's warm line racing from under our feet to the bank, where it stops in a burst of light and steam
+  const end = [236, 1449];
+  s += meltSeam([[600, 1950], [566, 1800], [470, 1650], [350, 1530], end], [76, 15]);
+  if (!plan) {
+    // its racing head: the snow thrown up off it, a bright wake along its last stretch
+    s += S(smoothD([[440, 1610], [350, 1530], [286, 1482], end], false), C.honeyL, 10, 'opacity="0.55" filter="url(#b4)"');
+    for (let i = 0; i < 16; i++) { const t = rnd(), px = lerp(440, end[0], t), py = lerp(1610, end[1], t); s += ell(px + rr(-40, 40), py - rr(10, 70), rr(2, 4), rr(2, 4), '#f6f7f9', `opacity="${f1(rr(0.6, 1))}"`); }
+  }
+  s += lineBurst(end[0], end[1] - 4, plan ? 0.62 : 1.4);
   if (plan) {
     seed(77);
-    // the plan, drawn on the lot in soft pencil: a hall standing on the lot, its big door facing the line's end
-    const z = 22, L = cam.p(-11.6, 0, z)[0], R = cam.p(bx1, 0, bz)[0] - 6, B = cam.p(0, 0, z)[1], T = cam.p(0, 10, z)[1];
-    const zb = 46, bl = cam.p(-11.6, 10, zb), blB = cam.p(-11.6, 0, zb);
-    // its left end receding toward the water, hatched in shade; the roof's far edge
-    s += pencilHatch([[bl[0], bl[1]], [L, T], [L, B], [blB[0], blB[1]]], 9, {op: 0.32, w: 1.8});
-    s += softPencil([[L, T], [bl[0], bl[1]], [blB[0], blB[1]]], 2.6, {op: 0.6, over: 8});
-    s += softPencil([[bl[0], bl[1]], [R, bl[1] + 2]], 2, {op: 0.36});
-    // the front: its walls, a parapet, the plinth, panel joints (a building standing on the lot, drawn; it runs on
-    // behind the old house)
-    s += softPencil([[L, B], [L, T]], 4.4, {over: 18, op: 0.86}) + softPencil([[L, T], [R, T]], 4.6, {over: 10, op: 0.88});
-    s += softPencil([[L - 50, B + 1], [R, B - 1]], 2.4, {op: 0.5});
-    s += softPencil([[L + 4, T + 22], [R, T + 22]], 2, {op: 0.5}) + softPencil([[L + 4, B - 24], [R, B - 24]], 1.8, {op: 0.42});
-    for (let x = L + 64; x < 470; x += 64) s += softPencil([[x, T + 26], [x, B - 28]], 1.4, {op: 0.24, passes: 1});
-    // the big door, faintly warm inside (the hope)
+    // the plan, drawn on the lot in soft pencil: a hall standing on the lot by the water, its long facade and its big
+    // door facing the line's end; graphite hatching gives it a wall; its right end runs on behind the old house
+    const z = 22, L = cam.p(-11.6, 0, z)[0], R = cam.p(hx1, 0, hz)[0] - 4, B = cam.p(0, 0, z)[1], T = cam.p(0, 10, z)[1];
     const dL = cam.p(-9.0, 0, z)[0], dR = cam.p(-5.0, 0, z)[0], dT = cam.p(0, 5.6, z)[1];
-    s += rect(dL - 40, dT - 40, dR - dL + 80, B - dT + 60, C.honey, 'opacity="0.26" filter="url(#b24)"');
-    s += hrect(dL, dT, dR - dL, B - dT, C.honeyL, 0.5, 'opacity="0.24"');
-    s += softPencil([[dL, B], [dL, dT], [dR, dT], [dR, B]], 4.2, {over: 8, op: 0.9});
-    s += softPencil([[(dL + dR) / 2, dT + 6], [(dL + dR) / 2, B - 4]], 2, {op: 0.5});
-    s += softPencil([[dL - 30, dT - 16], [dR + 70, dT - 16]], 2.2, {op: 0.55});
-    // the missing piece: a dashed pencil pipe across the untouched snow from the line's end to the drawn door
-    const pipe = [[end[0] - 12, end[1] - 6], [380, 1420], [300, 1388], [240, 1362], [(dL + dR) / 2 + 16, B + 2]];
-    s += S(smoothD(pipe, false), C.honey, 18, 'opacity="0.2" filter="url(#b8)"');
-    s += softPencil(sampleSmooth(pipe, 6), 5, {dash: '24 15', op: 0.9, passes: 2});
+    s += hatchRect(L + 6, T + 30, R, B - 30, 20, {op: 0.26, w: 2.2, skip: (p, q) => false});
+    s += rect(dL - 2, dT - 2, dR - dL + 4, B - dT + 2, V[5], 'opacity="0.5"');
+    s += softPencil([[L, B], [L, T]], 6, {over: 20, op: 0.9}) + softPencil([[L, T], [R, T]], 6, {over: 12, op: 0.9});
+    s += softPencil([[L - 6, T - 14], [R, T - 14]], 3, {op: 0.55}) + softPencil([[L - 6, T - 14], [L - 6, T + 2]], 3, {op: 0.55});
+    s += softPencil([[L - 60, B + 1], [R, B - 1]], 3.4, {op: 0.62});
+    s += softPencil([[L + 4, B - 26], [R, B - 26]], 2.4, {op: 0.48});
+    for (let x = L + 70; x < R - 20; x += 70) if (x < dL - 10 || x > dR + 10) s += softPencil([[x, T + 26], [x, B - 30]], 1.8, {op: 0.34, passes: 1});
+    // a strip of high windows, drawn
+    for (let x = L + 30; x < R - 40; x += 70) if (x + 44 < dL - 8 || x > dR + 8) s += softPencil([[x, T + 50], [x + 44, T + 50], [x + 44, T + 82], [x, T + 82], [x, T + 50]], 2.2, {op: 0.5, passes: 1});
+    // the big door, warm inside (the hope)
+    s += rect(dL - 50, dT - 50, dR - dL + 100, B - dT + 70, C.honey, 'opacity="0.34" filter="url(#b24)"');
+    s += hrect(dL, dT, dR - dL, B - dT, C.honeyL, 0.5, 'opacity="0.34"');
+    s += hrect(dL + 14, dT + 16, dR - dL - 28, B - dT - 16, C.honeyC, 0.5, 'opacity="0.22" filter="url(#b8)"');
+    s += softPencil([[dL, B], [dL, dT], [dR, dT], [dR, B]], 6, {over: 10, op: 0.95});
+    s += softPencil([[(dL + dR) / 2, dT + 6], [(dL + dR) / 2, B - 4]], 2.6, {op: 0.55});
+    s += softPencil([[dL - 34, dT - 18], [dR + 80, dT - 18]], 3, {op: 0.6});
+    // the missing piece: a dashed pencil pipe across the untouched snow from the line's end to the drawn door, a
+    // faint warmth along it as it draws itself
+    const pipe = [[end[0] - 6, end[1] - 6], [230, 1416], [226, 1384], [224, 1356], [(dL + dR) / 2 + 12, B + 2]];
+    s += S(smoothD(pipe, false), C.honey, 26, 'opacity="0.34" filter="url(#b8)"');
+    s += softPencil(sampleSmooth(pipe, 6), 7, {dash: '26 15', op: 0.95, passes: 2});
     // the survey stake where the line ends, its ribbon
-    const st = cam.p(-1.25, 0, 9.7), stT = cam.p(-1.25, 1.45, 9.7);
+    const st = cam.p(-3.3, 0, 9.0), stT = cam.p(-3.3, 1.45, 9.0);
     s += S(lineD([st, stT]), V[1], 5) + ell(st[0], st[1], 10, 3.5, V[3]) + P(polyD([[stT[0], stT[1] + 2], [stT[0] + 30, stT[1] + 8], [stT[0] + 26, stT[1] + 17], [stT[0], stT[1] + 12]], 0.4), V[12]);
-    // the year, on a paper pinned to the drawing above its door (the type guide's world word, in its ink)
-    const tx = Math.max(126, (dL + dR) / 2 - 140), ty = T + 36;
-    s += G(P(polyD([[tx, ty], [tx + 280, ty - 4], [tx + 283, ty + 166], [tx + 3, ty + 170]], 0.8), '#d9dae6') + ell(tx + 140, ty + 12, 7, 7, V[2]) +
-      `<text x="${tx + 141}" y="${ty + 126}" font-family="Gaegu" font-weight="700" font-size="138" text-anchor="middle" fill="#1f2b4b" class="ink">2027</text>`, `transform="rotate(-3 ${tx + 140} ${ty + 85})"`);
+    // the year, on a paper pinned to the drawing above its door (the type guide's world word: Gaegu 700 at 122 px,
+    // plum on cream, inside the frame and clear of the edges)
+    const tx = 118, ty = T + 30;
+    s += G(P(polyD([[tx, ty], [tx + 280, ty - 4], [tx + 283, ty + 166], [tx + 3, ty + 170]], 0.8), '#efe9dc') + ell(tx + 140, ty + 12, 7, 7, V[2]) +
+      `<text x="${tx + 141}" y="${ty + 124}" font-family="Gaegu" font-weight="700" font-size="122" text-anchor="middle" fill="${C.ink}" class="ink">2027</text>`, `transform="rotate(-3 ${tx + 140} ${ty + 85})"`);
   }
-  // her, in the street by the line's end, from behind: reaching toward the warmth (B7), or standing to look at the plan (B8)
-  const f = cam.p(-0.2, 0, 7.3), hh = cam.sz(1.7, 7.3);
+  // her, in the street by the line's end, from behind: up on her toes, reaching for the warmth (B7), or still, looking
+  // at the plan (B8)
+  const f = cam.p(-0.9, 0, 7.9), hh = cam.sz(1.7, 7.9);
   s += ell(f[0] + 4, f[1] + 2, hh * 0.2, hh * 0.04, V[4], 'opacity="0.6"');
-  s += fig(f[0], f[1], hh, plan ? {view: 'back', arms: [[8, 4], [10, 30]], coat: V[1], coatL: V[3], hair: V[0], skin: V[5], scarf: V[8], rim: C.honeyL, rimSide: 1} :
-    {view: 'back', arms: [[112, -6], [34, 18]], lean: -7, dir: 1, coat: V[1], coatL: V[3], hair: V[0], skin: V[5], scarf: V[8], rim: C.honeyL, rimSide: 1});
+  s += her(f[0], f[1], hh, plan ? {view: 'back', arms: [[6, 4], [8, 30]], coat: V[1], coatL: V[3], hair: V[0], skin: V[6], scarf: V[8], rim: C.honeyL, rimSide: -1, step: [2.6, 2.6]} :
+    {view: 'back', arms: [[146, -12], [62, 40]], lean: -8, step: [1.6, 5], coat: V[1], coatL: V[3], hair: V[0], skin: V[6], scarf: V[8], rim: C.honeyL, rimSide: -1, lift: 0.25});
   s += snowfall(200, 0, 1920);
   return s;
 }
@@ -797,91 +1039,121 @@ FRAMES.B5alt = () => {
   return svgPage(s);
 };
 
-// ---------- B6alt (reworked in round 1): out through the fan. Inside a data center's wall, one giant exhaust fan:
-// through its turning blades the snowy night and a far town's few warm lights; the hall's warm air pours out through it
-// and thins away over the empty snow; she stands small on the catwalk, her scarf pulled toward the fan ----------
+// ---------- B6alt (reworked in round 1): only the fox gets it. At night, the long wall of a data center: its big
+// fans breathe the hall's warmth straight out over the snow, which melts into a dark wet patch that leads nowhere,
+// steaming into the cold; asleep in the middle of it, curled tight, a fox (the only one who gets the warmth); far
+// across the empty field, the city's small warm lights ----------
 FRAMES.B6alt = () => {
-  seed(66);
+  seed(67);
+  const cam = Cam(950, 540, 1180, 1.2);
   let s = '';
-  // the hall's inner wall: pale and calm at the band, darkening down to the fan and the catwalk
-  s += `<linearGradient id="w6a" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1920"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.15" stop-color="${C.paper}"/><stop offset="0.31" stop-color="${C.paper}"/><stop offset="0.4" stop-color="${V[10]}"/><stop offset="0.7" stop-color="${V[7]}"/><stop offset="1" stop-color="${V[4]}"/></linearGradient><rect x="0" y="0" width="${W}" height="${H}" fill="url(#w6a)"/>`;
-  // concrete panel joints and a cable tray along the wall (under the band)
-  for (const y of [700, 1560]) s += S(lineD([[0, y], [W, y]]), V[8], 2, 'opacity="0.6"');
-  for (const x of [80, 1000]) s += S(lineD([[x, 640], [x, 1920]]), V[8], 2, 'opacity="0.5"');
-  const cx = 540, cy = 1105, R = 400;
-  // the opening: the night outside, seen through the fan
-  s += `<clipPath id="fanhole"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>`;
-  let out = '';
-  out += `<linearGradient id="n6a" gradientUnits="userSpaceOnUse" x1="0" y1="${cy - R}" x2="0" y2="${cy + R}"><stop offset="0" stop-color="${V[2]}"/><stop offset="0.5" stop-color="${V[4]}"/><stop offset="0.6" stop-color="${V[6]}"/><stop offset="0.62" stop-color="${V[10]}"/><stop offset="1" stop-color="${V[11]}"/></linearGradient><rect x="${cx - R}" y="${cy - R}" width="${2 * R}" height="${2 * R}" fill="url(#n6a)"/>`;
-  // the far snowy land, a dark tree line, and a far town's few warm lights where the heat could have gone
-  out += P(smoothD([[cx - R, cy + 70], [cx - 200, cy + 58], [cx, cy + 66], [cx + 200, cy + 56], [cx + R, cy + 64], [cx + R, cy + 90], [cx - R, cy + 92]], true), V[3]);
-  for (let i = 0; i < 34; i++) out += rect(rr(cx + 150, cx + 330), rr(cy + 48, cy + 66), 3.4, 3.2, C.honey, `opacity="${f1(rr(0.6, 1))}"`);
-  out += P(polyD([[cx - R, cy + 90], [cx + R, cy + 88], [cx + R, cy + R], [cx - R, cy + R]]), V[10]);
-  for (let i = 0; i < 7; i++) out += P(blobD(rr(cx - R, cx + R), rr(cy + 120, cy + R - 20), rr(80, 160), rr(5, 10), 8, 0.3), V[12], 'opacity="0.5"');
-  // the hall's warm air leaving: pale warm veils streaming out and away over the snow, thinning to nothing
-  for (let i = 0; i < 9; i++) { const t = i / 8; out += P(blobD(cx + rr(-40, 40) + t * 60, cy + 60 - t * 170, R * (0.9 - 0.55 * t), 70 + 30 * t, 9, 0.25), i < 4 ? C.honey : '#efe2c8', `opacity="${f1(0.42 * (1 - t * 0.85))}" filter="url(#b40)"`); }
-  for (let k = 0; k < 16; k++) { const y0 = cy + rr(-160, 200), x0 = cx + rr(-300, 300), pts = []; for (let j = 0; j <= 5; j++) pts.push([x0 + j * rr(14, 26), y0 - j * rr(12, 22) + Math.sin(j + k) * 6]); out += S(smoothD(pts, false), C.honeyL, rr(1.6, 2.8), `opacity="${f1(rr(0.25, 0.5))}" filter="url(#b2)"`); }
-  // snow outside, swirled away in the stream
-  for (let i = 0; i < 110; i++) { const a = rr(0, Math.PI * 2), r = rr(40, R); const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r * 0.9; if (y > cy + 90) continue; out += ell(x, y, rr(2, 4.4), rr(2, 4.4), '#f8f9fb', `opacity="${f1(rr(0.55, 1))}"`); }
-  s += G(out, 'clip-path="url(#fanhole)"');
-  // the heat being pulled through, on our side: a warm glow round the opening's inner edge
-  s += `<circle cx="${cx}" cy="${cy}" r="${R + 10}" fill="none" stroke="${C.honey}" stroke-width="70" opacity="0.32" filter="url(#b24)"/>`;
-  s += P(blobD(cx, cy + R * 0.55, R * 0.95, R * 0.4, 9, 0.2), C.honey, 'opacity="0.3" filter="url(#b40)"');
-  // the blades turning: dark, softened by their motion (ghosts behind), lit warm along their edges
-  const blade = (rot, op) => { let g = ''; for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + rot; const p1 = [cx + Math.cos(a) * 52, cy + Math.sin(a) * 52], p2 = [cx + Math.cos(a + 0.34) * R * 0.94, cy + Math.sin(a + 0.34) * R * 0.94], p3 = [cx + Math.cos(a + 0.7) * R * 0.9, cy + Math.sin(a + 0.7) * R * 0.9], p4 = [cx + Math.cos(a + 0.38) * R * 0.4, cy + Math.sin(a + 0.38) * R * 0.4]; g += P(smoothD([p1, p2, p3, p4], true), V[1], `opacity="${op}"`); if (op > 0.8) g += S(smoothD([p1, p2], false), C.honeyL, 3, 'opacity="0.55"'); } return g; };
-  s += blade(0.5, 0.1) + blade(0.36, 0.2) + blade(0.22, 0.94);
-  s += `<circle cx="${cx}" cy="${cy}" r="56" fill="${V[1]}"/><circle cx="${cx}" cy="${cy}" r="20" fill="${C.honeyD}" opacity="0.8"/>`;
-  // the guard: thin rings and spokes, the heavy housing ring with its bolts
-  for (const k of [0.3, 0.55, 0.8]) s += `<circle cx="${cx}" cy="${cy}" r="${R * k}" fill="none" stroke="${V[2]}" stroke-width="2.4" opacity="0.65"/>`;
-  for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; s += S(lineD([[cx + Math.cos(a) * 60, cy + Math.sin(a) * 60], [cx + Math.cos(a) * R, cy + Math.sin(a) * R]]), V[2], 2, 'opacity="0.55"'); }
-  s += `<circle cx="${cx}" cy="${cy}" r="${R + 22}" fill="none" stroke="${V[2]}" stroke-width="44"/><circle cx="${cx}" cy="${cy}" r="${R + 2}" fill="none" stroke="${V[1]}" stroke-width="5"/>`;
-  for (let i = 0; i < 24; i++) { const a = i / 24 * Math.PI * 2; s += ell(cx + Math.cos(a) * (R + 22), cy + Math.sin(a) * (R + 22), 4.5, 4.5, V[5]); }
-  // the catwalk: its grating and rail, under the fan
-  s += P(polyD([[0, 1496], [W, 1496], [W, 1530], [0, 1530]], 0.6), V[3]) + S(lineD([[0, 1440], [W, 1440]]), V[2], 5) + S(lineD([[0, 1468], [W, 1468]]), V[2], 3, 'opacity="0.8"');
-  for (let x = 30; x < W; x += 90) s += S(lineD([[x, 1440], [x, 1498]]), V[2], 4);
-  s += P(polyD([[0, 1530], [W, 1530], [W, H], [0, H]]), V[3]);
-  // below the catwalk, the hall: the tops of the giant computers in rows, their small lights, and their warm air
-  // rising past the rail toward the fan (the heat it throws out)
-  for (let r = 0; r < 3; r++) { const y = 1590 + r * 110, hgt = 70 + r * 26; for (let i = -1; i < 9; i++) { const x = i * 128 + (r % 2) * 50 - r * 18; s += hrect(x, y, 112 + r * 8, hgt + 200, V[1], 0.6) + hrect(x, y, 112 + r * 8, 12, V[4], 0.4); for (let j = 0; j < 3; j++) for (let k = 0; k < 3; k++) s += rect(x + 14 + j * 30, y + 24 + k * 16, 7, 3, '#dceef4', 'opacity="0.7"'); } }
-  for (let i = 0; i < 6; i++) s += P(blobD(rr(120, 960), rr(1500, 1700), rr(120, 220), rr(40, 70), 9, 0.3), C.honey, 'opacity="0.18" filter="url(#b40)"');
-  for (let k = 0; k < 7; k++) { const x0 = rr(160, 920), pts = []; for (let j = 0; j <= 5; j++) pts.push([x0 + (cx - x0) * j * 0.06 + Math.sin(j * 1.4 + k) * 8, 1680 - j * 36]); s += S(smoothD(pts, false), C.honeyL, 1.8, 'opacity="0.22" filter="url(#b2)"'); }
-  // her, small on the catwalk, from behind, watching the warmth go; the draught pulls her scarf and hair to the fan
-  s += fig(330, 1500, 250, {view: 'back', arms: [[14, 8], [10, 30]], coat: V[1], coatL: V[3], hair: V[0], skin: V[5], scarf: V[8], rim: C.honeyL, rimSide: 1, hairLift: 0.5, lean: 3});
-  s += P(smoothD([[336, 1300], [372, 1286], [412, 1262], [440, 1250], [446, 1262], [414, 1284], [378, 1304], [342, 1314]], true), V[8]);
-  s += snowfall(40, 640, 1500, {rmax: 2.6, op: 0.5});
+  s += `<linearGradient id="s6a" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1182"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.25" stop-color="${C.paper}"/><stop offset="0.5" stop-color="${C.paper}"/><stop offset="0.57" stop-color="${V[9]}"/><stop offset="0.72" stop-color="${V[4]}"/><stop offset="0.94" stop-color="${V[4]}"/><stop offset="1" stop-color="${V[6]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1184" fill="url(#s6a)"/>`;
+  // the empty snowy field to the horizon (right), a dark tree line, the city's few warm lights far off
+  s += P(polyD([[0, 1180], [W, 1180], [W, 1500], [0, 1500]]), V[9]);
+  s += P(smoothD([[700, 1182], [800, 1172], [900, 1176], [1000, 1168], [1080, 1172], [1080, 1186], [700, 1186]], true), V[3]);
+  for (let i = 0; i < 46; i++) s += rect(rr(790, 1070), rr(1168, 1182), rr(2.2, 3.6), rr(2, 3), C.honey, `opacity="${f1(rr(0.55, 1))}"`);
+  s += ell(930, 1172, 160, 18, C.honey, 'opacity="0.18" filter="url(#b14)"');
+  for (const [z1, z2, col] of [[4, 7, V[8]], [7, 14, V[9]], [14, 60, V[10]]]) s += P(polyD([cam.p(-30, 0, z1), cam.p(30, 0, z1), cam.p(30, 0, z2), cam.p(-30, 0, z2)], 1.5), col);
+  for (let i = 0; i < 9; i++) { const z = rr(5, 30), x = rr(1, 14); const p = cam.p(x, 0, z); s += P(blobD(p[0], p[1], cam.sz(rr(1, 2.4), z), cam.sz(rr(0.05, 0.12), z), 8, 0.3), V[11], 'opacity="0.6"'); }
+  // THE WALL: a data center's long blank wall, front-on, its parapet under the band, a few small cool lights; two big
+  // fans set low in it, breathing the hall's warmth out (a third runs off the frame)
+  const z = 9.2, X1 = -12, X2 = 2.1, Ht = 5.6;
+  s += faceZ(cam, z, X1, X2, 0, Ht, V[2]);
+  for (let X = X1; X < X2; X += 0.9) s += S(lineD([cam.p(X, 0.05, z - 0.01), cam.p(X, Ht - 0.1, z - 0.01)]), V[1], 2, 'opacity="0.5"');
+  s += faceZ(cam, z - 0.02, X1, X2 + 0.1, Ht - 0.35, Ht + 0.05, V[3]) + S(lineD([cam.p(X1, Ht + 0.08, z - 0.03), cam.p(X2 + 0.1, Ht + 0.08, z - 0.03)]), V[12], 4);
+  for (const X of [-9.5, -6, -2.6, 1.0]) { const p = cam.p(X, 4.6, z - 0.03); s += ell(p[0], p[1], 3, 3, '#e6f4f8') + ell(p[0], p[1], 10, 10, '#e6f4f8', 'opacity="0.25" filter="url(#b4)"'); }
+  const fans = [[-4.6, 1.75, 1.35], [-0.95, 1.75, 1.35], [-8.25, 1.75, 1.35]];
+  for (const [X, Y, Rm] of fans) { const c = cam.p(X, Y, z - 0.04); s += wallFan(c[0], c[1], cam.sz(Rm, z), {rot: X * 0.3}); }
+  // their breath: warm air pouring out toward us over the snow and rising, thinning into the cold night
+  for (const [X, Y] of fans) {
+    const c = cam.p(X, Y, z - 0.1), R = cam.sz(1.35, z);
+    for (let i = 0; i < 8; i++) { const t = i / 7; s += P(blobD(c[0] + rr(-20, 20) + t * 40, c[1] + 30 + t * 90 - t * t * 320, R * (1.0 + 1.1 * t), R * (0.5 + 0.4 * t), 9, 0.2), t < 0.35 ? C.honey : '#efdcbc', `opacity="${f1(0.34 * (1 - t * 0.8))}" filter="url(#b40)"`); }
+    for (let kk = 0; kk < 7; kk++) { const x0 = c[0] + rr(-R * 0.7, R * 0.7), pts = []; for (let j = 0; j <= 6; j++) pts.push([x0 + j * rr(4, 12) + Math.sin(j * 1.4 + kk) * 8, c[1] - R * 0.9 - j * rr(34, 52)]); s += S(smoothD(pts, false), C.honeyL, rr(1.6, 2.6), `opacity="${f1(rr(0.22, 0.4))}" filter="url(#b2)"`); }
+  }
+  // the near snow in front of us (a quiet field, darker toward us)
+  s += `<linearGradient id="n6a" gradientUnits="userSpaceOnUse" x1="0" y1="1460" x2="0" y2="1920"><stop offset="0" stop-color="${V[8]}"/><stop offset="1" stop-color="${V[6]}"/></linearGradient>`;
+  s += P(polyD([[0, 1440], [W, 1440], [W, H], [0, H]]), 'url(#n6a)');
+  for (let i = 0; i < 10; i++) { const y = rr(1500, 1900); s += P(blobD(rr(0, W), y, rr(80, 200) * (y / 1500), rr(6, 14) * (y / 1500), 8, 0.3), V[9], 'opacity="0.4"'); }
+  // the melted patch: the snow gone to dark wet ground (earth, flattened grass, puddles catching the warm light) in front
+  // of the fans, spreading toward us and going nowhere; a wet slushy rim where the snow begins again
+  const patch = [cam.p(-12, 0, z - 0.1), cam.p(1.8, 0, z - 0.1), cam.p(2.7, 0, 7.4), cam.p(3.1, 0, 5.2), cam.p(2.6, 0, 3.4), cam.p(0.9, 0, 2.55), cam.p(-1.6, 0, 2.6), cam.p(-3.4, 0, 3.3), cam.p(-5.8, 0, 4.3), cam.p(-12, 0, 5.2)];
+  s += P(smoothD(patch.map(([a, b]) => [a + rr(-12, 12), b + rr(-8, 8)]), true), V[9], 'opacity="0.9"');
+  s += P(smoothD(patch.map(([a, b]) => [lerp(a, 300, 0.05), lerp(b, 1330, 0.05)]), true), V[5]);
+  s += P(smoothD(patch.map(([a, b]) => [lerp(a, 300, 0.12), lerp(b, 1320, 0.12)]), true), V[3]);
+  for (let i = 0; i < 26; i++) { const zz = rr(3, 8.6), X = rr(-6, 2.4); const p = cam.p(X, 0, zz); s += P(blobD(p[0], p[1], cam.sz(rr(0.3, 0.9), zz), cam.sz(rr(0.04, 0.1), zz), 8, 0.35), rnd() < 0.5 ? V[4] : V[2], 'opacity="0.75"'); }
+  for (let i = 0; i < 6; i++) { const zz = rr(3.4, 8.2), X = rr(-5.4, 1.8); const p = cam.p(X, 0, zz); s += P(blobD(p[0], p[1], cam.sz(rr(0.3, 0.6), zz), cam.sz(rr(0.03, 0.06), zz), 8, 0.3), V[1], 'opacity="0.9"') + P(blobD(p[0], p[1] - 1, cam.sz(rr(0.15, 0.3), zz), cam.sz(rr(0.012, 0.025), zz), 8, 0.3), C.honey, 'opacity="0.6"'); }
+  for (let i = 0; i < 90; i++) { const zz = rr(2.8, 8.8), X = rr(-6.4, 2.6); const p = cam.p(X, 0, zz), hgt = cam.sz(rr(0.05, 0.13), zz); s += S(lineD([p, [p[0] + rr(-4, 4), p[1] - hgt]]), rnd() < 0.5 ? V[5] : V[6], rr(1.4, 2.6), 'opacity="0.75"'); }
+  for (let i = 0; i < 18; i++) { const t = rnd(), pa = patch[Math.floor(t * (patch.length - 1))]; s += P(blobD(pa[0] + rr(-20, 20), pa[1] + rr(-6, 6), rr(8, 22), rr(3, 7), 7, 0.3), V[11], 'opacity="0.8"'); }
+  s += ell(300, 1340, 440, 80, C.honey, 'opacity="0.14" filter="url(#b40)"');
+  // steam lifting off the warm wet ground into the cold
+  for (const [X, zz] of [[-4.4, 6.2], [-1.4, 5.0], [1.2, 6.8], [-6.4, 7.4]]) { const p = cam.p(X, 0, zz); s += steam(p[0], p[1] - 4, cam.sz(1.4, zz), cam.sz(2.6, zz), {n: 6, warm: true, col: V[12], op: 0.5, root: 0.25, lean: 0.06}); }
+  // the fox, asleep in the warmest spot, curled tight, its tail over its nose
+  const fp = cam.p(0.15, 0, 3.3);
+  s += ell(fp[0], fp[1] - 10, 230, 50, C.honey, 'opacity="0.2" filter="url(#b14)"');
+  s += foxCurled(fp[0], fp[1], cam.sz(1, 3.3), {dir: -1});
+  // snow falling, melting to drops in the warm air before the fans
+  { let g = ''; for (let i = 0; i < 200; i++) { const x = rr(0, W), y = rr(610, 1920); const warm = x < 760 && y > 820 && y < 1480; const r = rr(1.4, 3.6); g += warm && rnd() < 0.7 ? ell(x, y, r * 0.6, r * 1.1, '#e9eef2', 'opacity="0.55"') : ell(x, y, r, r * rr(0.85, 1.1), '#f4f5f7', `opacity="${f1(rr(0.4, 0.85))}"`); } s += g; }
   s += caption([{t: 'to blow that', x: 520, y: 395, size: 112}, {t: 'heat outside.', x: 560, y: 515, size: 112}]);
   return svgPage(s);
 };
 
-// ---------- B7alt: the city leans out: along the quay, windows swing open and people lean out toward the warm plume
-// drifting over the harbour: a hand held out, a mug held up, mittens hung out to warm ----------
+// ---------- B7alt: the city leans out: a Jugendstil facade front-on, window after window flung open and its people
+// leaning out on their sills toward the warmth thrown away far across the ice (an old man pointing, a child, a raised
+// mug, mittens pegged out to warm, a couple, a cat); below, the city's warm line runs along the street and stops where
+// the lot's untouched snow begins ----------
 FRAMES.B7alt = () => {
   seed(77);
   let s = '';
-  s += `<linearGradient id="s7a" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1000"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.3" stop-color="${C.paper}"/><stop offset="0.6" stop-color="${C.paper}"/><stop offset="0.75" stop-color="${V[9]}"/><stop offset="1" stop-color="${V[6]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1000" fill="url(#s7a)"/>`;
-  // the Jugendstil facade, front-on, its steep roof under the band, a low corner turret at the right
-  s += hrect(-20, 700, 940, 1240, V[3], 1) + P(polyD([[-20, 704], [60, 640], [880, 640], [930, 704]], 1), V[1]) + S(lineD([[-10, 700], [62, 644], [880, 644]]), V[12], 5);
-  s += hrect(900, 690, 200, 1240, V[2], 1) + P(smoothD([[890, 692], [930, 650], [1000, 618], [1070, 650], [1110, 692]], true), V[1]);
-  // the warm plume drifting in over the harbour from the right, across the facade (the heat they want)
-  s += steam(1120, 900, 560, 60, {n: 9, warm: true, col: V[12], op: 0.85, lean: -9, root: 0.35, sharp: true});
-  // windows in rows; the open ones: casements swung out, people leaning toward the warmth (lit from their rooms)
-  const cols = [70, 280, 490, 700], rows = [790, 990, 1190, 1390];
-  const open = {'0,1': 'mug', '1,0': 'hand', '2,1': 'hand', '3,0': 'mitten', '1,2': 'mug', '3,2': 'hand', '0,3': 'cat', '2,3': 'mug'};
+  s += `<linearGradient id="s7a" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1200"><stop offset="0" stop-color="${C.paperT}"/><stop offset="0.25" stop-color="${C.paper}"/><stop offset="0.5" stop-color="${C.paper}"/><stop offset="0.56" stop-color="${V[10]}"/><stop offset="0.7" stop-color="${V[6]}"/><stop offset="0.94" stop-color="${V[5]}"/><stop offset="1" stop-color="${V[7]}"/></linearGradient><rect x="0" y="0" width="${W}" height="1200" fill="url(#s7a)"/>`;
+  // the harbour beyond the facade's end (left): the far shore's city lights, a data center far across the ice
+  // throwing its warmth up into the night (far, out of reach), the ice, the quay's edge
+  s += P(polyD([[0, 1200], [0, 1166], [50, 1164], [56, 1152], [120, 1152], [126, 1160], [210, 1160], [216, 1146], [300, 1146], [306, 1158], [380, 1158], [380, 1200]], 0.6), V[3]);
+  for (let i = 0; i < 70; i++) s += rect(rr(4, 376), rr(1152, 1196), rr(2.4, 3.8), rr(2.2, 3.2), C.honey, `opacity="${f1(rr(0.55, 1))}"`);
+  s += hrect(70, 1166, 150, 30, V[1], 0.4) + rect(78, 1184, 134, 3, C.honey, 'opacity="0.55"');
+  for (const vx of [96, 136, 176]) s += hrect(vx - 11, 1159, 22, 8, V[1], 0.3) + ell(vx, 1160, 9, 3, C.honeyL, 'opacity="0.9"');
+  s += warmPlume(140, 1158, 130, 470, {lean: 0.05, op: 1.3});
+  s += P(polyD([[0, 1196], [400, 1196], [400, 1262], [0, 1262]]), V[10]) + P(smoothD([[0, 1204], [200, 1202], [400, 1205], [400, 1214], [200, 1216], [0, 1214]], true), V[3], 'opacity="0.85"');
+  s += P(polyD([[0, 1258], [400, 1258], [400, 1268], [0, 1268]], 0.5), V[3]);
+  // the lot by the water: its snow untouched (the gap), bright far off where the city's glow catches it, darker near
+  s += `<linearGradient id="lot7a" gradientUnits="userSpaceOnUse" x1="0" y1="1266" x2="0" y2="1920"><stop offset="0" stop-color="${V[12]}"/><stop offset="0.45" stop-color="${V[10]}"/><stop offset="1" stop-color="${V[8]}"/></linearGradient>`;
+  s += P(polyD([[0, 1266], [400, 1266], [400, 1920], [0, 1920]]), 'url(#lot7a)');
+  for (let i = 0; i < 7; i++) { const y = rr(1300, 1880); s += P(blobD(rr(20, 330), y, rr(50, 120) * (y / 1400), rr(4, 9) * (y / 1400), 8, 0.3), V[13], 'opacity="0.45"'); }
+  for (let i = 0; i < 6; i++) { const y = rr(1330, 1880); s += P(blobD(rr(20, 330), y + 8, rr(40, 110) * (y / 1400), rr(3, 7) * (y / 1400), 8, 0.3), V[7], 'opacity="0.3"'); }
+  for (let i = 0; i < 22; i++) s += ell(rr(10, 340), rr(1280, 1880), 1.4, 1.4, '#ffffff', `opacity="${f1(rr(0.4, 0.9))}"`);
+  for (const [bx, by, bw] of [[60, 1262, 12], [170, 1262, 12], [280, 1262, 12]]) s += hrect(bx - bw / 2, by - 20, bw, 20, V[1], 0.3) + ell(bx, by - 20, bw * 0.75, 3.5, V[13]);
+  // the Jugendstil facade front-on, its steep roof under the band, a low corner turret at the right
+  const fx = 352;
+  s += hrect(fx, 700, W - fx + 20, 920, V[3], 1);
+  s += P(polyD([[fx - 22, 704], [fx + 46, 642], [890, 642], [940, 704]], 1), V[1]) + S(lineD([[fx - 12, 700], [fx + 48, 646], [890, 646]]), V[12], 5);
+  s += hrect(930, 690, 190, 930, V[2], 1) + P(smoothD([[920, 692], [956, 652], [1020, 628], [1084, 652], [1120, 692]], true), V[1]) + S(smoothD([[930, 690], [960, 654], [1020, 632]], false), V[12], 3.6, 'opacity="0.85"');
+  s += hrect(fx, 1480, W - fx + 20, 140, V[4], 1);
+  for (let y = 1500; y < 1610; y += 34) s += S(lineD([[fx, y], [W, y]]), V[3], 1.6, 'opacity="0.7"');
+  for (const y of [940, 1140, 1340]) s += S(lineD([[fx, y], [930, y]]), V[5], 4, 'opacity="0.8"');
+  s += S(lineD([[fx, 700], [fx, 1610]]), V[5], 4, 'opacity="0.6"');
+  // the windows: most flung open, the people leaning out on their sills toward the far warmth
+  const cols = [392, 582, 772], rows = [758, 958, 1158], ww = 128, wh = 150, k = 98;
+  const kinds = {'0,0': 'mug', '1,0': 'mittens', '0,1': 'point', '2,1': 'couple', '0,2': 'child', '1,2': 'reach'};
   rows.forEach((wy, r) => cols.forEach((wx, c) => {
-    const key = c + ',' + r, kind = open[key];
-    s += win(wx, wy, 130, 150, {lit: true, glow: kind ? 1 : 0.5, core: false});
-    if (!kind) return;
-    s += P(polyD([[wx + 130, wy], [wx + 186, wy - 20], [wx + 186, wy + 170], [wx + 130, wy + 150]], 0.6), V[6]);   // the casement swung out
-    s += P(polyD([[wx + 136, wy + 6], [wx + 180, wy - 8], [wx + 180, wy + 160], [wx + 136, wy + 144]], 0.6), '#e6eef2', 'opacity="0.35"');
-    // a person at the sill, leaning out in profile toward the right (dark against the warm room, a warm rim)
-    const px = wx + 70, py = wy + 150;
-    s += personProfile(px, py + 110, 260, {pose: kind === 'mug' ? 'stand-toast' : 'stand-valve', mug: kind === 'mug', coat: V[2], coatL: V[3], hair: V[1], skin: V[7], rim: C.honeyL});
-    if (kind === 'mitten') { s += S(lineD([[wx + 130, wy + 30], [wx + 220, wy + 22]]), V[1], 2); s += P(blobD(wx + 160, wy + 54, 13, 19, 7, 0.2), V[10]) + P(blobD(wx + 200, wy + 48, 13, 19, 7, 0.2), V[10]); }
-    if (kind === 'cat') { s += P(smoothD([[wx + 110, wy + 150], [wx + 130, wy + 112], [wx + 176, wy + 104], [wx + 200, wy + 122], [wx + 196, wy + 150]], true), V[1]) + P(polyD([[wx + 184, wy + 108], [wx + 190, wy + 90], [wx + 198, wy + 110]]), V[1]); }
+    const kind = kinds[c + ',' + r];
+    if (!kind) { s += win(wx, wy, ww, wh, {lit: r !== 2 || c !== 2, glow: 0.5, core: false}); s += hrect(wx - 8, wy + wh, ww + 16, 8, V[6], 0.3) + rect(wx - 8, wy + wh - 2, ww + 16, 4, V[13]); return; }
+    s += openWin(wx, wy, ww, wh, {open: true, spill: 1.1, leafL: 0.26, leafR: 0.22});
+    s += leanOut(kind, wx + ww * (kind === 'child' ? 0.62 : 0.56), wy + wh, k, -1, {wx, wy});
+    s += sillFront(wx, wy, ww, wh);
+    if (kind === 'child') s += leanOut('cat', wx + ww * 0.1, wy + wh, k, -1, {catAt: 0});
   }));
-  // the street below: snow, the warm line under it
-  s += P(polyD([[0, 1600], [W, 1600], [W, H], [0, H]]), V[6]) + P(polyD([[0, 1720], [W, 1710], [W, H], [0, H]]), V[5]);
-  s += meltSeam([[-20, 1668], [300, 1660], [600, 1670], [1100, 1654]], [24, 18]);
+  // the turret's two small windows, lit; the house door (arched, its transom lit) on the street
+  s += win(990, 820, 56, 90, {lit: true, glow: 0.6, core: false}) + win(990, 1040, 56, 90, {lit: true, glow: 0.6, core: false}) + win(990, 1260, 56, 90, {lit: false});
+  { const x0 = 590, x1 = 700, yT = 1380, yB = 1612; s += P(smoothD([[x0, yB], [x0, yT + 40], [(x0 + x1) / 2, yT], [x1, yT + 40], [x1, yB]], true, 0.6), V[1]) + P(smoothD([[x0 + 8, yT + 44], [(x0 + x1) / 2, yT + 10], [x1 - 8, yT + 44], [x1 - 8, yT + 60], [x0 + 8, yT + 60]], true, 0.6), C.honey, 'opacity="0.85"'); }
+  for (const wx of [392, 772]) s += win(wx, 1380, ww, 110, {lit: true, glow: 0.45, core: false});
+  s += ell(640, 1600, 420, 40, C.honey, 'opacity="0.2" filter="url(#b24)"');
+  // the street below: trodden snow; the city's warm line runs along it and stops in a burst where the lot begins
+  s += P(polyD([[0, 1608], [W, 1608], [W, H], [0, H]]), V[6]) + P(polyD([[0, 1740], [W, 1730], [W, H], [0, H]]), V[5]);
+  // the ploughed bank where the trodden street ends and the untouched lot begins
+  s += P(polyD([[0, 1608], [352, 1608], [336, 1920], [0, 1920]]), 'url(#lot7a)');
+  s += P(smoothD([[340, 1606], [362, 1606], [384, 1760], [392, 1924], [300, 1924], [322, 1760]], true), V[10]) + P(smoothD([[352, 1606], [362, 1606], [384, 1760], [392, 1924], [356, 1924], [362, 1760]], true), V[7], 'opacity="0.55"') + S(smoothD([[342, 1608], [326, 1760], [304, 1920]], false), V[13], 4, 'opacity="0.7"');
+  for (let i = 0; i < 16; i++) { const x = rr(380, 1060), y = rr(1620, 1900); s += S(lineD([[x, y], [x + rr(30, 120), y + rr(-4, 4)]]), V[rnd() < 0.5 ? 7 : 4], rr(3, 6), 'opacity="0.35"'); }
+  s += meltSeam([[1110, 1716], [900, 1700], [700, 1712], [520, 1700], [372, 1706]], [26, 20]);
+  s += lineBurst(368, 1700, 0.9);
   s += snowfall(200, 0, 1920);
   s += caption([{t: 'But Helsinki', x: 360, y: 368, size: 112}, {t: 'wants', x: 570, y: 488, lit: true, size: 156}, {t: 'that heat.', x: 770, y: 580, size: 104}]);
   return svgPage(s);

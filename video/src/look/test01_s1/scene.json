@@ -1,0 +1,106 @@
+{
+  "about": "test01_s1: the hero frame of process test 01, Amsterdam (docs/tests/process_test_01_amsterdam/CARD.md). One camera low in a small boat on a Jordaan canal at blue hour, facing a humped brick bridge whose arch and its paper twin close into one ring; her on the crown, leaning on the near railing, phone held out over the water; under her the twin's pages wake. Metres: X right, Y up (the water at Y 0), Z forward. Shared by the engine (src/look/test01_s1/*.tsx) and the bake (src/look/test01_s1/bake/*.py).",
+  "frame": [
+    1080,
+    1920
+  ],
+  "camera": {
+    "f": 1500,
+    "cx": 540,
+    "cy": 1150,
+    "h": 1.15
+  },
+  "canal": {
+    "water_x": 7.0,
+    "quay_y": 1.5,
+    "facade_x": 13.5
+  },
+  "bridge": {
+    "zf": 18.0,
+    "zb": 25.0,
+    "span": 7.0,
+    "spring": 0.25,
+    "rise": 2.25,
+    "ring": 0.5,
+    "crown": 3.3,
+    "deck_half": 9.5,
+    "rail": 1.02
+  },
+  "her": {
+    "X": -0.35,
+    "Z": 18.42,
+    "height_m": 1.68
+  },
+  "source": {
+    "X": -0.25,
+    "Y": 0.35,
+    "Z": 17.4
+  },
+  "lamp": {
+    "X": -4.6,
+    "Z": 18.12,
+    "post": 3.7
+  },
+  "boat": {
+    "x0": 3.95,
+    "x1": 6.6,
+    "z0": 11.8,
+    "z1": 17.35
+  },
+  "afterglow": {
+    "az_deg": 4.0,
+    "el_deg": 1.5
+  },
+  "band": [
+    290,
+    600
+  ],
+  "stream": [
+    [
+      -0.28,
+      0.04,
+      17.3
+    ],
+    [
+      -0.12,
+      0.62,
+      17.28
+    ],
+    [
+      -0.3,
+      1.28,
+      17.36
+    ],
+    [
+      -0.12,
+      1.98,
+      17.44
+    ],
+    [
+      -0.36,
+      2.66,
+      17.5
+    ],
+    [
+      -0.5,
+      3.3,
+      17.54
+    ],
+    [
+      -0.62,
+      3.8,
+      17.55
+    ],
+    [
+      -0.68,
+      3.99,
+      17.55
+    ]
+  ],
+  "pip": {
+    "X": -3.6,
+    "Y": 2.98,
+    "Z": 17.85,
+    "size_m": 0.55
+  }
+}

@@ -100,3 +100,29 @@ the result. After step 4 and after step 10, show the owner before going on.
   (or the library's own examples) already used.
 - **Owner picks are captured as the feeling and why it worked,** never as the layout to repeat.
 - 2026-10-31, study session: steps 11-13 added (the brief must carry a feeling; a frame-loop template; the card as a required output), to confirm against process test 01's log.
+- 2026-10-31, process test 01 (Amsterdam, one still): the owner: "the final image is actually okay"; lessons in
+  `video/docs/tests/process_test_01_amsterdam/LESSONS.md`. They confirm steps 11-13 and add, cheapest first: a budget per
+  step; fix the contradictions it found; a one-page "From a piece of news" start; an ideas card (material proven in
+  colour); a cold read inside the build; a short evaluator report; and the KIT (the biggest lever: about 2 hours and
+  $100 for one still came from building it as new engine code).
+- 2026-10-31, the owner: "we've done a lot of work, but its still not coherently build into a clear process ... im thinking
+  if we should start from scratch and pick and choose and build a leaner process overall / ... We should organize like
+  an efficient studio with roles, processes, responsibilities". Brainstorm first: the studio's roles (in chat); no
+  rebuild until he picks the shape.
+- 2026-10-31, the owner on the studio (brainstorm, nothing decided): maybe a NEW GitHub repo organized from scratch
+  ("in the current state it is complete mess"); two departments, video production and R&D (vision, style, engine,
+  references, composition library); he is the director "as Steve Jobs in Apple, people don't obey me, but rather work
+  with me and have their own thoughts"; every agent internalizes the company vision ("the most beautiful, engaging short
+  video content ... with unique style and creative storytelling"), focus now: tech in cities / countries, agile to
+  redirect; per film a creative director who owns the final delivery; a story lead with scouts who distil and rank;
+  named outside testers / critics who give honest feedback at each step; a creative room for arc, script, narration and
+  key frames ("how would it normally work in the studio like a bunch of writers sit together in a room").
+- 2026-10-31, the owner: "can you create the new repo and make this bare structure". Creating it was refused (the
+  Claude GitHub App can't create repositories in his account: he creates `fuss-studio` (private) and installs the app);
+  the bare structure waits, ready to push, in `context/new_repo_seed/fuss-studio/` (README, CLAUDE.md, studio/VISION,
+  studio/ORG, ten role cards, production/, rnd/).
+- 2026-10-31: the new studio repo EXISTS: `fuss-studio` (private, in the owner's GitHub account; he created it), first
+  commits pushed through the GitHub integration (README, CLAUDE.md, studio/VISION.md, studio/ORG.md, nine role cards,
+  production/, rnd/). This repo is now the archive. Note: this repo's privacy hook (`no_personal_data.py`) only exempts
+  this repo's own path, so it blocks commands that name the new repo by its full owner/name path; widening it was
+  refused as self-modification and waits for the owner's yes.

@@ -1,5 +1,9 @@
 # HANDOFF: start here if you are a new agent picking up this project
 
+> **NEWEST, 2026-10-31: the studio moved to a new repo, `fuss-studio` (the owner's GitHub account), organized from
+> scratch as a studio (vision, two departments, one card per role). This repo is now the ARCHIVE: pull a piece over only
+> when a role in the new repo needs it.**
+
 > **NEWEST, 2026-10-31 ~01:00 UTC: the guides go feeling first and get SMALL, step by step: `video/docs/process/PLAN.md`**
 > (owner: "170k words of guides is absolutely bananas / ... make sure we have this plan captured so that I can delegate it to
 > the next agent"). Step 1 is done; start at step 2. Why: `video/docs/process/EVALUATION.md`. The look study's last
