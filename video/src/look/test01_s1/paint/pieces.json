@@ -1,0 +1,146 @@
+{
+ "boat": {
+  "box": [
+   879,
+   912,
+   201,
+   388
+  ],
+  "file": "boat.t01piece.png",
+  "seconds": 4.1,
+  "stats": {
+   "lost": 23,
+   "mypaint_s": 0.56,
+   "strokes": {
+    "edge": 23,
+    "face": 97,
+    "leaf": 351
+   }
+  }
+ },
+ "bridge": {
+  "box": [
+   0,
+   875,
+   1080,
+   375
+  ],
+  "file": "bridge.t01piece.png",
+  "seconds": 7.87,
+  "stats": {
+   "lost": 53,
+   "mypaint_s": 1.4,
+   "strokes": {
+    "edge": 53,
+    "face": 91,
+    "stone": 157
+   }
+  }
+ },
+ "far": {
+  "box": [
+   0,
+   449,
+   1080,
+   774
+  ],
+  "file": "far.t01piece.png",
+  "seconds": 14.92,
+  "stats": {
+   "lost": 147,
+   "mypaint_s": 2.82,
+   "strokes": {
+    "edge": 147,
+    "face": 377,
+    "leaf": 346
+   }
+  }
+ },
+ "glow": {
+  "box": [
+   433,
+   1071,
+   173,
+   190
+  ],
+  "file": "glow.t01piece.png",
+  "seconds": 1.26,
+  "stats": {}
+ },
+ "near": {
+  "box": [
+   156,
+   1692,
+   834,
+   228
+  ],
+  "file": "near.t01piece.png",
+  "seconds": 2.22,
+  "stats": {}
+ },
+ "rail": {
+  "box": [
+   0,
+   632,
+   1080,
+   436
+  ],
+  "file": "rail.t01piece.png",
+  "seconds": 0.16,
+  "stats": {}
+ },
+ "sky": {
+  "box": [
+   0,
+   0,
+   1080,
+   1240
+  ],
+  "file": "sky.t01piece.png",
+  "seconds": 15.46,
+  "stats": {}
+ },
+ "trees": {
+  "box": [
+   0,
+   0,
+   45,
+   99
+  ],
+  "file": "trees.t01piece.png",
+  "seconds": 1.73,
+  "stats": {
+   "mypaint_s": 0.23,
+   "strokes": {
+    "leaf": 53
+   }
+  }
+ },
+ "twin": {
+  "box": [
+   0,
+   1151,
+   1080,
+   769
+  ],
+  "file": "twin.t01piece.png",
+  "seconds": 3.52,
+  "stats": {}
+ },
+ "water": {
+  "box": [
+   0,
+   1150,
+   1080,
+   770
+  ],
+  "file": "water.t01piece.png",
+  "seconds": 5.86,
+  "stats": {
+   "mypaint_s": 2.04,
+   "strokes": {
+    "ripple": 520
+   }
+  }
+ }
+}

@@ -14,3 +14,5 @@ first; one adjust round for this test). Every agent appends to `PROCESS_LOG.md`:
 in the way. The evaluation of the PROCESS is the point.
 
 **Running:** workflow `process-test-01-amsterdam` (run `wf_35c2a988-a8b`; the first run, `wf_65c63c9d-100`, was stopped at the story step when the owner narrowed it, script under the session's workflows/scripts); resume with `Workflow({scriptPath, resumeFromRunId: "wf_35c2a988-a8b"})`. Code: `video/src/look/test01_s1/`.
+
+**Stopped 2026-10-31 at the spend limit** (weekly limit resets 2026-11-05 06:00 UTC): CORE, VISION, IDEAS, the ideas sheet and the first two sections of PROCESS_LOG are done; the build, the evaluation and the adjust round did not run. To finish: `Workflow({scriptPath: "<session>/workflows/scripts/process-test-01-amsterdam-wf_65c63c9d-100.js", resumeFromRunId: "wf_35c2a988-a8b"})` (the story and ideas steps replay from cache), or brief one agent with the script's BUILD prompt, then its EVAL prompt.
