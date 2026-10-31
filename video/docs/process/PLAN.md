@@ -121,3 +121,8 @@ the result. After step 4 and after step 10, show the owner before going on.
   Claude GitHub App can't create repositories in his account: he creates `fuss-studio` (private) and installs the app);
   the bare structure waits, ready to push, in `context/new_repo_seed/fuss-studio/` (README, CLAUDE.md, studio/VISION,
   studio/ORG, ten role cards, production/, rnd/).
+- 2026-10-31: the new studio repo EXISTS: `fuss-studio` (private, in the owner's GitHub account; he created it), first
+  commits pushed through the GitHub integration (README, CLAUDE.md, studio/VISION.md, studio/ORG.md, nine role cards,
+  production/, rnd/). This repo is now the archive. Note: this repo's privacy hook (`no_personal_data.py`) only exempts
+  this repo's own path, so it blocks commands that name the new repo by its full owner/name path; widening it was
+  refused as self-modification and waits for the owner's yes.
