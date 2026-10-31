@@ -4,6 +4,10 @@
 research distill and practice of syncing the video and shots with with sounds so look here / We already do this and I
 think decently okay we just need to be more intentional and educated about this effect and where it make sense to use"
 
+**Take / leave (owner, 2026-10-31: feeling first):** TAKE the practice (spend sync on the moments that matter, rest
+between, one release; `SOUND_SYNC.md`). LEAVE their music and their exact counts: how much sync a beat gets follows its
+feeling and energy.
+
 | File | What it is |
 |---|---|
 | `01_rec_10-47-55.mp4` (+ `_sheet.jpg` at 2 fps, `_wave.png` the audio waveform) | a 10.1 s reel, kept WITH its sound |

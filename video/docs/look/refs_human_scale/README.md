@@ -6,6 +6,12 @@ with these three pictures and the Cape Town poster, `../poster_refs/05_cape_town
 in terms of actual video / I think our references point should be closer to the original like where a person would be
 about this size / So I think our initial angle snd the view frankly wasn’t bad"
 
+**Take / leave (owner, 2026-10-31: feeling first; a reference lends its craft, not its mood):** TAKE the viewpoint (the
+camera where a person stands, a person at a real size), the big sky's drama, the painted skies and clouds, the clean
+refined people. LEAVE their mood by default: these are mostly lonely dusk and night scenes (a figure alone at a bus
+stop, a couple on an empty beach); a beat takes their low key, their quiet or their solitude only if its own feeling
+is that (v7 copied the key of 02 and 03 into a bold, surprising beat and lost the feeling).
+
 Then, on the painted look (2026-10-29): "Another piece of feedback is I really like the “painted” pieces like the sky
 and the clouds the references or some foreground buildings and trees / greenery are uniquely painted / Is it possible
 to modify our engine to match the story? Style" (playbook: PAINTED PIECES).

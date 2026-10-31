@@ -4,6 +4,11 @@
 composition shots to use / Take a look at this folder I collected some initial references but do the deeper research /
 https://drive.google.com/drive/folders/1bsedmOvPbQCBhsdgo33HeBztt4eF65eD"
 
+**Take / leave (owner, 2026-10-31: feeling first):** TAKE the ideas as a toolbox (every device the reels name, each
+with the feeling it creates: `COMPOSITION_SHOTS.md`). LEAVE their layouts: a device is chosen for the beat's feeling and
+invented for its frame, never copied as a placement ("there are million ways to build a scene with vanishing point
+composition").
+
 The folder held five phone screen recordings (Instagram reels, ~95 s in all; the app's UI is burned in). Saved here
 compressed to 540 px wide, video only, with a contact sheet each (1 frame per second); the originals stay in the Drive
 folder. The creators aren't named here; we learn the principles, never copy their footage.

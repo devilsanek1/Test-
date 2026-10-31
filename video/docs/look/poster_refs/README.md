@@ -1,5 +1,9 @@
 # City posters: the owner's style reference (2026-10-28)
 
+**Take / leave (owner, 2026-10-31: feeling first):** TAKE what the owner named (perspective, visual style, details,
+composition, one place told through its own things). LEAVE the poster's single still mood and its flat, static
+layout: a film's frames each serve their beat's feeling, and the camera moves.
+
 **The owner's words** (2026-10-28, ~21:35-21:45 UTC, sent with the seven pictures):
 - "so see these pictures - i really like the style and i want us to experiment more with the style and the focus on our videos"
 - "i think visually in the video about Google we have made good improvemnets in terms of overall style"
