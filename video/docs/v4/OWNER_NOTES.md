@@ -116,3 +116,326 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   5, rejected as too wide, re-scoped to the bunker).
 - 2026-10-29 ~09:30 UTC: "Helsinki is actually pretty good too / Let's do both as story 4 and 5" -> video 4 = Helsinki's AI-heated homes, produced by session
   https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt; the writer started.
+- 2026-10-29 ~10:00 UTC, G1: "alright pull the latest state of the repo, get familiar with the latest context and lets
+  work on the video 4 - pick up where its been left off" -> session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o
+  (branch `claude/kind-pascal-lvgsza`) runs G1 from `script/WRITER_BRIEF.md`: writer, critic (`script/CRITIC_BRIEF.md`),
+  fix pass; the owner was asked to add `ELEVENLABS_API_KEY` as the environment's network secret before G2.
+- 2026-10-29 ~10:20 UTC, G2 prep: the owner sent "eleven labs key" with a 64-character hex string -> one test call:
+  the API answered `api_key_id_used_as_api_key` (it is the key's ID, not the key, as on 2026-10-27; not filed
+  anywhere); the owner was asked for the value that starts with `sk_`, stored as the network secret
+  `ELEVENLABS_API_KEY` (`docs/voice/API_QUICKSTART.md` now names both).
+- 2026-10-29 ~10:20 UTC, G2: "lets try another voice - with this id MQnUCZUAQLYMCY1Ztz6d" -> v4's take uses voice
+  `MQnUCZUAQLYMCY1Ztz6d` (`docs/voice/VOICE.md`; checked with `GET /v1/voices/<id>` once a valid key exists).
+  -> rule: playbook, Script and voice (the voice is the owner's pick per film; their cloned narrator by default).
+- 2026-10-29 ~10:45 UTC, G2 prep: "wait so how do i get the actual key from this page" (a screenshot of ElevenLabs'
+  Developers -> API Keys) -> steps given: Create Key, copy the `sk_` value shown once, store it as the network secret;
+  then "try this" with a valid `sk_` key pasted in the chat -> tested (HTTP 200: Pro tier, ~628k of 717k characters
+  left; voice MQnUCZUAQLYMCY1Ztz6d is "Lady1", a cloned voice in the account); used inline in this session only, never
+  filed, prompted or committed; v4's G2 runs in this session; the owner was told it also belongs in the network secret.
+- 2026-10-29 ~11:30 UTC, G1 (on draft 1, archived in `archive/g1_draft1/`): "so what i don;t like about these scripts we
+  write lately is we are being too ambiguous and weird at times. Like lets break down each sentence", then line by line:
+  - "Did you know Helsinki wants AI to heat seventy thousand homes?": "great thats what i would like to tell my friends."
+  - "The chips get that hot.": "what is it? Like which chips? We are talking about reaching the biggest audience and
+    getting the engagement - but we would lose people on this sentence. Like we need to ask ourselves - is that
+    sentence good and will be received well by regular people? Chips is a word not a lot of people would understand."
+  - "One cabinet of them is like FORTY kettles, boiling non-stop.": "also similarly the next one too."
+  - "And nobody's even making tea.": "this is directionally okay, but still weird we need a simpler less scandalous
+    language."
+  - "So almost everywhere, that heat just gets dumped into the air or the sea.": "also find an easier, simpler way to
+    land the thought. I think you are having some deeper thought here and you choose to be obscure about it. So i think
+    you want to say that in a typical datacenter here is what happens. When you say "almost everywhere" - this is very
+    ambigous like what do you mean? we lose people here."
+  - "But Helsinki WANTS it.": "this is again too ambiguous for the audience. When you say IT - what exactly is it -
+    heat or air or sea?"
+  - "Distill and generalize the principles, then do the research on them around how the message should be structured
+    to land with the audience, bake into our rule set for the script generation and rework the script."
+  -> rule: playbook, Script and voice (CLEAR TO A REGULAR PERSON ON ONE HEARING), captured at once; then the workflow
+  `script-clarity` (`docs/retro/2026-10-29_script_clarity/`): two research lanes, one synthesis (principles, rule text,
+  a clarity lint spec), the rules integrated, `check_clarity.py` built, the script reworked (line 1 kept), a cold
+  three-viewer panel, a critic and a fix pass.
+- 2026-10-29 ~16:05 UTC, G1 (on draft 2 after fix round 3): "you are again packing more information than needed in the
+  short update - its actually okay to keep the text longer if needed, but you are having again too much of a sidequest -
+  like specifically this "Computers have heated Helsinki before. In twenty ten, a small data center under a cathedral
+  started heating homes." is the sidequest that doesn't really add much to the story. Also i would add more human /
+  conversation like sentences TACTICALLY like before this "Just one of them makes as much heat as FORTY kettles, boiling
+  non-stop." i want to say something like "to put it into perspective" or something like this. or something like
+  "Actually" / "so" that just adds a bit more human to it, figure out what to add / again generalize this feedback and
+  evalute the script once again" -> the cathedral beat is cut (the time-order variant's panel was stopped: moot);
+  -> rules: playbook ONE SUBJECT, GONE DEEP ("No side quests, and only the information the story needs") and Script and
+  voice ("Human connectors, placed TACTICALLY"); draft 3 by a writer, then a cold panel (which line could go; where it
+  sounds like a person) and a critic, a fix pass and a re-hear (workflow `v4-g1-draft3`).
+- 2026-10-29 ~16:10 UTC, G1: sent `Voice_Line_Clean_24bit.wav` (an El Niño explainer, 25.5 s): "I'll give you another
+  point of reference - listen there is first word cut off about El nino but it sounds directionally good to me" ->
+  saved with its transcript and measures (`docs/voice/refs/2026-10-29_el_nino/`: 214 wpm, short pauses, a lively male
+  read; connectors "So how does it work?", "Or in other words,", "Normally,", "The result is that"; three long
+  flowing sentences in a row, which our rhythm check failed); draft 3 restarted to use it (its first writer was 5
+  minutes in). -> rules: playbook (Human connectors, Rhythm: a run of up to 3, Taste signals); `check_rhythm.py`'s run
+  limit 2 -> 3; `docs/voice/VOICE.md` (the pace at G2).
+- 2026-10-29 ~18:40 UTC, G1 -> G2: on draft 3 (123 words; "your chatbot" restored): "i think this is a much better yes -
+  lets turn it into a voice now - play with the cadence and emotions to get to the best possible outcome capturing
+  people attention and keep them engaged" -> **G1 LOCKED** (the script, hook option 1, the core line "Your chatbot could
+  heat an apartment in Helsinki." and the card); G2 explores cadence and emotion internally (a few variants with the
+  voice Lady1: tags, expressiveness, pace, emphasis), measured against the El Niño reference and checked word by word,
+  and the owner gets ONE take. -> rule: playbook, Script and voice (the take is explored for attention, one delivered).
+- 2026-10-29 ~19:00 UTC, G2: "are you able to do some post processing on the voice to play with cadence and controls?" ->
+  yes: `scripts/voice/shape_take.py` (pauses, beats, tempo per sentence by Rubber Band, polish) and
+  `measure_take.py`; nine reads explored (v4 at 0.5/0.35/0.45, v3, v3 Conversational; per paragraph and whole script);
+  the take: eleven_v4, stability 0.35, livelier tags, whole read, shaped to 41.2 s and 183 words/min with a beat before
+  "But Helsinki WANTS that heat" and the payoff; MATCH. Our check had failed every read on "70 000": fixed
+  (`scripts/voice/textnorm.py`). -> rule: playbook, Script and voice (explored and shaped, one take sent).
+- 2026-10-29 ~19:20 UTC, G2: a screenshot of the app's "File preview unavailable" on take.wav: "Can't open play it here" ->
+  the same take sent as take.m4a and take.mp3 (`assets/v4/voice/`). -> rule: playbook, Script and voice (audio goes to
+  the owner as .m4a + .mp3); CLAUDE.md, PIPELINE_V2 G2, the quickstart.
+- 2026-10-29 ~19:40 UTC, G2: on the .m4a and .mp3 attachments: "None are available" -> the take on a private claude.ai page
+  with a player, the cadence strip and the script to tap through: https://claude.ai/artifact/Gn8KCPfZ6uh1AXos2koE8N
+  (built by `scripts/voice/take_page.py`). -> rule: playbook, Script and voice (a take reaches the owner on a player page);
+  CLAUDE.md, PIPELINE_V2 G2, the quickstart.
+- 2026-10-29 ~19:50 UTC, G2 (take 1 on the player page): "Okay so it sound extremely robotic like there is some weird
+  background / Weirdly except only the last phrase" -> the last phrase was the only part not time-stretched (tempo 1.0;
+  the rest ran through Rubber Band at 1.10): take 2 keeps every word as generated, shapes only the pauses (from their
+  own audio) and the two beats, lighter polish: 44.1 s, 171 words/min, MATCH; the page updated (version 2).
+  -> rule: playbook, Script and voice (never time-stretch the voice).
+- 2026-10-29 ~19:55 UTC, G2 (take 2): "Yeah we need to speed it up just a tiny bit yes" -> Eleven v4 ignores the speed
+  setting (probed), so three v4 reads with pace in the tags; take 3 = "brisk" (stability 0.35), shaped by its pauses only:
+  41.8 s, 180 words/min (+5 % on take 2's 171), the voice's pitch nearly unchanged (222 Hz vs 218), MATCH; the page
+  updated (version 3). -> rule: playbook, Script and voice (pace from the tags on v4).
+- 2026-10-29 ~20:10 UTC, G2: sent their own website take (`ElevenLabs_2026-10-29T20_06_41_Lady1_eleven_v4.wav`): "How about
+  this / I think in your version quality is not the same - here it's as if someone speaking in the microphone while in
+  your version it's more like in some chamber" -> measured: the raw reads match (bands, tails, pace), so the chamber was
+  our compressor and dynamic loudness; take 4 = their read, MATCH, pauses tightened and the two beats added, one static
+  gain, the voice untouched: 42.2 s, 177 words/min; the page updated (version 4). -> rule: playbook, Script and voice
+  (never process the voice itself); `generate_take.py` asks for 48 kHz like the website.
+- 2026-10-29 ~20:20 UTC, G2 -> visual script: on take 4: "Okay good" -> **G2 LOCKED**: `public/v4/voice.wav` (42.24 s,
+  48 kHz) + `public/v4/voice_words.json` (the script's words, Whisper-timed, the first at 0.13 s). Then: "We are still
+  iterating on the style tho. Instead brainstorm a story and like a visual script with what happens on the screen and
+  camera movements and etc / Again research his professional studios go through this step" -> workflow
+  `v4-visual-script`: research (pro pre-production formats; visual storytelling for a 40 s vertical explainer), our
+  method, three visual concepts, two judges, one visual script, a cold read and a critic, a fix pass; style-neutral.
+  -> rule: playbook, Storyboard (G3) and flow (the visual script before G3).
+
+## 2026-10-30: the visual script, asked about style (to the city-poster study session)
+- 2026-10-30 ~01:10 UTC, sending `Helsinki_Visual_Script.zip` (G2.5, 12 shots, the 42.24 s take): "What do you think about
+  this script / Would it fit into our style?" -> the study session's read: `STYLE_FIT_2026-10-30.md` (the story fits; the
+  picture needs a translation into the new look: a brush not a pen, an organic cut-away, a person near the camera, one
+  colour key and the window as the story light, a simpler composition).
+- 2026-10-30 ~01:30 UTC: "Commit the adjacentment to the story script to the story 4" -> the adjustments committed beside
+  the visual script on video 4's branch (`claude/kind-pascal-lvgsza`): `video/docs/v4/visual/STYLE_ADJUSTMENTS.md`
+  (fold into VISUAL_SCRIPT.md before G3).
+- 2026-10-30 ~14:10 UTC: "When we settle on the composition library recipes and overall approach we need to evaluate our
+  visual script for Helsinki story to figure out how to compose each scene and how we animate and move within a scene
+  and from scene to scene" -> queued: a composition-and-motion pass over the 12 shots once
+  `video/docs/look/COMPOSITION_SHOTS.md` is settled (playbook: "Every film's visual script gets a composition-and-motion
+  pass").
+
+
+## 2026-10-30: the words on screen (fonts and caption placement)
+- 2026-10-30 ~10:55 UTC, with two references (a screenshot of a reel titled "Scratchy — Sketched animated stories": a
+  white brush-script title and a hand-lettered subtitle, top left over a photo; and a screen recording of a reel whose
+  thin white hand-lettered words, one or two at a time, sit in the open wall above a drawn cat, placed and staggered
+  per phrase, about 1 s each): "One aspect I want you to evaluate and research is the fonts and the text caption
+  positioning I'll give you a few references / We previously would have the text to be pretty static but there is so
+  much more we can do to make it look premium, more interesting, dynamic and more engaging / Research —-> distill it in
+  the guidebook and recipes to use —-> give me still examples" -> an iteration (two max-effort agents: the research,
+  then the guide with its recipes and the stills, rendered on v4's words over our latest look frames), sent on a
+  private page: https://claude.ai/artifact/1magumGxnA4TGdeEQPc1Hv (14 stills, before and after, six picks; the guide
+  `docs/look/TYPE_GUIDE.md` DRAFT, the research `docs/look/type/RESEARCH.md`); the references measured in
+  `docs/look/type/refs/README.md`. -> rule: playbook, Visual style (the words
+  on screen are designed, never one static block).
+- 2026-10-30 ~13:20 UTC, on the type page (a crop of still 02: "But Helsinki / **WANTS** / that heat.", WANTS in Nanum
+  Brush Script, burnt #8E3A12, all capitals, on the dusk sky): "One immediate note / The text should be pleasant to look
+  at like it shouldn't look like a blood message on the wall / Reevaluate" -> the brush in dark burnt red retired; the
+  emphasis re-evaluated for pleasantness (colour, stroke, case), options compared on the same moment, the stills and the
+  page updated: the lit hand (the stressed word in the hand's Bold, bigger, lowercase; honey with a golden glow on night
+  skies, a soft warm halo on light skies; plum running ink on light skies), the brush and its write-on retired; options in
+  stills 15-17; `docs/look/type/PLEASANT.md`; page version 2 (same link). -> rule: playbook, Visual style (the words
+  are PLEASANT to look at).
+- 2026-10-30 ~14:10 UTC, on page version 2: "Okay you pick your best option for maximum engagement and pleasantry and
+  user attention retention" -> picked (1A Gaegu; 2 both: the big lit word for the 3-5 landing words and the numbers, the
+  same-size Bold lift for everyday stress; 3C the warm halo on light skies, night B, the number B; 4A words follow the
+  open space on one steady anchor; 5A the cover in the hand with one lit word; 6A the size steps as they are) and
+  applied: `docs/look/TYPE_GUIDE.md` PICKED, `LAYOUT.md` §1/§5/§6, DIRECTION rule 10, G5_BLOCKING's caption tones, the
+  playbook (the DESIGNED rule picked; the old captions retired). The code (font.ts, theme.ts, Captions.tsx, capcheck)
+  follows with the tooling lane; the motion (builds, the bloom) is judged moving in v4's G4 look clip. -> rule:
+  playbook, Process (a pick handed over: engagement, pleasantness, retention).
+- 2026-10-30 ~14:30 UTC, with five people references (`docs/look/people_design/refs_hair_2026-10-30/`): "So we previously
+  made a recipe and a detailed research and the update to people figures / We need to iterate on it more and improve
+  the hair and the proportions and stature / I will send you more references when it come to hair it's never really
+  static or like one firm it's always a little messy, unstructured wavy / Research the haircuts and the physics of hair
+  and let's make sure it's the most pleasant and modern recipe we have" -> a people iteration (hair, proportions,
+  stature) on direction C with the LASH face, stills first; it feeds video 4's person near the camera (S1, S11, S12).
+  Sent: https://claude.ai/artifact/1Xerf8RzpVF8WnH2PYEN8b (her before and after, twelve cuts, calm/breeze/walk/turn,
+  the cast at film size, heights and builds, seated and leaning, close and far; `docs/look/people_design/hair_v2/`).
+  -> rule: playbook, Visual style (hair is never static or one firm shape).
+- 2026-10-30 ~16:50 UTC, on the people page (a crop of S1's AFTER, plus three of the references again): "I don't get why
+  you changed the neck posture like now it looks like this person was sitting at computer the whole day / Also I don't
+  think I like it really it's more detailed yes but it's incoherent like it's not a proper haircut and more like a
+  person woke up and that's what we see like not stylish and not clean compare it deeper with our references if they
+  look more clean and stylish" -> the forward neck reverted (the head stacked over the shoulders); the hair rebuilt as a
+  proper, clean cut with one flow and a touch of looseness, measured against the references; people iteration 3
+  (`hair_v2/V3.md`: v2 had no real cut, locks waving their own ways, random tips, ~14 inner marks, the head at ~58 deg;
+  v3: 2-5 big shapes in one flow, alike tips, one loose bit at most, the neck ~73 deg); the page updated (version 2).
+  -> rule: playbook, Visual style (hair inside a proper, stylish, clean haircut; the upright neck).
+- 2026-10-30 ~17:10 UTC: "Another next point is the fade profile should be cute and like super appealing by modern
+  standards / Do the research if what makes the faces beautiful and cute and appealing like general face features and
+  make it / Like the woman sitting on the blue cliff reference obviously has appealing features like cuteness nose hair
+  female body composition and our man refreshed similarly has manly features" ("fade profile" read as the face's
+  profile) -> a face-and-body appeal round: the research and a profile design sheet now, beside the hair rebuild; built
+  into the figures once the hair round lands. -> rule: playbook, Visual style (faces cute and appealing; women
+  feminine, men manly).
+- 2026-10-30 ~17:40 UTC, on people page version 2 (round 3): "Nope not good enough we need to overhaul the hair I'm not
+  convinced it's going to be animated properly it's not looking clean at all looks like garbage and not appealing or
+  clean" -> the hair approach replaced, not tuned: clean designed shapes on a 2D rig (back / cap / front pieces, bone
+  chains with spring physics), proven with motion strips; research on how pro 2D pipelines draw and rig hair runs
+  beside the design-and-build agent. -> rule: playbook, Visual style (hair built to animate, drawn clean); Process
+  (the orchestrator looks before sending).
+- 2026-10-30 ~18:10 UTC: a crop of the v3 comparison sheet, ref 03's bob beside our v3 W1, no words -> read as the bar
+  and the gap (her volume, the hem's outward flips, two placed flyaways, the gloss and rim light, a delicate appealing
+  face; ours small, flat, plain, a blank face); written into the overhaul's briefs (the assembler reads it), the final
+  stills put ref 03 beside our bob again and show an "open eyes, looking away" head beside LASH for the owner to choose.
+- 2026-10-30 ~18:25 UTC: "Like this is one exsmple just compare it overall and evaluate what makes the left to be modern
+  and natural and appealing and right us absolute garbage / I think we do need to combine it with the faces research"
+  -> `docs/look/people_design/EVALUATION.md` (the root cause: our faceless flat "corporate" figure family vs today's
+  stylised 2D; eight measured differences: a face, 3D construction, light and rim, the value plan (ref hair L* 5 /
+  face 46 / sky 33 vs ours 19 / 83 / 90), the cut, edges, proportion and gesture, colour) and the eight changes; the
+  overhaul already combines hair with the faces work, and its assembler applies the evaluation. -> rule: playbook,
+  Visual style (hair, face, light and values designed together, judged overall).
+- 2026-10-30 ~19:10 UTC (orchestrator): the overhaul v4 looked at beside the references before sending: the hair (authored
+  shapes on a spring rig, soft shading, six cuts) and the redrawn faces clear the bar and the motion strips prove it
+  animates; the bodies (stand-ins: stiff, mitten hands, tees) do not, so the page (version 3, same link) shows the heads,
+  the motion strips and film size, with the bodies marked not done; a bodies round (poses, hands, clothes,
+  proportions) started beside the owner's review (`docs/look/people_design/bodies_v4/`).
+- 2026-10-30 ~19:20 UTC, on page version 3: "Hair is a bit cleaner let's keep it for now" -> hair v4 (authored shapes on
+  a spring rig, soft shading) is the hair in use for now (PEOPLE_DESIGN status, the playbook); to iterate later. The
+  eyes (LASH or open) and the cut-by-cut notes stay open; the bodies round continues. -> rule: playbook, Visual style
+  (hair v4 kept for now).
+- 2026-10-30 ~19:30 UTC: "Let's do open eyes" -> the redrawn faces' open eyes (looking away, never at us; a soft brow, a
+  small nose, the lips as a tone) are the default (`src/look/people_dirs/people_v4/head.ts`: eyes 'open'); the closed
+  LASH stays for downcast, serene moments. -> rule: playbook, Visual style (People: open eyes that look away).
+- 2026-10-30 ~20:05 UTC (orchestrator): the bodies round looked at beside the references and sent (page version 4, same
+  link): natural poses (contrapposto, walk, lean, ledge, ground), authored hands, six looks with fit and folds, the
+  open eyes in; rough spots named (her calm stance, the coat's far panel, the rail grip, the ground pose, the turn's
+  face swap, the bag) (`docs/look/people_design/bodies_v4/`).
+- 2026-10-30 ~20:15 UTC, on page version 4: "I think it is a bit better overall I think yes let's go with that for now"
+  -> the people in use for now: hair v4 + the redrawn faces with open eyes + the rebuilt bodies (PEOPLE_DESIGN status
+  block; the playbook); the rough spots stay on the list for later; video 4's person near the camera (S1, S11, S12)
+  is drawn with them. -> rule: playbook, Visual style (the people in use for now).
+- 2026-10-30 ~20:50 UTC, to the study session: "Make sure to commit all your changes so that we can start working on
+  production video 4 in parallel while you are showing the results" -> everything committed and merged both ways: video
+  4's branch, the study branch and video-production carry one state (HANDOFF 2e; the composition library, SOUND_SYNC,
+  the Helsinki composition pass draft, the people overhaul in use); production of video 4 continues in parallel with
+  the study's results.
+
+## 2026-10-30: production starts
+- 2026-10-30 ~20:35 UTC: "Okay I think we have everything we need to actually start production of the video 4 / I think we
+  have a voice sound , visual script, we have made a collection and a guideline on the composition of scenes and
+  transitions, we made a lot of guidelines and recipes on visual part and style, etc / Go ahead and start working on the
+  video 4, make sure to refresh the repo to take the latest context and the guidelines and recipes and references / Make
+  sure to parallelize the work between subagents and subthreads if you need / Make sure to give me periodic updates with
+  what's been cooked - visuals, videos if done" -> video-production merged in (the composition library, sound sync, painter
+  v7, the Helsinki pass draft); phase A in two parallel workflows (the visual script v3 lock with the folds and the
+  delegated calls + the camera plan; the W1 world bible; the G3 kit with the tier-1 deltas; the production captions);
+  then G3. Periodic updates with visuals and videos as they land.
+- 2026-10-30 ~21:00 UTC: "Give me here the recipes and guides you are going to be using - like the brand new ones I like
+  how they visually structured" -> the list in chat (words, composition, sound, look, people, flow and the animatic);
+  then "Yeah if they are saved as visuals only do not recreate it if they don't snd instead continue with video 4" ->
+  one page from the existing sheets only, nothing redrawn: https://claude.ai/artifact/AUT5fiRBdwhk8RzV6QxLz3; video 4's
+  production continues.
+- 2026-10-30 ~21:45 UTC, on the colour script strip: "I mean I am loooing at this oicture and each house is so alone like
+  the scene is empty / I mean is there any step that will make it coherent?" -> true of the plan, not only the strip:
+  the world bible's home view left ~45-50 % sky and ~35 % open snow, a thin belt of lone blocks. The world plan is
+  revised to a full neighbourhood (blocks shoulder to shoulder, layered rows and rooftops, the street's things, lit
+  homes everywhere; the computer and the plan site inside the city), the colour script redrawn, and the G3 density pass
+  fills the lanes' sets from it. -> rule: playbook, Visual style (a place, never buildings standing alone).
+- 2026-10-30 ~21:52 UTC, with a frame of video 1 ("Governments all over Europe just shut down": classical government
+  buildings with browser-window panes, a power-button sun, crowds with phones, Pip on a post;
+  `context/uploads/2026-10-30_v1_governments_frame.png`, history only): "One thing I'm wondering is our first video / Like it had so many details and
+  so coherent and so imaginative / Like I didn't give pretty much any visual instructions Claude just made this all up
+  in bisucally one shot / How did we get to this ?" -> the answer from v1's own brief and scene notes: one proven
+  reference style measured to the pixel (a loose architectural ink sketch, where detail is cheap and forgiving), the
+  bar "every frame should be worth pausing on", readable imaginative ideas from the script, each scene built whole by
+  one builder with many props; since then the look moved to clean, then no outlines, then painted (harder to make
+  dense), restraint rules piled up and the process fragmented. Proposed for v4: v1's bar at the top, one readable
+  imaginative idea per beat, density planned from the world bible (running), key frames painted whole before the
+  build; asked the owner whether fine ink line work may come back for detail. -> rule: playbook, Visual style (v1's
+  frame named as the bar for detail, coherence and imagination).
+- 2026-10-30 ~21:57 UTC: "how do we adjust our overal process, i want to make it more loose, more imaginative. i like the
+  main important rule is every frame is worth pausing on yes + readable imaginative ideas + frames planned and created
+  whole. We shouldn't be in a situation where we have our video and then we just fill up space for the sake of density
+  this is wrong we need to be imaginative and plan the whole frame from the get go" -> the four G3 board lanes (sparse
+  frames from the camera plan) and the density revision (a fill brief for the assembly) STOPPED; their files kept as
+  reference for the camera and the timing. The process changed (playbook THE THREE RULES; PIPELINE_V2's new loop):
+  ideas, then key frames designed whole, then the animatic plays the key frames. Video 4 restarts from an ideas round.
+  Then, on the line question: "so i like a bit of rougher ink style but our video 1 was too rough not looking clean or
+  premium. If you can come up with a clean way to incorporate a bit of messiness in the lines combined with all the
+  painting and styles and texture we added with it looking coherent - sure lets try" -> an ink-line look iteration
+  (stills) beside the ideas round. -> rules: playbook THE THREE RULES ABOVE ALL; Visual style (ink lines, a bit rough
+  but clean, to try).
+- 2026-10-30 ~22:03 UTC: "so how are visual script and ideas and key frames generation fit together? wouldn't the visual
+  script restrict the steps 3 and 4?" -> yes: v4's visual script v3 (written before any ideas) fixed the pictures, the
+  staging and the camera, and the ideas brief had called its 12 shots and camera fixed. The ideas round was STOPPED and
+  relaunched free: fixed are only the voice (words, times), the facts and the card's story-level choices; v3's pictures
+  are one candidate. The order now: beats -> ideas -> key frames made whole -> the shot plan (the visual script written
+  FROM the key frames) -> the animatic. -> rules: PIPELINE_V2 "THE LOOP NOW"; playbook, Storyboard (G3) and flow.
+- 2026-10-30 ~22:06 UTC: "are the composition recommendation included in here? Are the stylistic recipes included here?
+  is it completley free flowing or what we've done previously in terms of building up the visual recipes would be
+  included?" -> not enough: the relaunched brief named only the people and the type. The ideas round was stopped and
+  relaunched once more with the toolbox: the composition library (the grammar in every frame, one lead device per
+  frame by its code), LAYOUT's bands, DIRECTION, COZY_AND_SCALE, LIFE_AND_DENSITY; the look recipes named for the key
+  frames. -> rules: playbook THE THREE RULES (imagination first, inside the toolbox); PIPELINE_V2 THE LOOP NOW.
+- 2026-10-30 ~22:10 UTC: "okay im tired of pointing every single piece im sure we missed some more / so how do we make sure
+  that our toolbox carry but imagination and full scene planning is done completely - like one example here is
+  composition ... not the concrete steps "PUT A BUILDING HERE", but more abstarct like "layers and feel of distance" and
+  the feel of distance is achieved with a "visual" tool of layers. Are you able to analyze and see how we can rework our
+  process to get to this stage" -> workflow `process-design-language`: an audit of every guide (intents, tools,
+  prescriptions, checks; the gaps), research on pro art direction (Block's visual components, Bacher, Mateu-Mestre,
+  colour scripts, art bibles), then `docs/look/DESIGN_LANGUAGE.md` (the toolbox as feelings -> tools -> labelled examples
+  -> checks), `docs/look/FRAME_CARD.md` (every aspect of a frame as a question) and `docs/process/REWORK.md`. -> rule:
+  playbook THE THREE RULES (the toolbox as feelings and tools, never placements; one card per frame).
+- 2026-10-30 ~22:12 UTC: "make sure we have the loops setup correctly where the agents bulid the proposed scenes and we
+  evaluate and perhaps adjust it if its almost there or rework completely if it doesn't achieve the feeling we need - is
+  that something you would already do or we should explicitly setup?" -> it existed only in part (production critics
+  judged checklists; iterations had no review; the orchestrator's look was ad hoc), so it is set up explicitly: THE
+  FRAME LOOP (build -> a fresh evaluator judges the feeling first -> THERE / ALMOST: adjust, at most 2 rounds / NOT
+  THERE: rework from the idea, at most once), encoded in every workflow from the key frames on. -> rules: playbook THE
+  THREE RULES (the frame loop); PIPELINE_V2 "THE FRAME LOOP"; the two-modes rule (iterations keep one evaluator round).
+- 2026-10-30 ~22:15 UTC: "another possible problem is if every agent bulid a scene in isolation, the whole thing comes up
+  like a complete mess of hudge pudge ideas - is that a risk here? Anything in the process that ensures this doesn't
+  happen and the whole video and the narrative idea is clear?" -> yes (v3 failed this way); set up explicitly: one film
+  concept above the beats, sequences picked whole (the running ideas round already gives two whole sequences, A and B:
+  one becomes the base), one art director holding the vision, one shared world kit, every frame evaluated in the board
+  and a board read after each round, lanes by sequence. -> rules: playbook THE THREE RULES (one film, never a
+  hodge-podge); PIPELINE_V2 "ONE FILM, NEVER A HODGE-PODGE".
+- 2026-10-30 ~22:20 UTC: "don't reference video 1 - i think this would put agents in a box again" -> video 1 (its frame
+  and its ideas) is out of every brief, rule and guide the agents read: the playbook (the three rules, the frame loop,
+  the fullness bar, the scale and metaphor lines), PIPELINE_V2 (one film, the frame loop), DIRECTION's intro (a v1
+  number left in an older guide is a measurement, never a picture to look at), LIFE_AND_DENSITY, CINEMATIC_GUIDE (its
+  shot types are recipes, never upgrades of v1 shots), the ideas brief and the process brief; the frame moved to
+  `context/uploads/` (history); the ideas round relaunched without it. This supersedes the 21:52 line's "v1's bar at
+  the top". -> rule: playbook THE THREE RULES (no past film as the bar or the example).
+- 2026-10-30 ~22:20 UTC: "what would ultimately ensure that the world is build rich, visaully and aestethically
+  pleasing?" -> answered and set up: the world designed first from real photos of the real place (Helsinki's harbour
+  streets in winter; a real data hall, real pipes), its pieces built once at finished quality (the world kit); the hero
+  frame painted to full finish first and approved by the owner as the film's own bar; rich = specific, layered, alive
+  (three scales of detail, each detail about this place or this story); pleasing judged as a painter judges (values,
+  colour harmony, shape rhythm, edges, the finish), an ALMOST answered with a paint-over; the owner's eye on the hero
+  frame and on the board. -> rules: playbook THE THREE RULES (a rich, beautiful world); PIPELINE_V2 "A RICH, BEAUTIFUL
+  WORLD".
+- 2026-10-30 ~22:33 UTC, after the ink-line test page (https://claude.ai/artifact/NVsh6GUY5NoyGwLY4yJ7QF; the pick B, the
+  brush pen): "lets build without ink first and then we will test the final product with ink if its makes it any better"
+  -> video 4 is built with NO ink (the clean pen, no outlines); after the final cut, B is laid over it and the two cuts
+  are shown side by side; the owner decides. -> rules: playbook, Visual style (INK LINES: tested on the finished film);
+  PIPELINE_V2 THE LOOP NOW step 8.
+- 2026-10-30 ~22:36 UTC: "we are about to hit 5hour limit - don't lose anything" -> everything committed and pushed; the
+  running rounds' state and how to resume them written to `context/RESUME_2026-10-30.md` (and HANDOFF's top points to it).
+- 2026-10-30 ~22:38 UTC: "we need to make sure this playbook follows into the next videos. make sure to refine the
+  overall process the docs the guidelines to emphasise what we discussed here so that we don't talk about it again for
+  future videos" -> CLAUDE.md rewritten that minute with the day's decisions (the draft:
+  `context/agent_reports/2026-10-30_CLAUDE_md_draft_v4_session.md`); then the usage limit stopped this session, and the
+  study session's `docs/process/PLAN.md` (steps 1-9, 2026-10-31) carried the same decisions into the always-read docs:
+  CLAUDE.md (the one page), the playbook's top section (made small), PIPELINE_V2, FRAME_CARD, DESIGN_LANGUAGE, the
+  standard brief header and its hook. -> rule: playbook THE THREE RULES ("settled for every video").
+- 2026-10-31 ~02:10 UTC: "I hit my usage limit while you were working, but it has reset now. Please continue from where
+  you left off." -> the ideas round and the process rework had died at the limit with no output (only the audit and the
+  research files, archived in `context/agent_reports/`); the study session's commits merged (theirs kept where both
+  sessions changed a file); the ideas brief now opens each beat with its feeling (the standard brief header); the ideas
+  round waits for the owner's word on the week's tokens.

@@ -1,0 +1,874 @@
+{
+ "name": "13 Frost & Honey (proposed, video 4)",
+ "status": "PROPOSED in video 4's world bible (docs/v4/WORLD_BIBLE.md, W1, 2026-10-30); shown in the G4 look clip; goes into docs/look/palettes.json only after the owner approves it there (PALETTE.md 'How to use it').",
+ "mood": "A cold blue snowy night with one honey-warm accent: the heat. T3's low key (ORGANIC.md section 8) as a night; the captions warm white on the night band (TYPE_GUIDE.md).",
+ "use_cases": "a winter night in a city; any story about one warm thing in the cold (heat, a home, a light)",
+ "dna_notes": "Breaks one DNA line on purpose: the light page (L* >= 75); its page is the night sky (the band at L* 31.3). Every role is out of lib/water neverBand's beige, olive and grey bands, at C* >= 8 (designed neutrals at 9). One hero (the heat's warm water, C* 40-52), one tinted dark anchor (#191F32), no separate pop (the lit window is the one look-here).",
+ "colors": {
+  "bg": "#3B467D",
+  "ground": "#72768C",
+  "disc": "#FFD58C",
+  "hl": "#FFD58C",
+  "line": "#191F32",
+  "skin": "#9C7365",
+  "hero": "#EDB062",
+  "anchor": "#191F32",
+  "pop": "#FFD58C",
+  "ink": "#FFF0DE"
+ },
+ "colors_note": "palettes.json's role format: bg = the caption band (the night sky), ground = the street's far snow, disc/hl/pop = the story light (the honey; no separate pop), line = the darks' anchor (thin lines on things that are lines take their object's own deep shade), ink = the caption ink (warm white on night).",
+ "sky_stops_home_view": [
+  {
+   "y": 0,
+   "hex": "#2E3A6A",
+   "L": 25.7
+  },
+  {
+   "y": 290,
+   "hex": "#3B467D",
+   "L": 31.3
+  },
+  {
+   "y": 600,
+   "hex": "#3B467D",
+   "L": 31.3,
+   "note": "flat through the band"
+  },
+  {
+   "y": 780,
+   "hex": "#5C5A84",
+   "L": 40.0
+  },
+  {
+   "y": 980,
+   "L": 52,
+   "note": "PCHIP in OKLab between the stops"
+  },
+  {
+   "y": 1095,
+   "hex": "#A297AF",
+   "L": 64.1,
+   "note": "the glow: the lightest sky"
+  },
+  {
+   "y": 1150,
+   "hex": "#9B92AA",
+   "L": 62.0,
+   "note": "the air, the horizon (y 1150)"
+  }
+ ],
+ "shadow_tints": {
+  "note": "CRAFT section d.3: multiply, one family (violet on cool surfaces, rose-plum on warm ones), never grey",
+  "form_cool": "#D7C7DA",
+  "cast_cool": "#C6BACB",
+  "contact_cool": "#A598AF",
+  "form_warm": "#EACDD7",
+  "measured_on_snow_far": "form -10, cast -13, contact -20 L*, hue turned 12-14 deg toward violet, chroma kept",
+  "measured_on_warm": "form -9 to -11 L*, chroma >= 0.95x, hue turned 13-17 deg toward rose",
+  "board_one_shadow_value": "#9A9893 (STORYBOARD_STYLE section 2's mid, L* 63)"
+ },
+ "roles": [
+  {
+   "role": "sky.zenith",
+   "group": "sky",
+   "hex": "#2E3A6A",
+   "L": 25.7,
+   "C": 31.5,
+   "h": 290,
+   "job": "the sky top, y 0 (5.6 L* under the band: CRAFT g.1 <= ~6)"
+  },
+  {
+   "role": "sky.band",
+   "group": "sky",
+   "hex": "#3B467D",
+   "L": 31.3,
+   "C": 34.9,
+   "h": 291,
+   "job": "the caption band, y 290-600, flat (TYPE_GUIDE night band: #FFF0DE 7.96:1)"
+  },
+  {
+   "role": "sky.low",
+   "group": "sky",
+   "hex": "#5C5A84",
+   "L": 40.0,
+   "C": 25.7,
+   "h": 296,
+   "job": "under the band, y ~780 (home view); y ~980 L* ~52"
+  },
+  {
+   "role": "sky.glow",
+   "group": "sky",
+   "hex": "#A297AF",
+   "L": 64.1,
+   "C": 14.0,
+   "h": 308,
+   "job": "the horizon light band, y ~1060-1130: the lightest sky (the city glow on the low snow cloud)"
+  },
+  {
+   "role": "air",
+   "group": "sky",
+   "hex": "#9B92AA",
+   "L": 62.0,
+   "C": 13.9,
+   "h": 305,
+   "job": "the AIR: the sky lowest colour right behind the far planes (CRAFT f.1)"
+  },
+  {
+   "role": "cloud.body",
+   "group": "sky",
+   "hex": "#3B4166",
+   "L": 28.6,
+   "C": 23.9,
+   "h": 290,
+   "job": "snow-cloud masses, the hero cloud (within +-4-6 L* of their sky)"
+  },
+  {
+   "role": "cloud.lit",
+   "group": "sky",
+   "hex": "#6D6381",
+   "L": 43.9,
+   "C": 18.5,
+   "h": 304,
+   "job": "a cloud underside lit by the city glow"
+  },
+  {
+   "role": "far.roofs",
+   "group": "far",
+   "hex": "#8A8399",
+   "L": 56.0,
+   "C": 12.9,
+   "h": 303,
+   "job": "+4 far roofs (within dE 10 of the air)"
+  },
+  {
+   "role": "far.city",
+   "group": "far",
+   "hex": "#736F87",
+   "L": 48.0,
+   "C": 14.3,
+   "h": 298,
+   "job": "+3 far city body"
+  },
+  {
+   "role": "far.lit",
+   "group": "far",
+   "hex": "#A07C6C",
+   "L": 55.0,
+   "C": 18.3,
+   "h": 51,
+   "job": "+3 far lit windows (+7, warm-muted; the 70,000 wave)"
+  },
+  {
+   "role": "water.far",
+   "group": "far",
+   "hex": "#88839A",
+   "L": 55.9,
+   "C": 13.4,
+   "h": 300,
+   "job": "+2 harbour, far water (>= 4 under the air)"
+  },
+  {
+   "role": "water.near",
+   "group": "far",
+   "hex": "#495471",
+   "L": 35.9,
+   "C": 18.3,
+   "h": 281,
+   "job": "+2 harbour, near water"
+  },
+  {
+   "role": "ice",
+   "group": "far",
+   "hex": "#8F8F9F",
+   "L": 59.9,
+   "C": 9.0,
+   "h": 291,
+   "job": "ice floes, lit tops"
+  },
+  {
+   "role": "block.front",
+   "group": "street",
+   "hex": "#3F3343",
+   "L": 23.1,
+   "C": 11.9,
+   "h": 318,
+   "job": "the block facade facing us (in the key shade): dusky plum-mauve"
+  },
+  {
+   "role": "block.side",
+   "group": "street",
+   "hex": "#484457",
+   "L": 29.9,
+   "C": 12.3,
+   "h": 300,
+   "job": "its left-facing side, lit by the key"
+  },
+  {
+   "role": "next.block",
+   "group": "street",
+   "hex": "#28313F",
+   "L": 20.1,
+   "C": 10.1,
+   "h": 271,
+   "job": "the next block (right): slate"
+  },
+  {
+   "role": "pane.dark",
+   "group": "street",
+   "hex": "#1E2334",
+   "L": 14.0,
+   "C": 12.2,
+   "h": 284,
+   "job": "unlit panes, doorways, eave undersides (the dark pieces)"
+  },
+  {
+   "role": "pane.lit",
+   "group": "street",
+   "hex": "#77513A",
+   "L": 38.0,
+   "C": 23.8,
+   "h": 57,
+   "job": "other homes lit: +15 over the facade, muted amber, no bloom, never yellow"
+  },
+  {
+   "role": "snow.cap",
+   "group": "street",
+   "hex": "#8C90A2",
+   "L": 60.0,
+   "C": 10.2,
+   "h": 283,
+   "job": "sky-facing snow: roofs, sills, rails (the lightest snow)"
+  },
+  {
+   "role": "snow.far",
+   "group": "street",
+   "hex": "#72768C",
+   "L": 50.0,
+   "C": 12.9,
+   "h": 285,
+   "job": "street snow by the far kerb (it mirrors the bright horizon)"
+  },
+  {
+   "role": "snow.mid",
+   "group": "street",
+   "hex": "#5F6279",
+   "L": 42.1,
+   "C": 13.9,
+   "h": 288,
+   "job": "street snow, mid"
+  },
+  {
+   "role": "snow.near",
+   "group": "street",
+   "hex": "#45475F",
+   "L": 30.9,
+   "C": 15.3,
+   "h": 290,
+   "job": "street snow at the frame bottom (it mirrors the dark zenith: T3 ramp)"
+  },
+  {
+   "role": "snow.shade",
+   "group": "street",
+   "hex": "#4E4E67",
+   "L": 34.1,
+   "C": 15.7,
+   "h": 293,
+   "job": "drift shade, contact under things on the snow"
+  },
+  {
+   "role": "melt.wet",
+   "group": "street",
+   "hex": "#35384D",
+   "L": 24.1,
+   "C": 13.9,
+   "h": 288,
+   "job": "the melt: the bare wet strip over the warm pipe"
+  },
+  {
+   "role": "melt.sheen",
+   "group": "street",
+   "hex": "#886744",
+   "L": 46.1,
+   "C": 26.3,
+   "h": 71,
+   "job": "the warm sheen along the wet strip: the lit windows above, reflected"
+  },
+  {
+   "role": "melt.edge",
+   "group": "street",
+   "hex": "#5C5C73",
+   "L": 39.9,
+   "C": 14.0,
+   "h": 292,
+   "job": "the wet, thinning snow at the melt edge (no warm tint: no glow over the pipe)"
+  },
+  {
+   "role": "iron",
+   "group": "street",
+   "hex": "#2C303D",
+   "L": 20.0,
+   "C": 9.0,
+   "h": 282,
+   "job": "manholes, the small box, pipe metal"
+  },
+  {
+   "role": "comp.front",
+   "group": "computer",
+   "hex": "#152A3B",
+   "L": 16.2,
+   "C": 13.6,
+   "h": 260,
+   "job": "its front face: deep blue-slate"
+  },
+  {
+   "role": "comp.side",
+   "group": "computer",
+   "hex": "#475B73",
+   "L": 37.9,
+   "C": 16.1,
+   "h": 266,
+   "job": "its key side, lit (tier A: the front 22 L* under it)"
+  },
+  {
+   "role": "comp.rim",
+   "group": "computer",
+   "hex": "#647E9E",
+   "L": 51.9,
+   "C": 20.2,
+   "h": 267,
+   "job": "the cool rim on its left edge (tier A: +16, 4-6 px)"
+  },
+  {
+   "role": "comp.light",
+   "group": "computer",
+   "hex": "#84D2E8",
+   "L": 80.1,
+   "C": 26.0,
+   "h": 225,
+   "job": "its rows of small lights: the second, cooler source"
+  },
+  {
+   "role": "comp.blink",
+   "group": "computer",
+   "hex": "#A6E7F8",
+   "L": 88.0,
+   "C": 22.0,
+   "h": 222,
+   "job": "the blink back (S12, 0.2 s)"
+  },
+  {
+   "role": "comp.hot",
+   "group": "computer",
+   "hex": "#7E553B",
+   "L": 40.0,
+   "C": 26.0,
+   "h": 58,
+   "job": "its hot top (S3-S9): the heat as colour on the dark metal"
+  },
+  {
+   "role": "comp.melt",
+   "group": "computer",
+   "hex": "#BD8D56",
+   "L": 62.1,
+   "C": 38.1,
+   "h": 72,
+   "job": "melt water on its top, the warm sheen"
+  },
+  {
+   "role": "steam.base",
+   "group": "computer",
+   "hex": "#D2B188",
+   "L": 74.1,
+   "C": 26.2,
+   "h": 76,
+   "job": "steam where it leaves the heat"
+  },
+  {
+   "role": "steam.body",
+   "group": "computer",
+   "hex": "#989AAA",
+   "L": 63.9,
+   "C": 8.9,
+   "h": 286,
+   "job": "steam rising and thinning into the cold"
+  },
+  {
+   "role": "mach.hot",
+   "group": "computer",
+   "hex": "#D7A067",
+   "L": 69.9,
+   "C": 40.0,
+   "h": 70,
+   "job": "the 8 stacked machines, hot (S9-S10)"
+  },
+  {
+   "role": "mach.cool",
+   "group": "computer",
+   "hex": "#395967",
+   "L": 36.0,
+   "C": 14.0,
+   "h": 237,
+   "job": "a machine after the cool water passes (S10)"
+  },
+  {
+   "role": "water.cool",
+   "group": "thread",
+   "hex": "#83B9CC",
+   "L": 72.1,
+   "C": 19.9,
+   "h": 230,
+   "job": "cool water in a pipe (the inlet; S10 in at the top)"
+  },
+  {
+   "role": "water.warm",
+   "group": "thread",
+   "hex": "#EDB062",
+   "L": 76.0,
+   "C": 50.1,
+   "h": 74,
+   "job": "THE HERO: the warm water (S1 run, S10 out, S11, S12)"
+  },
+  {
+   "role": "water.gold",
+   "group": "thread",
+   "hex": "#F8C36B",
+   "L": 81.9,
+   "C": 51.7,
+   "h": 80,
+   "job": "past the small box: the boost, a step lighter"
+  },
+  {
+   "role": "radiator.cold",
+   "group": "thread",
+   "hex": "#424654",
+   "L": 29.9,
+   "C": 9.1,
+   "h": 282,
+   "job": "the radiator, cold (seen through the riser cut)"
+  },
+  {
+   "role": "radiator.warm",
+   "group": "thread",
+   "hex": "#D6A15E",
+   "L": 69.9,
+   "C": 43.9,
+   "h": 74,
+   "job": "its fins warm"
+  },
+  {
+   "role": "win.W0",
+   "group": "window",
+   "hex": "#212838",
+   "L": 16.1,
+   "C": 11.4,
+   "h": 279,
+   "job": "the one window, unlit (frame 0 to \"heat\")"
+  },
+  {
+   "role": "win.W1.pane",
+   "group": "window",
+   "hex": "#FFD58C",
+   "L": 87.4,
+   "C": 41.9,
+   "h": 82,
+   "job": "lit from \"heat\" (S1) to the film end; W2 = W1 with frost at the pane edges and snow on the sill (S2 to S11 \"homes.\")"
+  },
+  {
+   "role": "win.W1.core",
+   "group": "window",
+   "hex": "#FDEFDA",
+   "L": 95.0,
+   "C": 11.9,
+   "h": 84,
+   "job": "the core: the brightest below the band (R4 >= 95)"
+  },
+  {
+   "role": "win.W4.pane",
+   "group": "window",
+   "hex": "#FFCC83",
+   "L": 85.0,
+   "C": 44.1,
+   "h": 78,
+   "job": "a step warmer (S12 from \"apartment\")"
+  },
+  {
+   "role": "win.W4.core",
+   "group": "window",
+   "hex": "#FEEBD1",
+   "L": 93.9,
+   "C": 15.1,
+   "h": 81,
+   "job": ""
+  },
+  {
+   "role": "win.reveal",
+   "group": "window",
+   "hex": "#CDA478",
+   "L": 70.1,
+   "C": 30.0,
+   "h": 72,
+   "job": "the lit reveal, frame and sill snow"
+  },
+  {
+   "role": "frost",
+   "group": "window",
+   "hex": "#B9C1D1",
+   "L": 77.9,
+   "C": 9.0,
+   "h": 273,
+   "job": "frost at the pane edges (W2: the S2 un-paint to S11 \"homes.\")"
+  },
+  {
+   "role": "light.key",
+   "group": "light",
+   "hex": "#B4C0E5",
+   "L": 77.9,
+   "C": 20.1,
+   "h": 280,
+   "job": "the key: the blue hour afterglow, low west, screen LEFT (rims, tops)"
+  },
+  {
+   "role": "light.story",
+   "group": "light",
+   "hex": "#FFD58C",
+   "L": 87.4,
+   "C": 41.9,
+   "h": 82,
+   "job": "the story light: the one window (honey)"
+  },
+  {
+   "role": "light.second",
+   "group": "light",
+   "hex": "#96D6E8",
+   "L": 82.1,
+   "C": 22.0,
+   "h": 224,
+   "job": "the second, cooler source: the computer lights"
+  },
+  {
+   "role": "plan.A",
+   "group": "plan",
+   "hex": "#BEBFD9",
+   "L": 78.0,
+   "C": 13.9,
+   "h": 290,
+   "job": "the chalk-line plan as the subject (S8; S10 on \"big\")"
+  },
+  {
+   "role": "plan.C",
+   "group": "plan",
+   "hex": "#9494A9",
+   "L": 61.9,
+   "C": 11.8,
+   "h": 291,
+   "job": "the chalk-line plan, calm (framing)"
+  },
+  {
+   "role": "tag.paper",
+   "group": "plan",
+   "hex": "#D5D6E7",
+   "L": 86.0,
+   "C": 8.9,
+   "h": 289,
+   "job": "the 2027 tag paper"
+  },
+  {
+   "role": "tag.ink",
+   "group": "plan",
+   "hex": "#1F2B4B",
+   "L": 18.0,
+   "C": 22.2,
+   "h": 285,
+   "job": "its figures (9.7:1)"
+  },
+  {
+   "role": "kettle.body",
+   "group": "props",
+   "hex": "#485B73",
+   "L": 38.0,
+   "C": 16.0,
+   "h": 267,
+   "job": "40 kettles: slate enamel (one texture +-6 L*)"
+  },
+  {
+   "role": "kettle.lit",
+   "group": "props",
+   "hex": "#69788E",
+   "L": 50.0,
+   "C": 13.8,
+   "h": 269,
+   "job": "their lit side and lids"
+  },
+  {
+   "role": "kettle.dark",
+   "group": "props",
+   "hex": "#27313F",
+   "L": 20.0,
+   "C": 10.2,
+   "h": 269,
+   "job": "handles, spouts, bases"
+  },
+  {
+   "role": "mug.glaze",
+   "group": "props",
+   "hex": "#2F3D5B",
+   "L": 25.9,
+   "C": 20.0,
+   "h": 280,
+   "job": "the mug: deep indigo glaze, a dark silhouette on the steam"
+  },
+  {
+   "role": "mug.rim",
+   "group": "props",
+   "hex": "#CACBDC",
+   "L": 82.1,
+   "C": 9.0,
+   "h": 289,
+   "job": "its pale inner rim"
+  },
+  {
+   "role": "tea",
+   "group": "props",
+   "hex": "#B87F4C",
+   "L": 57.9,
+   "C": 39.9,
+   "h": 65,
+   "job": "the tea surface: the heat at the joke"
+  },
+  {
+   "role": "planet.limb",
+   "group": "planet",
+   "hex": "#A297AF",
+   "L": 64.1,
+   "C": 14.0,
+   "h": 308,
+   "job": "the limb band (the horizon light band seen from above)"
+  },
+  {
+   "role": "planet.land",
+   "group": "planet",
+   "hex": "#283044",
+   "L": 20.0,
+   "C": 13.8,
+   "h": 281,
+   "job": "night land"
+  },
+  {
+   "role": "planet.snowland",
+   "group": "planet",
+   "hex": "#484B5A",
+   "L": 32.1,
+   "C": 9.5,
+   "h": 285,
+   "job": "snow-covered land"
+  },
+  {
+   "role": "planet.sea",
+   "group": "planet",
+   "hex": "#11253A",
+   "L": 14.1,
+   "C": 16.0,
+   "h": 270,
+   "job": "night sea"
+  },
+  {
+   "role": "planet.cloud",
+   "group": "planet",
+   "hex": "#4D4F62",
+   "L": 34.1,
+   "C": 11.9,
+   "h": 288,
+   "job": "clouds far below"
+  },
+  {
+   "role": "planet.cloud.lit",
+   "group": "planet",
+   "hex": "#68667A",
+   "L": 44.0,
+   "C": 12.0,
+   "h": 296,
+   "job": "their lit tops (from the left)"
+  },
+  {
+   "role": "dc.box",
+   "group": "planet",
+   "hex": "#696C7D",
+   "L": 45.9,
+   "C": 10.1,
+   "h": 285,
+   "job": "data-centre boxes"
+  },
+  {
+   "role": "dc.plume",
+   "group": "planet",
+   "hex": "#9395A5",
+   "L": 62.0,
+   "C": 9.0,
+   "h": 286,
+   "job": "their plumes (heat let go)"
+  },
+  {
+   "role": "helsinki",
+   "group": "planet",
+   "hex": "#FAD18C",
+   "L": 85.9,
+   "C": 39.9,
+   "h": 82,
+   "job": "Helsinki: the one warm spot"
+  },
+  {
+   "role": "res.coat",
+   "group": "people",
+   "hex": "#203447",
+   "L": 20.9,
+   "C": 14.4,
+   "h": 263,
+   "job": "the resident: long coat, deep indigo-navy"
+  },
+  {
+   "role": "res.knit",
+   "group": "people",
+   "hex": "#A29EAE",
+   "L": 65.9,
+   "C": 9.0,
+   "h": 300,
+   "job": "her cream layer at the neck (keyed cool cream)"
+  },
+  {
+   "role": "res.hair",
+   "group": "people",
+   "hex": "#583335",
+   "L": 25.9,
+   "C": 18.0,
+   "h": 19,
+   "job": "her copper hair keyed: dark auburn"
+  },
+  {
+   "role": "res.tote",
+   "group": "people",
+   "hex": "#582F39",
+   "L": 25.0,
+   "C": 20.1,
+   "h": 5,
+   "job": "her burgundy tote: the look one accent"
+  },
+  {
+   "role": "res.skin",
+   "group": "people",
+   "hex": "#9C7365",
+   "L": 52.1,
+   "C": 20.0,
+   "h": 45,
+   "job": "skin under the night (hue kept, never blue or grey)"
+  },
+  {
+   "role": "res.silhouette",
+   "group": "people",
+   "hex": "#422F3B",
+   "L": 22.0,
+   "C": 11.8,
+   "h": 339,
+   "job": "her silhouette in the lit window (S11-S12): 65 L* under the honey pane (R4)"
+  },
+  {
+   "role": "glove",
+   "group": "people",
+   "hex": "#24364C",
+   "L": 22.1,
+   "C": 15.8,
+   "h": 269,
+   "job": "your glove: deep indigo knit"
+  },
+  {
+   "role": "glove.rib",
+   "group": "people",
+   "hex": "#3A4D64",
+   "L": 32.1,
+   "C": 15.8,
+   "h": 267,
+   "job": "its rib cuff"
+  },
+  {
+   "role": "phone.screen",
+   "group": "people",
+   "hex": "#B1CBD4",
+   "L": 80.1,
+   "C": 10.1,
+   "h": 227,
+   "job": "your phone screen: a cool light, a step under the window"
+  },
+  {
+   "role": "bubble",
+   "group": "people",
+   "hex": "#F6D9AC",
+   "L": 88.1,
+   "C": 26.1,
+   "h": 82,
+   "job": "the chat bubble: honey-cream (the heat begins)"
+  },
+  {
+   "role": "pip.lit",
+   "group": "pip",
+   "hex": "#8981AA",
+   "L": 56.0,
+   "C": 23.7,
+   "h": 300,
+   "job": "Pip lit face: lavender (its own hue, C* <= 25)"
+  },
+  {
+   "role": "pip.shade",
+   "group": "pip",
+   "hex": "#666186",
+   "L": 42.9,
+   "C": 22.4,
+   "h": 298,
+   "job": "Pip shade face"
+  },
+  {
+   "role": "pip.scarf",
+   "group": "pip",
+   "hex": "#A58291",
+   "L": 58.0,
+   "C": 16.2,
+   "h": 350,
+   "job": "Pip scarf: dusty rose"
+  },
+  {
+   "role": "anchor",
+   "group": "dark",
+   "hex": "#191F32",
+   "L": 12.1,
+   "C": 13.9,
+   "h": 285,
+   "job": "the tinted dark anchor: the darks hue"
+  },
+  {
+   "role": "ink.caption",
+   "group": "ink",
+   "hex": "#FFF0DE",
+   "L": 95.5,
+   "C": 10.7,
+   "h": 79,
+   "job": "captions: warm white (TYPE_GUIDE)"
+  },
+  {
+   "role": "ink.halo",
+   "group": "ink",
+   "hex": "#141A3A",
+   "L": 10.5,
+   "C": 23.4,
+   "h": 292,
+   "job": "the captions dark halo (TYPE_GUIDE)"
+  }
+ ],
+ "camera_home_place": {
+  "eye_m": 1.6,
+  "focal_px": 1160,
+  "horizon_y": 1150,
+  "vp": [
+   540,
+   1150
+  ],
+  "rule": "a thing H m tall at d m is 1160*H/d px, its foot at y 1150 + 1856/d"
+ }
+}

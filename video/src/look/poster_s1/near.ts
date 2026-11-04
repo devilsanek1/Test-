@@ -28,17 +28,31 @@ export function noBeige(hex: string): string {
   return cleanColour(hex);
 }
 
+/** (test/REVIEW.md MUST 2) The bank's BIG fields read the beige band wide: h 55-95 under C* 23 (lib/water's band
+ *  stops at C* 18, and the near floor lifts the peach stone to C* ~19: a milk-tea field over 23 % of the frame, the
+ *  first thing that looked off at a glance), turned to a terracotta-rose stone at the same value. */
+const BIG = {h0: 55, h1: 95, C: 23, toH: 46, toC: 22} as const;
+export function noBeigeBig(hex: string): string {
+  const c = lch(hex);
+  if (c.h >= BIG.h0 && c.h <= BIG.h1 && c.C < BIG.C) {
+    const out = fromLch(c.L, Math.max(BIG.toC, c.C), Math.min(c.h, BIG.toH));
+    return neverBand(out) ? cleanColour(out) : out;
+  }
+  return noBeige(hex);
+}
+
 const CACHE = new Map<string, Record<string, string>>();
 
 /** Source -> the colour to AUTHOR for plane `plane` (< 0) in the mid-tones: E's near floor, no beige, the pen's pull
- *  inverted. `entries`: the plane's colours with their rough area shares (the median is area-weighted). */
-export function nearMid(entries: readonly (readonly [string, number])[], plane: number): Record<string, string> {
-  const key = `${plane}|${entries.map(([c, a]) => `${c}:${a}`).join(',')}`;
+ *  inverted. `entries`: the plane's colours with their rough area shares (the median is area-weighted). `big`: an entry
+ *  with at least this share is one of the bank's big fields (noBeigeBig: the beige band read wide); undefined = none. */
+export function nearMid(entries: readonly (readonly [string, number])[], plane: number, o: {big?: number} = {}): Record<string, string> {
+  const key = `${plane}|${o.big ?? '-'}|${entries.map(([c, a]) => `${c}:${a}`).join(',')}`;
   const hit = CACHE.get(key);
   if (hit) return hit;
   const pal = nearPalette(entries, plane);
   const out: Record<string, string> = {};
-  for (const [c] of entries) out[c] = forTier(noBeige(pal[c] ?? c), 'environment');
+  for (const [c, a] of entries) out[c] = forTier((o.big !== undefined && a >= o.big ? noBeigeBig : noBeige)(pal[c] ?? c), 'environment');
   CACHE.set(key, out);
   return out;
 }

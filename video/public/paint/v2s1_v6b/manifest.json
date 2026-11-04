@@ -1,0 +1,22 @@
+{
+ "film": "v2s1_v6b",
+ "spec": "scripts/look/paint/v2s1_v6b.json",
+ "pieces": [
+  {
+   "id": "v2s1/sky",
+   "src": "paint/v2s1_v6b/sky.png",
+   "box": [
+    0,
+    0,
+    1080,
+    1100
+   ],
+   "style": "sky_recipe",
+   "seed": 61,
+   "from": "v2s1/sky",
+   "hides": [
+    "sun"
+   ]
+  }
+ ]
+}

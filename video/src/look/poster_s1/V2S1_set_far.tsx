@@ -21,12 +21,15 @@ import {tierFill} from '../../lib/pen';
 import {fromLch, lch, mixHex} from '../../lib/light';
 import {floodAt, S1_PALE} from './V2S1_clock';
 import {S1Plane, S1_PLANE} from './V2S1_float';
+import {mottleK} from '../../lib/texture';
 import {useSwitches} from './switches';
 import {S1FarStage} from './V2S1_far_stage';
 import {S1_EVENING} from '../../v2r/world/skies';
 import {skyColorAt} from '../../lib/sky';
 import {dE76, planePalette} from '../../lib/depth';
 import {PatchFill, wallPatch} from './V2S1_patch';
+import {Shade, tierFormFor} from '../../lib/light';
+import {s1CornerFloorY} from './V2S1_set_wing';
 
 /** (the look test: the sun one flat step off its sky, owner 2026-10-29: decision 6 (b); CRAFT §g.2) the disc mixed
  *  toward the sky round it (its visible cap, y ~720-758) until it sits dE ~18 off it: under the subject's separation
@@ -63,6 +66,7 @@ const TOWER = {x0: 258, x1: 346, top: 598};
 /** (computed at render: the clean pen's tier pull is known only once the film's pen is set) */
 const towerField = () => backing(tierFill(CM.limestone, 'environment'), atmos(CALM_FIELD, HAZE_K.near, S1_HAZE), {tier: 'environment', min: 15});
 const CalmTower: React.FC = () => {
+  const {shadeTier} = useSwitches();
   const field = towerField();
   const {x0, x1, top} = TOWER;
   const step = top + 26;
@@ -84,6 +88,9 @@ const CalmTower: React.FC = () => {
       <Fill d={wins} color={win} offset={false} seed="s1farTowerWin" />
       <Fill d={`M${x0} ${step}L${x0 + 5} ${step}L${x0 + 5} ${FOOT}L${x0} ${FOOT}Z M${x0 + 14} ${top}L${x0 + 19} ${top}L${x0 + 19} ${step}L${x0 + 14} ${step}Z`} color={lit} offset={false} seed="s1farTowerLit" />
       <Fill d={`M${x0} ${FOOT - 56}L${x1} ${FOOT - 56}L${x1} ${FOOT}L${x0} ${FOOT}Z`} color={foot} offset={false} seed="s1farTowerFoot" />
+      {/* (REVIEW SHOULD 5) under shadeTier its lower part one shade step down, in the far city's shade like the wing's
+          ground storey beside it (the sun sits on the far roofs): the wing's shaded corner parts from it by >= 12 L* */}
+      {shadeTier ? <Shade d={`M${x0} ${s1CornerFloorY()}L${x1} ${s1CornerFloorY()}L${x1} ${FOOT}L${x0} ${FOOT}Z`} strength={tierFormFor(field, CM.shadeCool, -10)} base={CM.shadeCool} /> : null}
     </>
   );
 };
@@ -602,7 +609,8 @@ export const S1WestGap: React.FC = () => {
           <S1Plane plane={S1_PLANE.farRoofs}>
             <SunDisc />
           </S1Plane>
-          <S1Plane plane={S1_PLANE.sky}>
+          {/* (the look test's texture: the stage is far tier C, k 0.4, on the sky's own seed) */}
+          <S1Plane plane={S1_PLANE.sky} k={mottleK({plane: 4})}>
             <S1FarStage />
           </S1Plane>
           <S1Plane plane={S1_PLANE.farRoofs}>
@@ -618,7 +626,9 @@ export const S1WestGap: React.FC = () => {
       <S1Plane plane={S1_PLANE.farTower}>
         <CalmTower />
       </S1Plane>
-      <S1Plane plane={S1_PLANE.bridge}>
+      {/* (the look test's texture: none on the bridge: its kit people, birds and bus are scaled groups, which a filter
+          would soften (Chrome resamples them), and at k 0.4 the mottle would not show on it) */}
+      <S1Plane plane={S1_PLANE.bridge} texture={false}>
         <CellPaint b={body.b} seed="s1bridge/body" cell={90} misreg={0.7} />
         <Bus />
         <BridgePeople />

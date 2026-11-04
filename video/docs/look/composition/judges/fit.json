@@ -1,0 +1,973 @@
+{
+ "lens": "FIT TO US: the 9:16 frame and the Instagram crop (the caption band y 290-600, the right rail x > 950 at y 900-1500, the bottom UI and name block y > 1520), our engine (Remotion 2.5D: painted layers, the parallax float, one story light, small people from behind; build cost exists / partly / new) and our look (DIRECTION, CRAFT: a human viewpoint with a 130-220 px person near the camera before a vast world, one painted language, calm and premium, organic not geometric, gentle light); grounded in DIRECTION.md, CRAFT.md, LAYOUT.md and CINEMATIC_GUIDE.md",
+ "scores": [
+  {
+   "id": "A1",
+   "score": 3,
+   "reason": "Placement, exists, but on 9:16 its upper crossings sit 40 px under the band (y 640) and the lower ones under the read zone (y 1280), so it survives only as 2:1 proportions and x 360/720, which LAYOUT already holds (horizon 0.40 H, subject axis x 380-700).",
+   "best_beats": [
+    "establishing / home wide",
+    "breather (horizon placement)"
+   ]
+  },
+  {
+   "id": "A2",
+   "score": 4,
+   "reason": "Its box x 413-667, y 951-1187 is our focal's home: inside the subject axis x 380-700, the read zone and R7's focal box (y 860-1200), clear of the band, the rail and the bottom UI; free and twice checked (composition_study R7, check_light --subject), but a placement N2's zones already enforce rather than a tool of its own.",
+   "best_beats": [
+    "every subject beat",
+    "cause / mechanism",
+    "payoff",
+    "join landing frame"
+   ]
+  },
+  {
+   "id": "A3",
+   "score": 3,
+   "reason": "Works only on the stage square (nested point (570, 1086) in the read zone; on the full frame it drops to y 1190-1380); a big form over a small subject suits a scale beat, but the big form must stay under half the focal's pull (R3, R8), hard to hold at phone size.",
+   "best_beats": [
+    "scale beat",
+    "discovery hold"
+   ]
+  },
+  {
+   "id": "A4",
+   "score": 2,
+   "reason": "Fitted to 9:16 its pole lands in the band or under the read zone; scaled to the subject it adds only a curve to A2's box, with no guide or check in the board, and the reel's drawn overlay is a callout we never draw (T's note).",
+   "best_beats": [
+    "establishing hold tying the hero cloud to the focal (R8 flow)"
+   ]
+  },
+  {
+   "id": "A5",
+   "score": 3,
+   "reason": "On the stage square its 40.4 deg diagonal and feet (626, 987) / (454, 1133) sit in the golden box, a free placement for a slope; but it wants two related points (the second must stay tier B, R3) and on the full frame its feet land in the band and by the bottom UI.",
+   "best_beats": [
+    "a slope or climb",
+    "cause and effect on a ramp"
+   ]
+  },
+  {
+   "id": "A6",
+   "score": 3,
+   "reason": "One post, mast, trunk or standing figure on the horizon reads at a glance and the tall frame suits it, but its top must stop at y >= 620 (the band), halving the 'full height', and a frontal cross is the 'square and proper' look unless the vertical is organic (a trunk, a figure).",
+   "best_beats": [
+    "still key-line beat",
+    "closing hold"
+   ]
+  },
+  {
+   "id": "A7",
+   "score": 3,
+   "reason": "lib/water.tsx mirrors its own shot and the axis x 540 sits 20 px off the caption line (x 520), so a mirrored waterfront is cheap; but CRAFT c WARNs on mirror symmetry (ORGANIC, NOT GEOMETRIC) and LAYOUT 2 bars three centred-landmark wides, so it is a once-a-film formal beat.",
+   "best_beats": [
+    "formal / institutional beat",
+    "end frame",
+    "symmetry broken on the turn"
+   ]
+  },
+  {
+   "id": "B1",
+   "score": 5,
+   "reason": "Our ground must recede anyway (CRAFT f.4: >= 20 % of visible lines to the VP, 'elevation' FAIL under 10 %) and lib/persp.tsx draws it; rising from the bottom (mass edges may start under the UI) and ending at the story light under the band, it is LAYOUT 3's leading-lines rule at no build cost.",
+   "best_beats": [
+    "establishing / home street",
+    "mechanism (the path to the cause)",
+    "scale landing (lines lead UP to the landmark)"
+   ]
+  },
+  {
+   "id": "B2",
+   "score": 4,
+   "reason": "lib/persp.tsx wallQuad({vp}) and check_depth exist and a VP at x 540-700, y 950-1150 sits in the stage at eye level; but a centred one-point street is 'a choice' (LAYOUT 8.2: the posters never centre one, v2 did in 5 of 8) and its facade arms must end under the band.",
+   "best_beats": [
+    "home street",
+    "destination / arrival",
+    "push-through target"
+   ]
+  },
+  {
+   "id": "B3",
+   "score": 3,
+   "reason": "Rays to one point are a natural form of the receding ground (tracks, paving joints) and keep wires out of the band, but 5-9 straight rays push the frame toward the ruler look the owner rejected (CRAFT c: straight runs >= 60 px <= 15 %); lib/cine street pieces are references only.",
+   "best_beats": [
+    "the cause as the centre",
+    "a light event at the convergence"
+   ]
+  },
+  {
+   "id": "B4",
+   "score": 4,
+   "reason": "A tall portal with its sides in the gutters through the band and a lit far opening of 15-25 % at (540, 950-1100) is LAYOUT 2's cozy 'one opening 15-30 %' with an A push-through built in; the Portal and room holes are only partly built (K9, TO BUILD).",
+   "best_beats": [
+    "threshold before a reveal",
+    "push-through join",
+    "cozy home"
+   ]
+  },
+  {
+   "id": "B5",
+   "score": 3,
+   "reason": "Steps, railings or courses at 30-60 deg below y 600 are cheap and suit the follow (RM3), but evenly spaced rows are the 'square and proper' look (CRAFT c: rows never evenly spaced, CV >= 0.3) and the device serves only a travel or mechanism beat.",
+   "best_beats": [
+    "mechanism in transit",
+    "follow along a stair or quay"
+   ]
+  },
+  {
+   "id": "B6",
+   "score": 3,
+   "reason": "One 30-45 deg slope inside the stage square, broken by the focal, is cheap and reads on a phone, but it is barred from cozy beats (>= 50 % of the runtime) and must stay out of the band, so it serves the turn or a climb only.",
+   "best_beats": [
+    "'But' turn",
+    "a climb / effort"
+   ]
+  },
+  {
+   "id": "B7",
+   "score": 2,
+   "reason": "Needs a raised 35-55 deg view (K10: once a film, on a crowd or a crossing) against the eye-level human viewpoint (DIRECTION 7), the raised view is only partly built, and from straight above the reel's arms cross the band.",
+   "best_beats": [
+    "one overview of a crossing or system"
+   ]
+  },
+  {
+   "id": "B8",
+   "score": 4,
+   "reason": "A free curve is the organic line the owner asked for (ORGANIC, NOT GEOMETRIC); lib/water.tsx draws a canal or shore, and entering at the bottom edge to end at the focal under the band it reads 9:16 depth; at standing eye level the bends compress, so it wants setup B or a real winding path.",
+   "best_beats": [
+    "arrival / the way in",
+    "waterfront establishing",
+    "the thread object's journey"
+   ]
+  },
+  {
+   "id": "B9",
+   "score": 4,
+   "reason": "LAYOUT 3 already names it (the BALCONY C-curve: in at y 600-700, out at y 860-1060, under a mass through a mouth <= 8 % of the edge); it embraces the subject ('held, not shut') at no cost, but it depends on a raised balcony view.",
+   "best_beats": [
+    "cozy home",
+    "quiet beat",
+    "callback"
+   ]
+  },
+  {
+   "id": "B10",
+   "score": 4,
+   "reason": "LAYOUT 2's cozy frame in one wing (one tall side cut by the top, flat through the band or in the gutter, <= 216 px; the other side topping out below y 600): built around the band and free, the home look's skeleton, but one part of N13's refuge rather than the whole device.",
+   "best_beats": [
+    "home place / cozy beats",
+    "establishing",
+    "callback"
+   ]
+  },
+  {
+   "id": "B11",
+   "score": 3,
+   "reason": "Facades to a VP exist (lib/persp.tsx) and the V opens round the band, but its canyon (>= 2:1, sky <= 10 %) is the enclosed extreme the owner felt as 'suffocating' and its <= 10 % sky cannot hold the band's own sky (x 95-945 by y 290-600 is ~13 % of the frame); keep it for the confining turn.",
+   "best_beats": [
+    "'But' turn (inverted)",
+    "a confined lane"
+   ]
+  },
+  {
+   "id": "B12",
+   "score": 2,
+   "reason": "The reel's form is a straight-down view (a map, against DIRECTION 7's human viewpoint; LAYOUT K10 once a film), there is no spiral helper, and at eye level it dissolves into B8 and B9's pathways.",
+   "best_beats": [
+    "one overview of a stair or ramp"
+   ]
+  },
+  {
+   "id": "B13",
+   "score": 2,
+   "reason": "A round opening duplicates C1 with the most geometric shape (CRAFT c: compass arcs, the 'square and proper' look), and the ring of things needs a raised camera; only when the place owns a real oculus or porthole.",
+   "best_beats": [
+    "a porthole or round window as the one opening"
+   ]
+  },
+  {
+   "id": "C1",
+   "score": 5,
+   "reason": "LAYOUT 2's cozy row asks for exactly this (ONE opening 15-30 %, read in y 600-1250, >= 10 L* off its surround); it hosts the story light (R4: v6's lit door) and the A push-through, and check_light already measures the aperture as the brightest area.",
+   "best_beats": [
+    "home place",
+    "the hook's cause outside the window",
+    "threshold before a reveal",
+    "push-through join"
+   ]
+  },
+  {
+   "id": "C2",
+   "score": 4,
+   "reason": "The near band y 1250-1920 is our second quiet field and may run under the bottom UI; at <= 2 props cut by an edge inside the near shade mass it is the owner's 'small, subtle hint at the edges' and the float's fastest plane, but its dose is capped ('way too big', scene-1 still v1).",
+   "best_beats": [
+    "every exterior hold",
+    "the parallax float",
+    "S1's start"
+   ]
+  },
+  {
+   "id": "C3",
+   "score": 4,
+   "reason": "The 9:16 height holds two levels (y 700-950 over y 1150-1450) joined by a stair under one camera, cause and effect in one frame, drawn per film on lib/depth planes; the second level must stay tone-on-tone so it never becomes a second call (R3).",
+   "best_beats": [
+    "cause and effect",
+    "mechanism",
+    "here and there in one place"
+   ]
+  },
+  {
+   "id": "D1",
+   "score": 5,
+   "reason": "Built into our frame: the sky with the band (R5: >= 30 %, patterned +-4-6 L*) is negative space in every shot, and the S3/S4 breathers push it to 60-80 % with the 130-220 px figure at its foot; lib/sky.tsx, lib/clouds.tsx and R5's check exist.",
+   "best_beats": [
+    "breather (S3, S4)",
+    "key line",
+    "ending",
+    "time passes"
+   ]
+  },
+  {
+   "id": "D2",
+   "score": 4,
+   "reason": "A 130-220 px 'you' beside a >= 0.7 H thing is DIRECTION 7's scale from a human viewpoint (K6), but the tall thing must cross the band as one flat field (L* >= 70), risks the 'suffocating' wall up close, and scale is 1-2 moments a film.",
+   "best_beats": [
+    "scale beat",
+    "the quantity line",
+    "a reveal's landing"
+   ]
+  },
+  {
+   "id": "D3",
+   "score": 2,
+   "reason": "Two equal masses are two equal calls (R3: one rival at most), mirrored within +-5 % trips CRAFT c's mirror-symmetry WARN, and as wings each must stay <= 216 px; only a once-a-film ceremonial frame.",
+   "best_beats": [
+    "one formal / ceremonial beat"
+   ]
+  },
+  {
+   "id": "D4",
+   "score": 4,
+   "reason": "It is R8 (one soft counterweight, pull < 50 %: the hero cloud in the top gutter, lib/clouds.tsx) placed for our crop: the subject on the axis, the weight kept out of the lower right where the rail and the name block sit; free, and R3 counts the calls.",
+   "best_beats": [
+    "establishing / home",
+    "any hold with a hero cloud",
+    "breather"
+   ]
+  },
+  {
+   "id": "D5",
+   "score": 3,
+   "reason": "A scalene triangle with its base on the near ground (y 1350-1520) and its apex on the focal under the band suits the tall stage at no cost, but its three spots press on R6 (<= 6 named objects) and a literal triangle reads 'proper'.",
+   "best_beats": [
+    "hierarchy: one cause over many",
+    "a group or a stack"
+   ]
+  },
+  {
+   "id": "D6",
+   "score": 3,
+   "reason": "One seam across the stage, two fields >= 13 L* apart and the subject on it is a notan-friendly comparison inside the home place (one comparison allowed), but two fields of equal pull risk a second call and the reel's top-down view is not ours.",
+   "best_beats": [
+    "before / after",
+    "this vs that",
+    "'But' turn"
+   ]
+  },
+  {
+   "id": "D7",
+   "score": 4,
+   "reason": "Windows as one texture inside a mass with ONE break at the focal fits rule 3 (things as texture) and the dark share in many small pieces, and windowLit lights the break on its word; but ORGANIC rejects frontal grids of identical rectangles (repeats vary 5-12 %).",
+   "best_beats": [
+    "'this one' / how many",
+    "number beat",
+    "a window lighting on its word"
+   ]
+  },
+  {
+   "id": "E1",
+   "score": 4,
+   "reason": "DIRECTION 7's real-size person (130-220 px, the reels' median 178) from behind where the lines meet, feet above y 1480; but our focal is usually the story's object (tiers by story role, DIRECTION 2), so a figure AT the focal fits the scale wide and the arrival, not every beat; lib/figure draws v6's her, direction C's module is still to build.",
+   "best_beats": [
+    "establishing",
+    "scale landing (S5's end figures)",
+    "arrival",
+    "any beat with the 'you'"
+   ]
+  },
+  {
+   "id": "E2",
+   "score": 5,
+   "reason": "R4 verbatim (aperture L* >= 95, figure L* <= 28, a step >= 65 L*: subject, story light and hardest step in one place) with lib/light2 LightMaps and check_light.py (the brightest 5 % on the subject) already built; the 'proper light' the owner asked for (2026-10-30).",
+   "best_beats": [
+    "home place at dusk or night",
+    "focal of any beat",
+    "destination / payoff"
+   ]
+  },
+  {
+   "id": "E3",
+   "score": 4,
+   "reason": "Life passing sideways in one band behind a still subject is our cozy rule (nothing comes at the lens), and lib/idle.ts crossing / shuttle exist; with no blur the still subject must win by value and light, the movers <= 3-4 noticeable and tier C.",
+   "best_beats": [
+    "quiet beat",
+    "time passing",
+    "the 'you' waiting",
+    "cozy hold"
+   ]
+  },
+  {
+   "id": "E4",
+   "score": 4,
+   "reason": "A free placement with numbers for our crop (the rail moves the right edge to x 870; a right-facing figure at x <= 410 below y 860); with people mostly from behind the room runs up the frame into the depth, and the 'you''s sightline crosses the focal's box.",
+   "best_beats": [
+    "any shot with the 'you'",
+    "eyeline join (J6)"
+   ]
+  },
+  {
+   "id": "E5",
+   "score": 4,
+   "reason": "Softness by value, not blur (DIRECTION 5), with lost edges and the near plane by lib/depth.ts: the owner's 'near frame a small, subtle hint' at <= 2 props, top at y 1450-1650; a supporting layer, never a lead.",
+   "best_beats": [
+    "every exterior hold",
+    "the parallax float"
+   ]
+  },
+  {
+   "id": "E6",
+   "score": 5,
+   "reason": "CRAFT f.2 verbatim (one fixed mix per plane 0/12/22/40/65 %, values 5/5/4/3/2) with lib/depth.ts and check_depth's 'no air' FAIL; layers stacked up the tall frame give the vast world beyond the near 'you' that DIRECTION 7 asks for, at no extra cost.",
+   "best_beats": [
+    "establishing",
+    "scale landing",
+    "breather",
+    "every exterior"
+   ]
+  },
+  {
+   "id": "E7",
+   "score": 4,
+   "reason": "LAYOUT 2's street rule (one long sight line at most, ended by one object; a hidden VP the coziest) with lib/persp.tsx placing the VP on the object, which stops the eye leaving through an open VP into the band's sky; mostly the end of B1's lines rather than a frame of its own.",
+   "best_beats": [
+    "home street",
+    "destination / arrival",
+    "push-through target"
+   ]
+  },
+  {
+   "id": "E8",
+   "score": 5,
+   "reason": "DIRECTION 6 and R11 (one hot accent only at the focal, the rest tone-on-tone dE <= 6-8), measured by colour_meter.py; reads at phone size at a glance and travels with the thread across B matches, at zero build cost.",
+   "best_beats": [
+    "every subject beat",
+    "thread joins",
+    "payoff",
+    "cover"
+   ]
+  },
+  {
+   "id": "E9",
+   "score": 5,
+   "reason": "Our default motion (DIRECTION 8: every hold locked or a slow float) with the subject owning >= 60 % of the motion (CRAFT b); Walk, Move and crossing exist, and the path's end in the golden box keeps the read under the band.",
+   "best_beats": [
+    "cause / mechanism",
+    "the thread's travel",
+    "arrival / departure"
+   ]
+  },
+  {
+   "id": "E10",
+   "score": 5,
+   "reason": "DIRECTION 7 exactly: the camera where a person stands, a whole 130-220 px 'you' from behind at x 130-380 (or 700-830), head top above y ~1380, body under the bottom UI; the owner's human-scale references are built on it (lib/figure draws v6's her; direction C's shared module is a film-wide build, PEOPLE_DESIGN 5.10).",
+   "best_beats": [
+    "home place",
+    "the opening's 'you'",
+    "personal stake",
+    "scale landing"
+   ]
+  },
+  {
+   "id": "E11",
+   "score": 3,
+   "reason": "The effect landing in the hand on its word is a strong stake for the hook (v3's opening did it) and the wrist runs under the bottom-left UI clear of the rail, but there is no shared hand primitive (direction C hands are new), a near hand is a big near mass, and it replaces the drawn 'you' for the film.",
+   "best_beats": [
+    "the hook's effect",
+    "the viewer's stake",
+    "payoff in hand"
+   ]
+  },
+  {
+   "id": "T",
+   "score": 5,
+   "reason": "DIRECTION 9 (frame 0 is the scene drawn in the clean pen: the line, then the colour flood under it), with Ink and Fill built and SketchReel's draw / fillIn for the board; after frame 0 only where the drawing is the beat (DIRECTION 8), so its dose limits itself.",
+   "best_beats": [
+    "opening (frame 0)",
+    "chart line in step with the voice",
+    "loop back to frame 0"
+   ]
+  },
+  {
+   "id": "X1",
+   "score": 1,
+   "reason": "DIRECTION 5: no blur, fog or gradient over the world (one 2.2-3 px optical blur on a near framing object aside); a defocus fringe reads as an outline and the 4:2:0 encode smears it (modern M10).",
+   "best_beats": []
+  },
+  {
+   "id": "X2",
+   "score": 1,
+   "reason": "Playbook Hook and LAYOUT 1: frame 0 shows the first spoken line as a caption, never a title over it ('Wait why do we have the text repeat itself?'); the band belongs to the captions, and the core line as a title goes only on the cover.",
+   "best_beats": []
+  },
+  {
+   "id": "N1",
+   "score": 4,
+   "reason": "x 540, y 950-1050 sits on the subject axis, under the band, left of the rail, where a new shot's first look lands (a 300 px saccade costs ~0.2-0.3 s; the join's eye jump <= 0.10); free and checked, but strict centring reads formal and LAYOUT 2 bars three centred-landmark wides in a row.",
+   "best_beats": [
+    "close (N9)",
+    "chart / number",
+    "a join's landing frame",
+    "hook"
+   ]
+  },
+  {
+   "id": "N2",
+   "score": 5,
+   "reason": "The 9:16 frame's own grammar: the words in the top square (band y 290-600), the story in y 600-1520 above the bottom UI; theme.ts safe areas and framecheck exist, and A2, A3 and A5 only fit our crop when built on it.",
+   "best_beats": [
+    "every beat"
+   ]
+  },
+  {
+   "id": "N3",
+   "score": 4,
+   "reason": "The master decision of every exterior, with our numbers (setup A y 1150-1300, setup B y 690-860) and heads on the horizon at eye level for the 'you'; but its 'never y 900-1020' clashes with LAYOUT 2's street horizon 0.50-0.60 H (y 960-1152; LAYOUT wins on framing), and it is only partly built (no setup helper or check).",
+   "best_beats": [
+    "establishing",
+    "home street",
+    "scale landing",
+    "every exterior with the 'you'"
+   ]
+  },
+  {
+   "id": "N5",
+   "score": 4,
+   "reason": "The band is the headroom: the focal 300-450 px under the block's foot (y 556, so y ~856-1006) gives a short words-to-subject path on every caption page (~1.1-1.5 s), inside R7's 300-650 px; partly checked (framecheck, check_light; no drop-distance check).",
+   "best_beats": [
+    "every captioned beat",
+    "hook",
+    "number beat"
+   ]
+  },
+  {
+   "id": "N6",
+   "score": 5,
+   "reason": "The tall frame's own depth: near at the bottom, far higher (the hanging scroll), 4-6 planes (5-7 on a vista) as CRAFT f.1, with lib/depth.ts planes, PARALLAX_K and check_depth; it is what makes the parallax float and the 'vast world beyond' read in 9:16.",
+   "best_beats": [
+    "establishing",
+    "scale",
+    "every exterior",
+    "the float"
+   ]
+  },
+  {
+   "id": "N7",
+   "score": 5,
+   "reason": "R1 (the notan first: three masses >= 85 % at a squint) and R4's >= 65 L* step at the focal, checked by composition_study.py and the board's grey tiers; with no outlines (DIRECTION 4) counterchange is how the subject parts from its field (CRAFT f.3's 'melts' FAIL), and it reads at 0.25 scale.",
+   "best_beats": [
+    "every beat (G3 notan first)",
+    "hook",
+    "the focal at a join"
+   ]
+  },
+  {
+   "id": "N9",
+   "score": 4,
+   "reason": "LAYOUT 2's close (one object >= 60 % W on a quiet backing, a 30-60 px calm ring, reached by a push <= 2x or a 'But' cut-in, never a face); ShotCam push exists, but it drops the human viewpoint and the vast world, so it is the personal beat only.",
+   "best_beats": [
+    "personal beat",
+    "the thread object up close",
+    "'But' cut-in"
+   ]
+  },
+  {
+   "id": "N11",
+   "score": 3,
+   "reason": "K7 gives our numbers (horizon 0.58-0.64 H, feet above y 1250, the colossus >= 0.7 H cut by the top and flat through the band) and its parallel verticals keep one camera, but lib/cine's monuments converge (X8) and are references only, and LAYOUT keeps it to the quantity, never the thing under critique.",
+   "best_beats": [
+    "the quantity line",
+    "scale beat"
+   ]
+  },
+  {
+   "id": "N12",
+   "score": 3,
+   "reason": "A balcony view 35-55 deg down is still a person's viewpoint (BALCONY, setup B), but LAYOUT keeps K10 to once a film, on a crowd, never one person; past 3.5 F it reads as a map, and it is only partly built (EndlessCity roof tops, a reference piece).",
+   "best_beats": [
+    "overview of a crowd or system",
+    "a crossing"
+   ]
+  },
+  {
+   "id": "N13",
+   "score": 5,
+   "reason": "LAYOUT 2's cozy home row in one device (refuge 35-55 % on >= 2 edges plus a top-edge object in y 0-290, one opening 15-30 % in y 600-1250, asymmetric for the captions) and DIRECTION 7's 'held, not shut' for >= 50 % of the runtime; drawn per film (NOOK, LANE).",
+   "best_beats": [
+    "home place",
+    "opening",
+    "quiet beat",
+    "callback"
+   ]
+  },
+  {
+   "id": "N14",
+   "score": 4,
+   "reason": "The callback and the B thread match in one (the exact frame, or the thread within 150 px and 1.2x, one change at the focal); Film matchcut exists and LAYOUT 4 keeps the callback on the opening's exact end frame; only the boundary anchor check is new.",
+   "best_beats": [
+    "callback",
+    "before / after",
+    "loop end",
+    "time passes in place"
+   ]
+  },
+  {
+   "id": "N15",
+   "score": 3,
+   "reason": "The focal at x 250-380 or 700-830 with no counterweight suits the 'But' turn once or twice a film at no cost, but it leaves R7's focal box (x 380-700, <= 0.2 W off x 520) and its right form at x 700-830 sits on vertical.md V11's line (no call at x > 830 below y 790), beside the rail.",
+   "best_beats": [
+    "'But' turn"
+   ]
+  },
+  {
+   "id": "M3",
+   "score": 2,
+   "reason": "A free placement, but it breaks two of our frame rules at once (R7's focal box x 380-700, and E4's gaze cue: the 'you' looks at the subject, never out of the frame), the low quadrant's >= 60 % field must still be patterned, and it is once a film, never in a cozy beat (>= 50 % of the runtime).",
+   "best_beats": [
+    "'But' turn (once)"
+   ]
+  },
+  {
+   "id": "Z1",
+   "score": 3,
+   "reason": "LAYOUT 2 gives the scale row (5-7 planes, one landmark huge yet far, 1-2 a film, ~1.5-4 s) and lib/pullback.tsx lands it, but the K wides' 60-150 px observer sits under DIRECTION 7's 130-220 px human scale and a far panorama is what the owner called 'too cheap looking'; it fits as S5's end with 170-200 px figures, and lib/cine's city pieces are references only.",
+   "best_beats": [
+    "scale reveal landing",
+    "the system line"
+   ]
+  },
+  {
+   "id": "Z2",
+   "score": 4,
+   "reason": "The home view at our human scale (the 'you' 130-220 px near the camera, setup A or B, >= 50 % of the runtime), drawn per film with nothing to build; a size on the ladder rather than a device: the composing inside it is N13's, C1's and E6's.",
+   "best_beats": [
+    "home place",
+    "establishing",
+    "callback"
+   ]
+  },
+  {
+   "id": "Z3",
+   "score": 4,
+   "reason": "The explainer's working size: the subject box 270-460 px is LAYOUT 1's subject box (35-60 % of the 760 px stage), one backing, <= 2 props cut by the edges, sizes 2-3x from the wide; drawn per film, but it trades away the vast world beyond, so it carries mechanism beats, not the place.",
+   "best_beats": [
+    "cause / mechanism",
+    "what it does"
+   ]
+  },
+  {
+   "id": "Z4",
+   "score": 4,
+   "reason": "LAYOUT 2's chart row (paper in the place, straight-on, >= 60 % of the stage, one number 120-160 px, words >= 56 px read at 0.25 scale), entered by a push (A) or a card flip (E), with Ink drawing the number on in step with the voice; it counts neither cozy nor scale.",
+   "best_beats": [
+    "chart / number",
+    "proof",
+    "payoff number"
+   ]
+  },
+  {
+   "id": "S2",
+   "score": 3,
+   "reason": "CINEMATIC_GUIDE S2's numbers are ours (a ~650 px disc at (580, 1060), the silhouette in the bottom 22 % from y ~1500, the sky above holding the captions), but 3 values and one flat silhouette set aside DIRECTION 5-6's lit and shade faces and full value range, the disc may be the pop only here, once a film, and lib/cine BigSun is a reference piece.",
+   "best_beats": [
+    "time passes",
+    "ending",
+    "key line held"
+   ]
+  },
+  {
+   "id": "K8",
+   "score": 2,
+   "reason": "A shaft needs dark air in a vast structure, and ours are warm cozy places where 'night is temperature, not darkness' (DIRECTION 5); CRAFT d.7 caps shafts at 2-3 soft wedges of +2-4 L*, CINEMATIC_GUIDE's 'Not for us' rejects god rays as a show, and LightShaft is a lib/cine reference piece.",
+   "best_beats": [
+    "one person singled out by light (an interior scale beat)"
+   ]
+  },
+  {
+   "id": "X4",
+   "score": 1,
+   "reason": "Two stages stacked are two calls (R3) under two cameras (CRAFT f.4), and in a 9:16 frame the upper stage lands in the band (y 290-600); a comparison is a sequence (N14) or one seam (D6).",
+   "best_beats": []
+  },
+  {
+   "id": "X5",
+   "score": 1,
+   "reason": "DIRECTION 8: no roll; a canted horizon in a tall frame reads as a mistake and would tip every receding line toward the band; the camera's rotation stays 0 in the engine.",
+   "best_beats": []
+  },
+  {
+   "id": "X7",
+   "score": 1,
+   "reason": "A parallel projection breaks the one camera (CRAFT f.4: lines converge, sizes fall as 1/distance) and the human viewpoint (DIRECTION 7: never a far poster-like panorama); a diagram is paper in the place (Z4).",
+   "best_beats": []
+  },
+  {
+   "id": "X8",
+   "score": 1,
+   "reason": "CINEMATIC_GUIDE 'Not for us': 3-point convergence; our verticals stay parallel (a shift), and the converging towers in lib/cine/tower.tsx and monument.tsx are a trap to avoid, not a resource.",
+   "best_beats": []
+  },
+  {
+   "id": "RM1",
+   "score": 5,
+   "reason": "Our default motion (motion.md: 'take it as the default'; DIRECTION 8): a locked or floating frame while the subject travels the device's line and owns >= 60 % of the motion (CRAFT b); Walk, Move, crossing and getPointAtLength exist, poses step every 5 f while the camera glides, and it crosses an opening in ~1-2 s, never the 884 px stage.",
+   "best_beats": [
+    "cause / mechanism",
+    "the thread's travel",
+    "arrival / departure"
+   ]
+  },
+  {
+   "id": "RM2",
+   "score": 4,
+   "reason": "Our 'life passing sideways' (DIRECTION 7) drawn sharp and slow (far walkers 12-50 px/s, mid 90-215 px/s, clouds 0-15 px/s), one band both ways, <= 3-4 noticeable movers taking turns and none entering within 0.4 s of a join (CRAFT b); lib/idle.ts crossing / shuttle and lib/particles exist.",
+   "best_beats": [
+    "quiet beat",
+    "time passing",
+    "cozy hold"
+   ]
+  },
+  {
+   "id": "RM3",
+   "score": 3,
+   "reason": "CineCamera x / y / anchor keys and camSpeed exist, but sideways is expensive in 9:16 (detail <= ~6.4 px/f, the painted layers drawn as the view plus the travel, thin lines held at 2 px against twinkle, CRAFT c) and never two follows in a row; worth it only when the journey is the beat.",
+   "best_beats": [
+    "the thread's journey",
+    "mechanism in transit"
+   ]
+  },
+  {
+   "id": "RM4",
+   "score": 4,
+   "reason": "ShotCam push and CineCamera exist and DIRECTION 8 allows a zoom as a visible story move (>= 3 % in <= 2 s, <= 2x per panel, scaled about the target held within +-40 px), the lead-in to J2; never in a hold, and the engine's push: true (1.06 over 2 s, MOTION.camera.push) is reference 2's retired breathe.",
+   "best_beats": [
+    "the payoff word",
+    "into the subject",
+    "lead-in to a push-through"
+   ]
+  },
+  {
+   "id": "RM5",
+   "score": 5,
+   "reason": "Owner-approved (2026-10-28: 'planes move by depth') and DIRECTION 8's hold: floatCam, parallaxOffset and PARALLAX_K exist; translation only at 8-15 px/s, home by every join, the sky and the band at 0 so the captions never move; the one move that shows our 2.5D painted layers' depth without adding a mover.",
+   "best_beats": [
+    "every hold",
+    "home place",
+    "establishing",
+    "breather"
+   ]
+  },
+  {
+   "id": "RM6",
+   "score": 4,
+   "reason": "A window or lamp lighting in 0.1-0.3 s at the focal, its bloom at the source, is PROPER LIGHT's story light arriving on its word and our 'one window lighting at a time' life; windowLit and lib/light2 exist, the lightPull helper is new, one light event at a time, never > 3 flashes a second.",
+   "best_beats": [
+    "'now': arrival",
+    "'this one' (D7)",
+    "payoff"
+   ]
+  },
+  {
+   "id": "RM7",
+   "score": 5,
+   "reason": "DIRECTION 8's hold, free in the engine (no keys, handheld 0) and guarded by deadframes.py (never > 1 s without slow life); a locked hold keeps every thin line steady (CRAFT c: 1.2-1.6 px lines only on a locked shot) and hands the motion to the subject, as 17 of the reels' 23 example shots are, locked or nearly.",
+   "best_beats": [
+    "every hold",
+    "key line",
+    "chart / number",
+    "scale landing hold"
+   ]
+  },
+  {
+   "id": "RM8",
+   "score": 5,
+   "reason": "DIRECTION 9's bold opening (the line draws on, then the colour floods under it, >= 1 s with its biggest change after 0.4 s: the owner found ~0.3 s invisible) on built pieces: Ink with the pen tip, Fill, Pop, Rise, Move, the un-build in lib/exit.tsx; after frame 0 only where the drawing is the beat, leaving by un-drawing, never a fade.",
+   "best_beats": [
+    "opening (frame 0)",
+    "the mechanism built step by step",
+    "chart line in step with the voice"
+   ]
+  },
+  {
+   "id": "RM9",
+   "score": 1,
+   "reason": "DIRECTION 8: holds are locked or a slow float, no roll, no compound moves; a 16-83 px/s wander with a +-0.3-6 %/s zoom wobble would twinkle every thin line (CRAFT c), smear the painted layers' depth and read rough, the opposite of calm and premium.",
+   "best_beats": []
+  },
+  {
+   "id": "I4",
+   "score": 5,
+   "reason": "The owner's favourite (S5, 2026-10-26) and DIRECTION 7's one big move, built (lib/pullback.tsx: PullPlane, S5_EASE, planeSpeed) and retimed (3.3 s = 156 + 42 f), landing on LAYOUT 2's end frame (horizon 0.46 H, figures 170-200 px at x 420-560, the spire top at y >= 620): the human viewpoint opening onto the vast world.",
+   "best_beats": [
+    "scale reveal (the one big move)",
+    "the system line",
+    "'bigger than you thought'"
+   ]
+  },
+  {
+   "id": "I5",
+   "score": 3,
+   "reason": "In 9:16 the reveal is vertical (600-900 px in 3.5-4.5 s, front-loaded) and CineCamera tilt keys exist, but everything that enters from the top crosses the band during the move, so it must be one flat field there (CINEMATIC_GUIDE rule 2) or pass in the gutters, and unveil lives only in v3's SketchReel; 1-2 a film.",
+   "best_beats": [
+    "scale beat on a tall thing",
+    "'it keeps going'"
+   ]
+  },
+  {
+   "id": "I6",
+   "score": 4,
+   "reason": "CINEMATIC_GUIDE's highest-confidence shot (S1, min 7, avg 7.7) on a true crane (CineCamera y keys), the horizon moving only 0.37 -> 0.40 H so the band stays sky; but at its landing the wall and the 'you' have left the frame, so no person stands near the camera (DIRECTION 7), and S1 and S5 share one slot a film.",
+   "best_beats": [
+    "scale reveal (the one big move, S1)",
+    "arrival: the city lands"
+   ]
+  },
+  {
+   "id": "I11",
+   "score": 4,
+   "reason": "With no blur (DIRECTION 5) the light moves instead of the focus: the new focal to the hardest step (>= 65 L*), the old down >= 10-15 L*, ORGANIC's 'the old focal calms as the new one lights'; windowLit, World sky keys and lib/light2 exist, the lightPull helper and its check are new.",
+   "best_beats": [
+    "'look here now'",
+    "the turn told by light",
+    "time passing"
+   ]
+  },
+  {
+   "id": "I12",
+   "score": 4,
+   "reason": "anchor / anchorTo and PullPlane's pivot exist; the subject within +-40 px of its screen spot through any move keeps the read under the band and the eye jump at a join <= 0.10 (CRAFT a), as S5's figures hold x ~0.45 W; a rule every move obeys rather than a move of its own.",
+   "best_beats": [
+    "any camera move",
+    "scale reveal",
+    "continuous joins"
+   ]
+  },
+  {
+   "id": "X6",
+   "score": 1,
+   "reason": "A dolly against a zoom is a compound move (DIRECTION 8: no compound moves; one variable per move on one ease) made for vertigo and dread, the opposite of our calm, cozy films; not built.",
+   "best_beats": []
+  },
+  {
+   "id": "X9",
+   "score": 1,
+   "reason": "DIRECTION's Retired list: 'a zoom, push or breathe in any hold'; a 1.6 % pull-out reads frozen (CINEMATIC_GUIDE S3), and the engine still ships reference 2's 1.06-over-2 s push behind World / ShotCam push: true, one prop away from motion with no meaning in every hold.",
+   "best_beats": []
+  },
+  {
+   "id": "X10",
+   "score": 1,
+   "reason": "A punch-in on every stressed word spends the viewer's orienting response on nothing and breaks 'every hold locked or a float' and the calm (DIRECTION 3, 8); one story push on the payoff word (<= 2x per panel) is all we take.",
+   "best_beats": []
+  },
+  {
+   "id": "RJ1",
+   "score": 1,
+   "reason": "A black card between beats breaks rule 1 (one flowing story, every join carries something; a dip to black is never a join) and puts a near-black frame against 'night is temperature, not darkness'; what we keep of it (a new idea every ~2-3 s, the line first) lives in T and RM8.",
+   "best_beats": []
+  },
+  {
+   "id": "X3",
+   "score": 1,
+   "reason": "DIRECTION 8: no opacity fades (a dissolve only as a declared time-passing exception); nothing in lib/motion.tsx animates opacity, and two half-contrast pictures give no single place to look (R3).",
+   "best_beats": []
+  },
+  {
+   "id": "RJ2",
+   "score": 2,
+   "reason": "Carrier F: at most 2 a film, each on a 'But' turn with the thread on both sides (DIRECTION 1, CRAFT a); Film cut exists and gate_check counts it, but a plain cut by default is what the owner rejected ('just a bunch of shots put together', v3 G5b), so it is our most rationed join.",
+   "best_beats": [
+    "'But' turn",
+    "K1 scale jolt (close -> wide)"
+   ]
+  },
+  {
+   "id": "RJ3",
+   "score": 5,
+   "reason": "DIRECTION 9: the film loops back to frame 0's drawing state; built (Film transitionOut 'unbuild', lib/exit.tsx, 0.5 s on MOTION.unbuild, the captions back to page 1 ~0.22 s before the seam), and on a feed that auto-replays it makes the rewatch seamless.",
+   "best_beats": [
+    "loop end",
+    "callback to the opening"
+   ]
+  },
+  {
+   "id": "RJ4",
+   "score": 5,
+   "reason": "Carrier C (DIRECTION 1) and the shape of the owner's 'animated sketchbook' reel: Film camera-continuous and the matchcut seam exist (1.4 s, <= 1.15x or <= 150 px, the subject the pivot within +-40 px, ~15 px/f budget); it is how the opening stays ONE continuous shot (DIRECTION 9) and every change inside one place avoids a cut.",
+   "best_beats": [
+    "opening",
+    "any change inside one place",
+    "scale reveal into the next view"
+   ]
+  },
+  {
+   "id": "J2",
+   "score": 5,
+   "reason": "Carrier A (DIRECTION 1) with Film push-through built (1.1 s: in 45 % to a 7x zoom, out 55 %); its opening (15-30 % on the axis, the aperture the lightest area) is our cozy opening (C1, LAYOUT 2), so frame and join are one design; only the K9 Portal and room holes are still to build.",
+   "best_beats": [
+    "into a place or a thing",
+    "the home place's window",
+    "from the place to the chart"
+   ]
+  },
+  {
+   "id": "J3",
+   "score": 5,
+   "reason": "Carrier B (DIRECTION 1) with Film matchcut built: the thread or a shape holding its screen spot (within 150 px; the thread within 1.2x) with ONE change, 0 f long, so it spends no screen time and keeps the eye jump <= 0.10; the one home place's link to other places; the anchor check is new.",
+   "best_beats": [
+    "between places",
+    "thread joins",
+    "callback"
+   ]
+  },
+  {
+   "id": "T2",
+   "score": 2,
+   "reason": "2-4 cuts of 20-30 f each break panels averaging >= 3.5 s (DIRECTION 1) and the calm; an Arcane montage form not judged for our films; buildable with Film cut / matchcut, but the pinned-anchor check is new.",
+   "best_beats": [
+    "'meanwhile, still this' (rare)"
+   ]
+  },
+  {
+   "id": "J4",
+   "score": 4,
+   "reason": "Our story light and one hot accent (DIRECTION 5-6) give a bright anchor in every shot, and Film matchcut with the colour-shift and eye-jump metrics exists (Arcane T1: layout correlation 0.81-0.90); but its 760-1000 px circles centred at y 800-1050 reach into the band, so a circle keeps its top at y >= 600 (centre >= 600 + r).",
+   "best_beats": [
+    "same light, somewhere else",
+    "same place, later",
+    "thread joins"
+   ]
+  },
+  {
+   "id": "J5",
+   "score": 3,
+   "reason": "A cut mid-action that runs on >= 0.3 s in the same direction is cheap (cut / matchcut with the mover on film time), but it counts as an F (<= 2 a film) unless the thread crosses it, and our size changes come by pushes, so it stays rare.",
+   "best_beats": [
+    "'it keeps happening'",
+    "the thread in motion across a cut"
+   ]
+  },
+  {
+   "id": "J6",
+   "score": 4,
+   "reason": "DIRECTION 7's near 'you' turned into a join: the figure from behind looks (>= 0.5 s, the head turning 0.3-0.5 s before) and the push runs down its sightline (J2) to the next focal within 150 px of where it pointed; a planning rule, nothing to build.",
+   "best_beats": [
+    "'what it sees'",
+    "from the 'you' to the subject"
+   ]
+  },
+  {
+   "id": "J7",
+   "score": 4,
+   "reason": "Carrier D (DIRECTION 1): the thread leaves one edge and enters the next shot from the opposite at the same speed; but in 9:16 a vertical carry crosses the band (y 290-600) and a right-edge exit below y 790 runs through the rail's zone (vertical.md V11: no call at x > 830 below y 790), so our carries run sideways at y 600-790; the carry check is new.",
+   "best_beats": [
+    "'it went there'",
+    "the thread's travel between places"
+   ]
+  },
+  {
+   "id": "J8",
+   "score": 3,
+   "reason": "It hides a scale jump behind our own tier-C near mass (S5's chimney pot) with the captions held in screen space, but >= 70 % of the stage covered for <= 0.5 s is the 'big chunky' near mass the owner rejected, the clean-pen wiper is new, and it is 1-2 a film.",
+   "best_beats": [
+    "scale jump inside S5",
+    "a change too big to show"
+   ]
+  },
+  {
+   "id": "J9",
+   "score": 1,
+   "reason": "A 20 f whip fights 'alive but calm' (DIRECTION 3) and the speed budget, its live-action form hides the cut in blur (DIRECTION 5: no blur), and nothing is built; declared-only.",
+   "best_beats": []
+  },
+  {
+   "id": "J10",
+   "score": 3,
+   "reason": "'This IS that' suits an explainer and @remotion/paths' interpolatePath is installed, but the staged morph helper is new and costly, the object must stay the brightest, hottest thing throughout, and a shape sliding between two painted worlds risks reading pasted (CRAFT c); sparingly, never two in a row.",
+   "best_beats": [
+    "transformation / equivalence",
+    "from the place to the chart"
+   ]
+  },
+  {
+   "id": "J11",
+   "score": 4,
+   "reason": "Time passing by light in one frame keeps the rig (a source never moves between cuts, DIRECTION 5): World sky keys {t, tod, wipe, dur}, windowLit and lib/light2 exist and the caption tone follows the edge (wipe: 'down'); a key change is a story turn, once or twice a film, and the light-pull helper is new.",
+   "best_beats": [
+    "'later'",
+    "time passes in place",
+    "the key turning on the turn"
+   ]
+  },
+  {
+   "id": "J13",
+   "score": 3,
+   "reason": "Carrier E for paper only: the chart keeps its spot and turns nearly orthographic (~2.7 % growth edge-on), but Film has no E type yet (lib/Card.tsx's v1 flip is the start), and it serves only the chart beats, which count neither cozy nor scale.",
+   "best_beats": [
+    "chart to chart",
+    "next page of the proof"
+   ]
+  },
+  {
+   "id": "J15",
+   "score": 4,
+   "reason": "Off the picture, so the band, the rail and the frame stay untouched while every carrier gets smoother: the ambience leads its picture by 0.2-0.5 s and trails 0.3-1.0 s, the picture leading its word by 0.1-0.3 s; Film sfx, av_lag.py and beatsync.py exist, per-join bridges and the offset check are new.",
+   "best_beats": [
+    "every join",
+    "entering a new place",
+    "scale reveal"
+   ]
+  },
+  {
+   "id": "X11",
+   "score": 1,
+   "reason": "Spins, glitches, RGB splits and flashes break the clean premium look and 'no roll' (DIRECTION 4, 8) and are full-frame onsets with no place to look; framecheck already flags 1-2 f flashes.",
+   "best_beats": []
+  }
+ ],
+ "top10": [
+  "E10",
+  "N13",
+  "C1",
+  "E2",
+  "RM5",
+  "E6",
+  "J2",
+  "N2",
+  "B1",
+  "I4"
+ ],
+ "bottom10": [
+  "X2",
+  "X9",
+  "X3",
+  "RJ1",
+  "X11",
+  "X1",
+  "X10",
+  "RM9",
+  "X8",
+  "X7"
+ ],
+ "notes": "Judged blind (catalogue.json only; catalogue_prior.json and the other judges unread), on fit alone, grounded in DIRECTION, CRAFT a-g, LAYOUT 1-4 and 8, CINEMATIC_GUIDE, ORGANIC 4.4 (R1-R12), the playbook's DEPTH AND SCALE FROM A HUMAN VIEWPOINT, vertical.md's crop table (the name block from y 1519; V11: no call at x > 830 below y 790) and PEOPLE_DESIGN 5.10, with the cited engine pieces checked in src/lib (Film's push-through, matchcut, foreground-wipe, camera-continuous, cut and unbuild; floatCam, PARALLAX_K, S5_EASE, windowLit, anchorTo; World and ShotCam push opt-in at 1.06 over 2 s). Scale: 5 x 22 (21 %), 4 x 35, 3 x 23, 2 x 9, 1 x 14; no bonus or penalty for the source (the owner's 58 average 3.57, ours 45 average 3.20, the gap being our rejected X entries). WHAT LIFTS FIT: devices our zones already encode (the stage square y 600-1520 under the band; one opening of 15-30 % read in y 600-1250; the 130-220 px 'you' at x 130-380 or 700-830, head above y ~1380; the atmospheric steps 0/12/22/40/65 %), the owner-approved float with the sky and the band at 0, and the carriers A, B and C already in Film. WHAT LOWERS IT: anything that must cross the band y 290-600 in a frame, a move or a join; raised or top-down views (35-55 deg down: one K10 slot a film, shared by B7, B12 and N12); two equal calls (D3, X4); the ruler, grid and mirror look (ORGANIC, NOT GEOMETRIC); blur, fades, roll, flashes and zooms in a hold. NUMBERS THIS LENS ADDS FOR OUR FRAME: (1) whatever a move or a join carries through y 290-600 is one flat field there: a tilt's tall thing (I5), a vertical carry (J7), a match circle (J4: its top at y >= 600, so its centre at y >= 600 + r; a 760 px circle at y >= 980); (2) sideways carries and right-side calls stay above y 790 or left of x 830 (V11), a right-facing figure at x <= 410 (E4); (3) the near frame holds <= 2 props, its top at y 1450-1650, within 8 L* of the near shade mass (C2, E5); a near-mass wipe over >= 70 % of the stage only inside the one big move (J8); (4) one big move a film: I4 (S5, landing with 170-200 px figures near the camera) before I6 (S1 lands with nobody near the camera). BUILD COST THE CATALOGUE OVERSTATES: lib/cine drawing pieces (tower, monument, city, street, windows, light, props) are references only (CRAFT c: each film draws its own), so 'exists' through them means 'partly' for a film (A6, B3, B10, C2, D2, D7, N11, N12, Z1, S2, K8); direction C people are a film-wide build not yet in lib/figure, which draws v6's her (PEOPLE_DESIGN 5.10: E1, E10, E11, J6); new helpers several entries share: lightPull (RM6, I11, J11), the K9 Portal (B4, C1, J2), the anchor check (J3, T2, N14), the carry check (J7), a clean-pen near-mass wiper (J8), Film's E type (J13), a horizon setup helper and check (N3). DOC CLASHES FOUND (for the orchestrator; LAYOUT wins on framing): N3's 'never y 900-1020' cuts into LAYOUT 2's street horizon 0.50-0.60 H (y 960-1152) and its eye-height scale shots 0.52-0.59 H (y 998-1133); B11's canyon 'sky <= 10 %' cannot hold its own band in the sky (x 95-945 by y 290-600 is ~13 % of the frame); J4's 760-1000 px circles centred at y 800-1050 reach into the band; MOTION.camera.push (1.06 over 2 s) still carries reference 2's retired per-shot push behind push: true (RM4, X9); E1 and E10 cite lib/figure as 'exists' while it draws v6's her, not direction C. TOP 10 ORDER: the human viewpoint (E10), the cozy home and its one opening (N13, C1), the story light in it (E2), depth in motion and in colour (RM5, E6), the carrier that joins through that opening (J2), the frame's own grammar (N2), the receding ground (B1), the one big move (I4). BOTTOM 10 ORDER: worst first by harm and likelihood: the title over the captions the owner already sent back (X2), the zoom in a hold one prop away in the engine (X9), then fades, the black card, flashes, blur, punch-ins, handheld, the converging towers lib/cine draws, isometric views; X4, X5, X6 and J9 are also 1 but unbuilt or blocked by the engine (rotation 0)."
+}

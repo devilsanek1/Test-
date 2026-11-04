@@ -1,0 +1,1621 @@
+[
+ {
+  "id": "L1",
+  "kind": "attention lever",
+  "name": "Motion onset",
+  "rule": "Each beat has ONE onset, the subject's change (a stroke drawing on, a pop, a tick, a light coming on), started inside the golden box; tier A enters by drawing on, growing or popping (looming); tiers B and C only drift in at a constant speed from an edge or from behind a mass; exits shrink or slide out (they do not capture).",
+  "numbers": "The onset within ~0.1-0.4 s of a cut, inside x 436-644, y 951-1168 (in the opening it peaks at 0.4-0.7 s); B and C entries >= 370 px (5 degrees) from the focal and never within 0.5 s of A's onset.",
+  "evidence": "S+, large: onset captures, steady motion and stopping do not; looming captures, receding does not; dynamic features predict saccades up to 3.6x better than static ones",
+  "source": "attention.md 3 L1 [AT10, AT11, AT12, AT13, AT14, S9]",
+  "catalogue": [
+   "RM1",
+   "RM8",
+   "RM6"
+  ]
+ },
+ {
+  "id": "L2",
+  "kind": "attention lever",
+  "name": "Words",
+  "rule": "Words live only in the band and in the one number or label per shot; nothing letter-like anywhere else; a caption page is an onset, so the picture's event leads its word.",
+  "numbers": ">= 56 px for any word in the world; nothing letter-like within 370 px of the focal; the picture leads its caption page by 0.1-0.3 s.",
+  "evidence": "S+, large: text draws 11.1x and faces 16.6x the fixations of matched regions, even unreadable text",
+  "source": "attention.md 3 L2 [AT16, AT17, AT21, AT27, AT46]",
+  "catalogue": [
+   "X2"
+  ]
+ },
+ {
+  "id": "L3",
+  "kind": "attention lever",
+  "name": "People and animals",
+  "rule": "A person is the subject or stays tier B (soft, small, steady); the 'you' sits at one side with its head and shoulders turned into the focal's box; strangers stay away from the subject and out of the drop; birds fly straight and even, away from the focal; a face's features only on the beat's subject.",
+  "numbers": "The 'you' 130-220 px; strangers >= 220 px from the subject's silhouette; features only on figures over ~200 px.",
+  "evidence": "S+, large: saccades reach faces from 100-110 ms; added people are missed 11 % of the time against 34 % for objects",
+  "source": "attention.md 3 L3 [AT4, AT16, AT18, AT19, AT20]",
+  "catalogue": [
+   "E1",
+   "E10"
+  ]
+ },
+ {
+  "id": "L4",
+  "kind": "attention lever",
+  "name": "The screen centre, re-found at every cut",
+  "rule": "After every cut the focal sits near the visible centre; a focal farther out needs an onset to mark it.",
+  "numbers": "Within ~150 px (2 degrees) of (540, 960), by default x 410-670, y 950-1050; farther out costs an extra saccade of ~0.2-0.3 s.",
+  "evidence": "S+, large for the first fixation",
+  "source": "attention.md 3 L4 [S7, AT15, V5]",
+  "catalogue": [
+   "N1",
+   "A2"
+  ]
+ },
+ {
+  "id": "L5",
+  "kind": "attention lever",
+  "name": "Value contrast and the brightest area",
+  "rule": "The hardest value step and the brightest area below the band sit on the subject; no skylit gap, white prop or highlight in the stage outshines the focal's light.",
+  "numbers": "A step >= 65 L* at the focal; no other light within 10 L* of it.",
+  "evidence": "S+, medium-large in the first ~0.5 s, small after; our measurement: a brighter patch beat the subject in 12 of 20 reel examples",
+  "source": "attention.md 3 L5 [AT5, AT6, AT8]; reels.md 0, 6",
+  "catalogue": [
+   "E2",
+   "N7"
+  ]
+ },
+ {
+  "id": "L6",
+  "kind": "attention lever",
+  "name": "One unique thing in a uniform field (the singleton)",
+  "rule": "The subject differs from its field in >= 2 channels (value, colour, motion, edge); its field is tone-on-tone with one hot accent only, at the focal; a clear ring round it.",
+  "numbers": "Within ~370 px of the focal: +-4-6 L*, dE <= 6-8; a clear ring of ~150-220 px round the subject's silhouette.",
+  "evidence": "S+, large: clutter predicts search time; dense features cut attention and liking (249 ads)",
+  "source": "attention.md 3 L6 [AT22, AT23, AT24, AT25, AT26, AT28]",
+  "catalogue": [
+   "D7",
+   "D1",
+   "N9"
+  ]
+ },
+ {
+  "id": "L7",
+  "kind": "attention lever",
+  "name": "Words and picture together",
+  "rule": "The focal sits close under the caption and the picture's event comes just before its word; the caption names what the frame shows.",
+  "numbers": "The focal 300-450 px under the block (y ~856-1006), 650 px at most; the event 0.1-0.3 s before its word, never after.",
+  "evidence": "S+, large for learning: temporal contiguity d ~1.22-1.30, spatial d ~0.79-1.10",
+  "source": "attention.md 3 L7 [AT34, V9]",
+  "catalogue": [
+   "N5"
+  ]
+ },
+ {
+  "id": "L8",
+  "kind": "attention lever",
+  "name": "Coherence",
+  "rule": "Nothing interesting-but-irrelevant: Pip, life and dressing never in the drop, never on a line into the focal, never pulling as hard as half the focal; one idea per shot; no decorative event on a beat that explains.",
+  "numbers": "Supporting pulls < 50 % of the focal's.",
+  "evidence": "S+, medium-large: removing extraneous material d ~0.70-0.86; seductive details g ~ -0.33",
+  "source": "attention.md 3 L8 [AT34, AT35, AT26]",
+  "catalogue": []
+ },
+ {
+  "id": "L9",
+  "kind": "attention lever",
+  "name": "Size",
+  "rule": "The hook's subject is big, a close is big, and a small subject appears only as the singleton of a calm field, held longer.",
+  "numbers": "The hook's subject >= 400 px wide (45 % of the visible width); a close >= 650 px; a 130-220 px subject held >= 4 s (est.).",
+  "evidence": "S (mixed), medium",
+  "source": "attention.md 3 L9 [AT27, AT28, AT50, V1]",
+  "catalogue": [
+   "N9",
+   "Z1"
+  ]
+ },
+ {
+  "id": "L10",
+  "kind": "attention lever",
+  "name": "A sound on the change",
+  "rule": "Every onset the viewer must catch gets its own sound, starting with it; supporting life gets a bed, never transient sounds; never a sound on a distractor.",
+  "numbers": "The sound on the same frame to ~50 ms after the onset (est.).",
+  "evidence": "S (lab), large in clutter; untested in film",
+  "source": "attention.md 3 L10 [AT39]",
+  "catalogue": [
+   "J15"
+  ]
+ },
+ {
+  "id": "L11",
+  "kind": "attention lever",
+  "name": "Pointers that converge",
+  "rule": "The vanishing point sits on the subject or behind it; lines end at the focal (they mark the place, they do not carry the eye); people near the story face the subject.",
+  "numbers": "The vanishing point within 60 px of the subject; lines end within 40 px of the focal's box.",
+  "evidence": "S for the vanishing point and gaze, 1 for lines; medium; the eye jumps between key elements, it does not ride a line",
+  "source": "attention.md 3 L11 [AT29, AT20, S9, AT30, AT31]",
+  "catalogue": [
+   "B1",
+   "B2",
+   "E7",
+   "E4"
+  ]
+ },
+ {
+  "id": "L12",
+  "kind": "attention lever",
+  "name": "Selective detail",
+  "rule": "The finest marks and the crisp found edges sit near the focal; lost edges and coarser marks elsewhere.",
+  "numbers": "Within ~150-300 px of the focal; tier A's small-feature coverage >= 2.5x tier C's (CRAFT.md b).",
+  "evidence": "S (small studies), medium",
+  "source": "attention.md 3 L12 [AT33]",
+  "catalogue": []
+ },
+ {
+  "id": "L13",
+  "kind": "attention lever",
+  "name": "The light as the cue",
+  "rule": "The story light's pool is on the subject; when the beat changes, the light changes with the event; no arrows, rings or pointing labels.",
+  "numbers": "The surround 10-20 L* lower than the pool.",
+  "evidence": "S+, small-medium: cues d ~0.41-0.46; a spotlight cue in an animation helped even what it did not light",
+  "source": "attention.md 3 L13 [AT34, AT36, AT37]",
+  "catalogue": [
+   "E2",
+   "I11",
+   "K8"
+  ]
+ },
+ {
+  "id": "L14",
+  "kind": "attention lever",
+  "name": "Emotion",
+  "rule": "Surprise at the hook, small warm joys in the life, one awe moment, peaks alternating with calm beats; saturation spent only at the focal.",
+  "numbers": "The hook's surprise at ~2 s; one scale moment a film.",
+  "evidence": "S, medium",
+  "source": "attention.md 3 L14 [AT47, AT48, AT49, AT60]",
+  "catalogue": [
+   "D2",
+   "I4"
+  ]
+ },
+ {
+  "id": "L15",
+  "kind": "attention lever",
+  "name": "Pacing: the event rate",
+  "rule": "The pace lives in the events, not the cuts: change inside continuous shots; the hook's arousing beat never stacked with fast cuts.",
+  "numbers": "Caption pages ~1.1-1.5 s; a story event every ~1.5-3 s from the subject's own build; joins >= 3.5 s on average.",
+  "evidence": "S (television era) + P, medium",
+  "source": "attention.md 3 L15 [AT43, AT44, AT45, AT46, AT58]",
+  "catalogue": [
+   "RJ4"
+  ]
+ },
+ {
+  "id": "AR1",
+  "kind": "attention rule",
+  "name": "One place for both phases",
+  "rule": "The subject is the frame's salience peak at ~0.3 s (the hardest value step, the brightest area below the band, the beat's one onset, the one hot accent) and its meaning at ~1 s (the thing the caption names).",
+  "numbers": "Test: at a 1 % squint, flashed for 0.25 s at feed size, the eye lands on the subject.",
+  "evidence": "S+ [AT5-AT7]; our measurement: the light beat the lines in 12 of 20 reel examples",
+  "source": "attention.md 6 AR1",
+  "catalogue": [
+   "E2",
+   "N7"
+  ]
+ },
+ {
+  "id": "AR2",
+  "kind": "attention rule",
+  "name": "The focal's home, re-found at every cut",
+  "rule": "By default the focal sits near the visible centre; after a join the new focal sits near the old one or near the centre; anywhere else an onset (motion and sound) marks it in its first 0.3 s.",
+  "numbers": "Within ~150 px of the centre (x 410-670, y 950-1050); after a join within ~220 px (3 degrees; CRAFT.md a's eye jump <= 0.10 of the diagonal).",
+  "evidence": "S+ [S7, AT15, AT41]",
+  "source": "attention.md 6 AR2",
+  "catalogue": [
+   "N1",
+   "A2"
+  ]
+ },
+ {
+  "id": "AR3",
+  "kind": "attention rule",
+  "name": "How big",
+  "rule": "The hook's and a close's subject are big; a wide's subject takes a share of the height; a small subject appears only as the singleton of a calm field, held long.",
+  "numbers": "The hook and a close >= 400 px wide (45 % of the visible width); a wide's subject 15-35 % of the frame's height; a subject under ~250 px (3.4 degrees) only in a calm field, held >= 4 s.",
+  "evidence": "S [AT28]; V9",
+  "source": "attention.md 6 AR3",
+  "catalogue": [
+   "Z1",
+   "Z2",
+   "Z3",
+   "N9"
+  ]
+ },
+ {
+  "id": "AR4",
+  "kind": "attention rule",
+  "name": "Against a uniform field, with a clear ring",
+  "rule": "Near the focal everything but the subject is tone-on-tone; no other named object or crisp detail near the subject's silhouette; the subject differs from its field in >= 2 channels.",
+  "numbers": "Within ~370 px (5 degrees): +-4-6 L*, dE <= 6-8; the clear ring ~150-220 px (the crowding distance from the words).",
+  "evidence": "S+ [AT22, AT24, AT25, AT26]",
+  "source": "attention.md 6 AR4",
+  "catalogue": [
+   "D1",
+   "D7"
+  ]
+ },
+ {
+  "id": "AR5",
+  "kind": "attention rule",
+  "name": "The subject owns the onsets",
+  "rule": "In each beat only the subject (or the thread object it hands on) starts, enters, pops, grows or turns; tiers B and C move at a constant speed or not at all, entering only from an edge or from behind a mass.",
+  "numbers": "First inside the golden box x 436-644, y 951-1168; B and C entries >= 370 px from the focal, never within 0.5 s of A's onset.",
+  "evidence": "S+ [AT10, AT11, AT14]",
+  "source": "attention.md 6 AR5",
+  "catalogue": [
+   "RM1",
+   "RM2"
+  ]
+ },
+ {
+  "id": "AR6",
+  "kind": "attention rule",
+  "name": "Persistent changes, spaced events",
+  "rule": "Every story change leaves its new state on screen; transient events the viewer must catch are spaced; the pieces of one build count as one event.",
+  "numbers": "The new state >= 0.5 s on screen (better >= 1 s); transient events >= 0.5 s apart (the attentional blink).",
+  "evidence": "S+ [AT40]",
+  "source": "attention.md 6 AR6",
+  "catalogue": [
+   "RM8"
+  ]
+ },
+ {
+  "id": "AR7",
+  "kind": "attention rule",
+  "name": "Words only where they are read",
+  "rule": "The band, plus one number or label per shot; nothing letter-like anywhere else; the picture's event leads its caption page.",
+  "numbers": ">= 56 px; nothing letter-like within 370 px of the focal; the lead 0.1-0.3 s, never trailing.",
+  "evidence": "S+ [AT16, AT17, AT34]",
+  "source": "attention.md 6 AR7",
+  "catalogue": [
+   "X2",
+   "Z4"
+  ]
+ },
+ {
+  "id": "AR8",
+  "kind": "attention rule",
+  "name": "People and animals are magnets: give each one a job",
+  "rule": "A person is the subject or tier B; the 'you' turns its head and shoulders into the focal's box; strangers stay away from the subject and out of the drop; birds and Pip move evenly near the focal; a face's features only on the beat's subject.",
+  "numbers": "Strangers >= 220 px from the subject's silhouette; no animate turns or flap bursts within 370 px of the focal; features only on figures over ~200 px.",
+  "evidence": "S+ [AT18, AT19, AT20]",
+  "source": "attention.md 6 AR8",
+  "catalogue": [
+   "E10",
+   "E1"
+  ]
+ },
+ {
+  "id": "AR9",
+  "kind": "attention rule",
+  "name": "Pointers converge on the subject",
+  "rule": "The vanishing point, every leading line and every sightline end on the subject.",
+  "numbers": "The vanishing point within 60 px of the subject or behind it; every leading line ends within 40 px of the focal's box; sightlines cross it.",
+  "evidence": "S [AT29]; 1 [AT30]",
+  "source": "attention.md 6 AR9",
+  "catalogue": [
+   "B1",
+   "B2",
+   "E4"
+  ]
+ },
+ {
+  "id": "AR10",
+  "kind": "attention rule",
+  "name": "Detail where the eye goes",
+  "rule": "The finest marks and the crisp found edges sit near the focal; lost edges and coarser marks elsewhere.",
+  "numbers": "Within ~150-300 px of the focal.",
+  "evidence": "S [AT33]",
+  "source": "attention.md 6 AR10",
+  "catalogue": []
+ },
+ {
+  "id": "AR11",
+  "kind": "attention rule",
+  "name": "The light is the cue, and it moves with the event",
+  "rule": "The story light's pool is on the subject; a light change starts with the event it marks; no arrows, rings or pointing labels.",
+  "numbers": "The surround 10-20 L* lower than the pool.",
+  "evidence": "S+ [AT36, AT37]",
+  "source": "attention.md 6 AR11",
+  "catalogue": [
+   "I11",
+   "RM6"
+  ]
+ },
+ {
+  "id": "AR12",
+  "kind": "attention rule",
+  "name": "A sound for each onset that matters",
+  "rule": "Each onset the viewer must catch has a sound that starts with it; transient sounds only on the subject's events; supporting life is a bed.",
+  "numbers": "The same frame to ~50 ms after the visual onset.",
+  "evidence": "S [AT39]",
+  "source": "attention.md 6 AR12",
+  "catalogue": [
+   "J15"
+  ]
+ },
+ {
+  "id": "AR13",
+  "kind": "attention rule",
+  "name": "Joins hide on motion and land where the eye is",
+  "rule": "Cut or carry on the subject's or the carrier's motion; the next focal lands where the eye already is.",
+  "numbers": "The next focal within ~220 px of the current gaze, or at the centre; nothing new starts in the 0.4 s round the join; a continuity cut on a motion onset goes unseen a third of the time.",
+  "evidence": "S [AT41, AT42]",
+  "source": "attention.md 6 AR13",
+  "catalogue": [
+   "RJ4",
+   "J5",
+   "J7"
+  ]
+ },
+ {
+  "id": "AR14",
+  "kind": "attention rule",
+  "name": "Event rate, not cut rate",
+  "rule": "Novelty comes from the subject's own build; no decorative interrupt; the hook's arousing beat never stacked with fast cuts.",
+  "numbers": "Caption pages ~1.1-1.5 s; a story event every ~1.5-3 s; joins >= 3.5 s on average.",
+  "evidence": "S [AT46]; P [AT58]",
+  "source": "attention.md 6 AR14",
+  "catalogue": []
+ },
+ {
+  "id": "AR15",
+  "kind": "attention rule",
+  "name": "The swipe window",
+  "rule": "The first three seconds follow the eye: words and gist first, then the subject's bold onset, then a second change, then reality overtaking.",
+  "numbers": "0-0.4 s the words and the gist (frame 0 being drawn); 0.4-0.7 s the subject's bold onset peaks in the golden box with its sound; 1.2-1.7 s a second change on the subject; ~2 s reality overtakes; one leading pen at <= ~25 px a frame.",
+  "evidence": "S+ and measured [AT1, AT6, AT12, AT61, V4]",
+  "source": "attention.md 6 AR15",
+  "catalogue": [
+   "T",
+   "RM8"
+  ]
+ },
+ {
+  "id": "AR16",
+  "kind": "attention rule",
+  "name": "The emotional arc",
+  "rule": "Peaks alternate with calm beats, never a sustained high.",
+  "numbers": "The hook's surprise at ~2 s; small warm joys in the life; one awe moment (the scale beat).",
+  "evidence": "S [AT47, AT48]",
+  "source": "attention.md 6 AR16",
+  "catalogue": []
+ },
+ {
+  "id": "AR17",
+  "kind": "attention rule",
+  "name": "Coherence",
+  "rule": "Nothing off-story pulls hard, sits in the drop or lies on a line into the focal (Pip's hiding rule is this rule); one idea per shot.",
+  "numbers": "Off-story pulls < 50 % of the focal's.",
+  "evidence": "S+ [AT35]",
+  "source": "attention.md 6 AR17",
+  "catalogue": []
+ },
+ {
+  "id": "AR18",
+  "kind": "attention rule",
+  "name": "Measure attention cheaply (tooling)",
+  "rule": "Check attention with cheap tests rather than by eye alone.",
+  "numbers": "(a) the flash test: each key frame shown 0.25 s at feed size, 'what is it and where did you look?'; (b) an onset map per 0.5 s window: tier A >= 60 % of the pixels that start moving; (c) a glyph check outside the band; (d) a clutter meter round the focal; spectral-residual saliency is not reliable enough to gate on.",
+  "evidence": "[AT24, AT62]; est.",
+  "source": "attention.md 6 AR18",
+  "catalogue": []
+ },
+ {
+  "id": "M1",
+  "kind": "modern principle (rule)",
+  "name": "Centre-weighted framing: the crop-safe axis",
+  "rule": "The focal sits on or near the frame's vertical centre line and every key read stays inside the crop-safe stage; off the centre only for a declared reason (a scale shot's landmark, the left-third hero spot, the turn).",
+  "numbers": "The focal within 130 px of x 540 (x 410-670), y 860-1200; key reads in x 130-870 by y 600-1519 (above y 860 to x 945); for a boosted post above y 1247 and left of x 780 below y 840.",
+  "evidence": "STUDY for the centre bias [S7, V5]; the crops measured or official; the centring 'trend' ONE SOURCE",
+  "source": "modern.md 3 M1",
+  "catalogue": [
+   "N1"
+  ]
+ },
+ {
+  "id": "M5",
+  "kind": "modern principle (rule)",
+  "name": "Stack in depth, move along Z",
+  "rule": "The near subject low and the far one higher, never side by side at one depth; camera moves in order of preference: push or pull (Z), rise or tilt (Y), truck (X) only when the travel is the story.",
+  "numbers": "The 'you' 130-220 px with its feet at y ~1220-1510; the subject on the axis at y 950-1200; the far figure 1/2.2-1/3 of the near one's height, tops >= 40 px apart, overlapping >= 10 px or >= 20 px apart.",
+  "evidence": "CONSENSUS (makers' guides [N38]; micro-drama practice, weaker sources [N39]); STUDY (looming [N11], motion parallax [N12])",
+  "source": "modern.md 3 M5",
+  "catalogue": [
+   "N6"
+  ]
+ },
+ {
+  "id": "M7",
+  "kind": "modern principle (rule)",
+  "name": "Height as meaning",
+  "rule": "Eye level by default; a low angle on the quantity, never on the thing under critique; a high angle once a film on crowds and patterns; overhead only as paper or the 'you's own look down at its hands; no forced three-point perspective.",
+  "numbers": "As N3 (setups A and B), N11 (horizon y 1114-1229) and N12 (35-55 degrees down).",
+  "evidence": "ONE SOURCE [N29]; cinema.md 3 (C5)",
+  "source": "modern.md 3 M7",
+  "catalogue": [
+   "N3",
+   "N11",
+   "N12",
+   "Z4",
+   "X8"
+  ]
+ },
+ {
+  "id": "M8",
+  "kind": "modern principle (rule)",
+  "name": "One bold colour, on the subject",
+  "rule": "One hot accent per scene, at the focal; every other colour tone-on-tone in its mass; the accent travels with the thread object across the joins; never a second saturated patch on the stage.",
+  "numbers": "Chroma C* >= 50 against tier B's <= 25 (est.); the accent ~3-5 % of the frame (est.); dE <= 6-8 elsewhere.",
+  "evidence": "STUDY [N13] (the capture is contested); our measurement (reels E8; v6's yellow windows out-shouted the door)",
+  "source": "modern.md 3 M8",
+  "catalogue": [
+   "E8"
+  ]
+ },
+ {
+  "id": "M9",
+  "kind": "modern principle (rule)",
+  "name": "The practical as the story light",
+  "rule": "One story light per scene, on the subject, from a source in the frame whenever the shot allows; glow and bloom at the source only; rims only in the key's colour family; warm practicals against one cool field; no two-colour neon as a default, no volumetric shafts as a show.",
+  "numbers": "The brightest 5 % below the sky within 134-288 px of the subject; the glow ends >= 10 px outside the band.",
+  "evidence": "our measurement (reels.md 0); ONE SOURCE each [N29, N30, N33]",
+  "source": "modern.md 3 M9",
+  "catalogue": [
+   "E2",
+   "K8"
+  ]
+ },
+ {
+  "id": "M10",
+  "kind": "modern principle (rule)",
+  "name": "Drawn depth instead of optical blur",
+  "rule": "Near and far are separated by drawn cues (the paint coarsens with distance, fewer values, the hue of the air), never by blur, fog or a colour-offset fringe.",
+  "numbers": "One fixed mix toward the sky per plane (0, 12, 22, 40, 65 %), value steps 5, 5, 4, 3, 2 (CINEMATIC_GUIDE Scale cues 5).",
+  "evidence": "ONE SOURCE each [N30, N31, N32, N34]; DIRECTION rules 4-5 in force",
+  "source": "modern.md 3 M10",
+  "catalogue": [
+   "E5",
+   "E6",
+   "X1"
+  ]
+ },
+ {
+  "id": "M11",
+  "kind": "modern principle (rule)",
+  "name": "Design complexity up, feature complexity down",
+  "rule": "A rich arrangement (one device, varied organic silhouettes, 4-6 planes, the far side's density as texture) with little pixel-level clutter away from the focal.",
+  "numbers": "<= 10 value pieces at a squint; quiet fields within +-4-6 L*; far texture tone-on-tone (+-6 L*); found edges only at the focal; detail peaking just under the horizon and nowhere else.",
+  "evidence": "STUDY [N16]; STUDY review [N15]; ONE SOURCE blogs [N41]",
+  "source": "modern.md 3 M11",
+  "catalogue": []
+ },
+ {
+  "id": "M12",
+  "kind": "modern principle (rule)",
+  "name": "The cut is an attention event: ration it, and make it related",
+  "rule": "Novelty often, cuts rarely: something new every ~1-2 s from the subject's own build; every join related (carriers A-E); at most 2 plain cuts, each on a 'But'.",
+  "numbers": "Panels average >= 3.5 s; caption pages every 1.1-1.5 s; F <= 2 a film.",
+  "evidence": "STUDY [N1, N2, N3, N4]; ONE SOURCE official [N25]",
+  "source": "modern.md 3 M12",
+  "catalogue": [
+   "RJ2"
+  ]
+ },
+ {
+  "id": "M14",
+  "kind": "modern principle (rule)",
+  "name": "Motivated moves: a push is looming; a pull needs its own event",
+  "rule": "Every camera move has a story reason: the push says 'this matters', the pull 'see where it sits'; a pull-out carries its own attention event; no zoom in a hold.",
+  "numbers": "A story push >= 3 % in <= 2 s, <= 2x per panel, on its word, the picture ~0.1 s ahead of the voice.",
+  "evidence": "STUDY (looming captures, receding does not [N11]); MEASURED (Arcane, research/cine_motion.md 1)",
+  "source": "modern.md 3 M14",
+  "catalogue": [
+   "RM4",
+   "I4",
+   "X9"
+  ]
+ },
+ {
+  "id": "M15",
+  "kind": "modern principle (rule)",
+  "name": "Asymmetric easing: decelerate in, accelerate out, move on arcs",
+  "rule": "Things that arrive decelerate, things that leave accelerate, travellers move on arcs; position and scale only, never opacity.",
+  "numbers": "Arrivals over 0.25-0.45 s (15-27 f; decelerate cubic-bezier(0.05, 0.7, 0.1, 1.0)); exits over 0.15-0.25 s (9-15 f; accelerate cubic-bezier(0.3, 0.0, 0.8, 0.15)); the thread on an arc or an S, never a ruler line.",
+  "evidence": "ONE SOURCE official [N24]; MEASURED (Arcane); CONSENSUS (animation principles [S5])",
+  "source": "modern.md 3 M15",
+  "catalogue": [
+   "RM8",
+   "J10"
+  ]
+ },
+ {
+  "id": "M16",
+  "kind": "modern principle (rule)",
+  "name": "Stepped drawings, smooth camera",
+  "rule": "Drawn poses and drawn effects step while the camera, the parallax, the light and the captions move on every frame.",
+  "numbers": "A pose held ~5 f at 60 fps ('twos' at 24 fps = 83 ms; 'threes' 7-8 f).",
+  "evidence": "ONE SOURCE each [N30, N32]; DIRECTION rule 8 in force",
+  "source": "modern.md 3 M16",
+  "catalogue": [
+   "RM1"
+  ]
+ },
+ {
+  "id": "M17",
+  "kind": "modern principle (rule)",
+  "name": "2.5D inside its limits: the hole rule",
+  "rule": "Painted planes moved by one camera hold only within a range: a move uncovers a strip between neighbouring planes, so the farther plane is painted past the nearer one's edge; every plane carries its own perspective.",
+  "numbers": "The farther plane painted >= its relative shift + 40 px (the float's overscan) behind the nearer one's edge; Z moves uncover least, sideways most (a truck's background = the view plus the travel); 4-6 planes, 5-7 on a vista; the nearest plane moves only inside its overscan.",
+  "evidence": "STUDY [N12]; CONSENSUS [N42]; est.",
+  "source": "modern.md 3 M17",
+  "catalogue": [
+   "RM5",
+   "RM3"
+  ]
+ },
+ {
+  "id": "M18",
+  "kind": "modern principle (rule)",
+  "name": "Sideways motion reads faster in 9:16",
+  "rule": "For the same felt calm, sideways movers and moves go about half as fast per frame as vertical ones; travel by tilt or rise where the story allows.",
+  "numbers": "The visible width 884 px against the height 1920: a mover crosses the width 2.2x sooner (est.).",
+  "evidence": "ONE SOURCE [N38]; est.",
+  "source": "modern.md 3 M18",
+  "catalogue": [
+   "RM3",
+   "I5"
+  ]
+ },
+ {
+  "id": "M19",
+  "kind": "modern principle (rule)",
+  "name": "Eye trace: the attended thing keeps its screen spot across the join",
+  "rule": "Across a cut or a transition, the thing the eye is on (or the next shot's subject) sits where the eye already is.",
+  "numbers": "The next focal within 150 px (2 degrees) of the last; within 370 px (5 degrees) one short saccade (~0.2 s); 190 px for a light match; beyond that only where a carrier leads or on an F cut.",
+  "evidence": "STUDY [N5, N6, N7, N9]; CONSENSUS [N10]",
+  "source": "modern.md 3 M19",
+  "catalogue": [
+   "J3",
+   "J4",
+   "RJ4"
+  ]
+ },
+ {
+  "id": "M23",
+  "kind": "modern principle (rule)",
+  "name": "Sound leads the cut",
+  "rule": "The next shot's sound (for us the voice's next sentence) starts at or just before the picture changes.",
+  "numbers": "A join's midpoint on the next sentence's first word; the picture ~0.1 s ahead of its word; a join never in a pause of the voice longer than ~0.3 s (est.).",
+  "evidence": "STUDY [N5, N6]",
+  "source": "modern.md 3 M23",
+  "catalogue": [
+   "J15"
+  ]
+ },
+ {
+  "id": "M25",
+  "kind": "modern principle (rule)",
+  "name": "Coherence: no seductive detail",
+  "rule": "Everything in the frame serves the beat; interesting but irrelevant extras are cut.",
+  "numbers": "<= 6 named objects (the subject, the thread, one big quiet mass, 1-3 supporting things); Pip >= 250 px from the focal, off the eye path; no joke props, no logos, no readable fine print.",
+  "evidence": "META [N18]",
+  "source": "modern.md 3 M25",
+  "catalogue": []
+ },
+ {
+  "id": "M26",
+  "kind": "modern principle (rule)",
+  "name": "Signalling: one highlight, on its word",
+  "rule": "The essential is cued at the moment it is said, one signal at a time; all of a beat's signals land on the same word.",
+  "numbers": "The caption's keyword, the light's peak, the accent's arrival and the push on one word; the picture ~0.1 s ahead; no arrows or callout boxes.",
+  "evidence": "META [N19]: retention g = 0.53, transfer g = 0.33; STUDY [N20]",
+  "source": "modern.md 3 M26",
+  "catalogue": [
+   "RM6",
+   "I11"
+  ]
+ },
+ {
+  "id": "M27",
+  "kind": "modern principle (rule)",
+  "name": "The live drawing, with a visible agent",
+  "rule": "The picture is drawn while you watch, the drawer's tool (our pen tip) in view.",
+  "numbers": "Frame 0's draw-on: a moving pen tip at full contrast, the line the darkest mark, >= 1 s, peaking after 0.4 s; after frame 0 only where the drawing is the beat, the tip in view.",
+  "evidence": "STUDY [N20] (hand in view d = 0.35, no hand d = -0.16), [N21]",
+  "source": "modern.md 3 M27",
+  "catalogue": [
+   "RM8",
+   "T"
+  ]
+ },
+ {
+  "id": "M28",
+  "kind": "modern principle (rule)",
+  "name": "Congruence and apprehension: animate the real mechanism, slowly enough to see",
+  "rule": "The motion shows the structure of what it explains (cause, then effect, one tick per unit) at a speed the eye can follow.",
+  "numbers": "Each unit of cause one visible tick of the effect; each step held ~0.4 s or more unless one of many read as a flow (est.); one causal chain at a time.",
+  "evidence": "STUDY review [N22]; STUDY [N23]",
+  "source": "modern.md 3 M28",
+  "catalogue": [
+   "RM8",
+   "C3"
+  ]
+ },
+ {
+  "id": "M29",
+  "kind": "modern principle (rule)",
+  "name": "Words few and big, in one home",
+  "rule": "On-screen words are few, large, in one fixed place, in step with the voice.",
+  "numbers": "Captions only in the band (98 px, <= 2 lines, lines <= 780 px), popping in place on the voice; at most one label or number in the world (>= 56 px; a number 120-160 px); no title over the picture; no kinetic type through the stage.",
+  "evidence": "STUDY [N14, N17]; ONE SOURCE blogs [N41]",
+  "source": "modern.md 3 M29",
+  "catalogue": [
+   "X2"
+  ]
+ },
+ {
+  "id": "MR1",
+  "kind": "motion rule",
+  "name": "One story motion at a time",
+  "rule": "Either the camera moves and the subject is the still pivot, or the camera holds and the subject moves; never both freely; the world's life slow, even, low in contrast, taking turns.",
+  "numbers": "The pivot within +-40 px; <= 3-4 noticeable movers; none entering in the 0.4 s round a join.",
+  "evidence": "STUDY [MO7, MO8]; cinema.md [S6]",
+  "source": "motion.md 9 MR1",
+  "catalogue": [
+   "RM1",
+   "I12",
+   "RM2"
+  ]
+ },
+ {
+  "id": "MR2",
+  "kind": "motion rule",
+  "name": "A move is three designed frames",
+  "rule": "The start, middle and end frames each pass the composition rules as stills; the caption band is a fixed mat at every frame; anything crossing the band during a move is flat or in the gutters.",
+  "numbers": "Three frames: p 0, 0.5, 1; the band one flat field throughout; plane edges across it only at x < 95 or > 945.",
+  "evidence": "CONSENSUS (layout practice: cinema.md C12)",
+  "source": "motion.md 9 MR2",
+  "catalogue": []
+ },
+ {
+  "id": "MR3",
+  "kind": "motion rule",
+  "name": "Pick the move and the join from the composition's device",
+  "rule": "An opening -> the push-through; one shape or light at one spot -> a match; lines into depth -> the subject travels or a push; a tall thing -> a tilt; two levels -> a crane or a tilt; a near layer -> the float and the wipe; negative space -> a hold or the float, never a push; a pattern's break -> the build or the light pull.",
+  "numbers": "(see each device's pairs_with)",
+  "evidence": "our analysis of the owner's 41 in motion (motion.md 2)",
+  "source": "motion.md 9 MR3",
+  "catalogue": [
+   "J2",
+   "J3",
+   "J4",
+   "RM1",
+   "RM4",
+   "I5",
+   "I6",
+   "RM5",
+   "J8",
+   "RM7",
+   "RM8",
+   "I11"
+  ]
+ },
+ {
+  "id": "MR4",
+  "kind": "motion rule",
+  "name": "The default motion is the owner's E9",
+  "rule": "The camera holds while the subject travels the device's line at its scale's speed, its onset on its word, crossing an OPENING or entering or leaving, never the whole frame.",
+  "numbers": "~0.8 x its height in px per second; an opening crossed in ~1-2 s.",
+  "evidence": "MEASURED (the reels, motion.md 1.2); STUDY [MO8]",
+  "source": "motion.md 9 MR4",
+  "catalogue": [
+   "E9",
+   "RM1"
+  ]
+ },
+ {
+  "id": "MR5",
+  "kind": "motion rule",
+  "name": "The float",
+  "rule": "The parallax float as in force, by depth, home by every join; in a mirrored frame its legs run vertical only.",
+  "numbers": "8-15 px/s at the near plane, peak <= 25 px/s, net within +-12 px of home.",
+  "evidence": "MEASURED (COZY_AND_SCALE 3b.5: the cozy reference's float 10.1 px/s); est. for the mirror",
+  "source": "motion.md 9 MR5",
+  "catalogue": [
+   "RM5",
+   "A7"
+  ]
+ },
+ {
+  "id": "MR6",
+  "kind": "motion rule",
+  "name": "The story push",
+  "rule": "A push is a story move: visible, bounded, about its target, one per beat, on its word; a lean-in lands on a settle, a drawn-in push peaks late.",
+  "numbers": ">= 3 % per 2 s; <= 2x per panel; scaled about the target's centre; a drawn-in push peaks at 65-80 % of its length.",
+  "evidence": "STUDY (looming [MO8]); MEASURED (Arcane P4a, P4b)",
+  "source": "motion.md 9 MR6",
+  "catalogue": [
+   "RM4"
+  ]
+ },
+ {
+  "id": "MR7",
+  "kind": "motion rule",
+  "name": "A pull carries its own event",
+  "rule": "A pull-out reveal is used only with its own attention event (a light burst, the landmark rising on its word, birds crossing toward it).",
+  "numbers": "The event before the landing (S5: the light burst at p 0.5-0.55, the landmark lands by p 0.96).",
+  "evidence": "STUDY (receding motion does not capture [MO8])",
+  "source": "motion.md 9 MR7",
+  "catalogue": [
+   "I4"
+  ]
+ },
+ {
+  "id": "MR8",
+  "kind": "motion rule",
+  "name": "Reveal tilts",
+  "rule": "A vertical reveal is slow and front-loaded, a pan-head shift with no zoom-out.",
+  "numbers": "600-900 px in 3.5-4.5 s, front-loaded (unveil = trapezoid(0.1, 0.6)) or linear.",
+  "evidence": "MEASURED (Arcane: all 7 vertical reveals peak at <= 45 %)",
+  "source": "motion.md 9 MR8",
+  "catalogue": [
+   "I5"
+  ]
+ },
+ {
+  "id": "MR9",
+  "kind": "motion rule",
+  "name": "Sideways is expensive in 9:16",
+  "rule": "Prefer the tilt, the push and the pull; a sideways pan of a detailed frame stays slow; a sideways mover goes at about half the px per frame of a vertical one.",
+  "numbers": "A full-frame sideways pan of detail <= ~6 px/f (est., to test; the 7-second rule at 60 fps).",
+  "evidence": "ONE SOURCE [MO1, MO26]; est.",
+  "source": "motion.md 9 MR9",
+  "catalogue": [
+   "RM3",
+   "I5"
+  ]
+ },
+ {
+  "id": "MR10",
+  "kind": "motion rule",
+  "name": "Easing",
+  "rule": "Arrivals decelerate, exits accelerate, camera moves ease in AND out, long moves cruise, a join's two legs meet at one velocity; never a linear camera start or stop, never a camera bounce, never staggered starts across many movers.",
+  "numbers": "Arrivals over 15-27 f, exits over 9-15 f; the cruise trapezoid(0.25, 0.35) peaks at 1.43x the mean.",
+  "evidence": "STUDY [MO14, MO15]; CONSENSUS [MO30]",
+  "source": "motion.md 9 MR10",
+  "catalogue": []
+ },
+ {
+  "id": "MR11",
+  "kind": "motion rule",
+  "name": "The light pull is our focus pull",
+  "rule": "The new focal takes the hardest step while the old one drops; one light change at a time, with something new at the new focal; never more than 3 flashes a second.",
+  "numbers": "The new focal >= 65 L*, the old one down >= 10-15 L*; a lamp 0.1-0.3 s, the sky ~1 s; >= 0.5 s from any other onset.",
+  "evidence": "STUDY [MO9]; attention.md [AT36]",
+  "source": "motion.md 9 MR11",
+  "catalogue": [
+   "I11"
+  ]
+ },
+ {
+  "id": "MR12",
+  "kind": "motion rule",
+  "name": "Choose the join by what changes",
+  "rule": "Closer or wider in one place -> the continuous camera; into a place seen through an opening -> the push-through; to another place with the thread -> a shape or light match; following a traveller -> the carry; a jump that must not show -> the wipe; one thing becomes another -> the morph; time passes -> the light change; to the proof -> the card flip; the turn -> the plain cut; the end -> the loop.",
+  "numbers": "motion.md 4.3's table: <= 1.15x or 150 px over 1.4 s (C); the opening 15-30 %, 1.1 s (A); the anchor within 150 px (190 for a light) and 1.5x (B); the same speed and direction (D carry); >= 70 % of the stage covered (D wipe); 0.4-0.8 s (morph); a lamp 0.1-0.3 s, the sky 0.4-1.5 s; at most 2 F.",
+  "evidence": "our synthesis (motion.md 4)",
+  "source": "motion.md 9 MR12",
+  "catalogue": [
+   "RJ4",
+   "J2",
+   "J3",
+   "J4",
+   "J7",
+   "J8",
+   "J10",
+   "J11",
+   "J13",
+   "RJ2",
+   "RJ3"
+  ]
+ },
+ {
+  "id": "MR13",
+  "kind": "motion rule",
+  "name": "Join numbers",
+  "rule": "The next focal stays near the last; the push-through's opening is big enough and shown long enough; a match keeps its anchor's spot and size; ONE change across a match.",
+  "numbers": "The next focal within 150 px of the last (370 px at most) except on F; J2's opening 15-30 % of the frame, shown >= 0.5 s, a flat light field before the zoom passes ~3 % a frame; J3's anchor within 150 px and 1.5x (1.2x for the thread itself); J4's light within 190 px.",
+  "evidence": "modern.md M19-M21; MEASURED (Arcane T1, T7); est.",
+  "source": "motion.md 9 MR13",
+  "catalogue": [
+   "J2",
+   "J3",
+   "J4"
+  ]
+ },
+ {
+  "id": "MR14",
+  "kind": "motion rule",
+  "name": "The cut on action",
+  "rule": "The motion runs on after the cut in the same screen direction; it counts as an F unless the thread crosses the cut.",
+  "numbers": "The motion >= 0.3 s after the cut.",
+  "evidence": "STUDY [MO4]",
+  "source": "motion.md 9 MR14",
+  "catalogue": [
+   "J5"
+  ]
+ },
+ {
+  "id": "MR15",
+  "kind": "motion rule",
+  "name": "The carry",
+  "rule": "The traveller keeps its speed and direction across the cut; vertical carries suit 9:16.",
+  "numbers": "The same speed within ~10 %; it enters within 0-2 f.",
+  "evidence": "CONSENSUS; cinema.md 6.3",
+  "source": "motion.md 9 MR15",
+  "catalogue": [
+   "J7"
+  ]
+ },
+ {
+  "id": "MR16",
+  "kind": "motion rule",
+  "name": "The wipe",
+  "rule": "The wiper is a tier-C near mass already in the outgoing shot, our own organic shape in the clean pen, never a stranger's back; once or twice a film.",
+  "numbers": ">= 70 % of the stage covered on the cut frame, <= 0.5 s on screen, its own 8-12 f window.",
+  "evidence": "STUDY [MO23]; MEASURED (Arcane T5, S5); DIRECTION rules 3-4",
+  "source": "motion.md 9 MR16",
+  "catalogue": [
+   "J8"
+  ]
+ },
+ {
+  "id": "MR17",
+  "kind": "motion rule",
+  "name": "The morph",
+  "rule": "Staged (position, then shape and colour, then the world); the object the brightest and hottest thing throughout; never two in a row.",
+  "numbers": "0.4-0.8 s.",
+  "evidence": "STUDY [MO16, MO17]",
+  "source": "motion.md 9 MR17",
+  "catalogue": [
+   "J10"
+  ]
+ },
+ {
+  "id": "MR18",
+  "kind": "motion rule",
+  "name": "Time passes by light, in place",
+  "rule": "A lamp, the sky's moving edge, a cloud; the dissolve stays a declared exception.",
+  "numbers": "A lamp 0.1-0.3 s; the sky ~0.8-1.5 s for 'time passes' (est.).",
+  "evidence": "STUDY [MO11]; DIRECTION rules 5, 8",
+  "source": "motion.md 9 MR18",
+  "catalogue": [
+   "J11",
+   "X3"
+  ]
+ },
+ {
+  "id": "MR19",
+  "kind": "motion rule",
+  "name": "No whip",
+  "rule": "If one is ever declared: the same direction and speed on both sides, one smear drawing, no blur.",
+  "numbers": "~0.33 s; the smear held 2-3 f.",
+  "evidence": "[MO21, MO22]; DIRECTION rule 5",
+  "source": "motion.md 9 MR19",
+  "catalogue": [
+   "J9"
+  ]
+ },
+ {
+  "id": "MR20",
+  "kind": "motion rule",
+  "name": "Sound across a join",
+  "rule": "The picture leads its word; a place's ambience may lead its picture and trail under the next, ducked; one bridge per join; an effect sits on its event or just after.",
+  "numbers": "The picture 0.1-0.3 s ahead of its word; ambience leads 0.2-0.5 s, trails 0.3-1.0 s; an effect on its event's frame or 1-2 f after, never > 2 f before (detected from +45 ms lead or 125 ms lag).",
+  "evidence": "ITU-R BT.1359 [MO19]; STUDY [MO4]; [MO20]",
+  "source": "motion.md 9 MR20",
+  "catalogue": [
+   "J15"
+  ]
+ },
+ {
+  "id": "MR21",
+  "kind": "motion rule",
+  "name": "Joins sit at the breakpoint",
+  "rule": "A join sits at the end of a sentence or an action, where viewers blink; its midpoint on the next sentence's first word; never mid-action except a cut on action; never a cut in the middle of a move.",
+  "numbers": "The midpoint on the next sentence's first word (in force).",
+  "evidence": "STUDY [MO10]; [MO6]",
+  "source": "motion.md 9 MR21",
+  "catalogue": []
+ },
+ {
+  "id": "MR22",
+  "kind": "motion rule",
+  "name": "Life's speed by its scale",
+  "rule": "A walker moves at ~0.8 x its height in px per second; huge means slow; the near mover is the fastest.",
+  "numbers": "Far walkers 15-60 px tall ~12-50 px/s; mid walkers 110-260 px ~90-215 px/s; the 180 px 'you' ~150 px/s; clouds 0-15 px/s.",
+  "evidence": "est. (motion.md 5.4); CINEMATIC_GUIDE Scale cues 10",
+  "source": "motion.md 9 MR22",
+  "catalogue": [
+   "RM2",
+   "RM1"
+  ]
+ },
+ {
+  "id": "MR23",
+  "kind": "motion rule",
+  "name": "The build",
+  "rule": "One pen tip leads; the opening's draw-on is long enough to see after the swipe; pieces of one build come fast, separate reads slowly.",
+  "numbers": "The tip at ~12-25 px/f; the draw-on >= 1 s, peaking after 0.4 s; one build's pieces every 0.1-0.2 s (in seconds, not frames); separate reads >= 0.5 s apart.",
+  "evidence": "STUDY ([MO25]; attention.md [AT40], [AT61]); MEASURED (reel 03)",
+  "source": "motion.md 9 MR23",
+  "catalogue": [
+   "RM8"
+  ]
+ },
+ {
+  "id": "MR24",
+  "kind": "motion rule",
+  "name": "Check it",
+  "rule": "Every move and join is checked by tools: on-screen speed (with a lateral warning), dead frames, the gate's join counts, and the new join checks.",
+  "numbers": "scripts/camspeed.py (+ a lateral WARN ~6 px/f), scripts/qa/deadframes.py, scripts/qa/gate_check.py, the carry and eye-jump tool promoted from the retro tools, the anchor / carry / aperture / sound-offset checks.",
+  "evidence": "tooling (motion.md 7)",
+  "source": "motion.md 9 MR24",
+  "catalogue": []
+ },
+ {
+  "id": "CS1",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "Design for the window the phone shows",
+  "rule": "Key reads sit inside the clear window; only masses run into the cut strips, under the rails and under the bottom UI; a thing cut by a side edge must still read with its outer 98 px gone.",
+  "numbers": "Key reads in x 130-945 from y 600 to 860 and x 130-870 from y 860 to 1519; nothing to read above y 240 or at y >= 1519; words >= 56 px (the fluent floor is a 17 px x-height), lines >= 2 px, a figure 'doing what' >= 40 px and reliably 60-80 px.",
+  "evidence": "MEASURED on the owner's recordings (vertical.md 1, 3.4)",
+  "source": "COMPOSITION_SHOTS.md 1 rule 1 (V1-V4, V7)",
+  "catalogue": []
+ },
+ {
+  "id": "CS2",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "Three stacked pictures",
+  "rule": "The words' sky (the band one flat field, nothing across it), the stage (the story) and the near band (one quiet mass under the app's text); depth stacks up the frame; one stage, never a split screen.",
+  "numbers": "y 0-600 / 600-1520 / 1250-1920; planes overlap >= ~10 px, no two plane tops within ~40 px; width is 884 visible px.",
+  "evidence": "our measurement (16 of the reels' 21 focal points land in or within 40 px of R7's box); cinema.md 1, 4.8; vertical.md 2",
+  "source": "COMPOSITION_SHOTS.md 1 rule 2",
+  "catalogue": [
+   "N2",
+   "N6",
+   "X4"
+  ]
+ },
+ {
+  "id": "CS3",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "One focal, in its home",
+  "rule": "The focal's centre sits on the subject axis, by default near x 540 and close under the captions; off its home only for a declared reason; nothing calls in the drop.",
+  "numbers": "x 380-700 (by default x 410-670), y 860-1200, default spot y 950-1050; the drop from the block's foot (y 556) 300-650 px (4-8.7 degrees), the short end (300-450 px) whenever the shot allows.",
+  "evidence": "STUDY (the centre bias [S7], [V5]); R7; C1; V8",
+  "source": "COMPOSITION_SHOTS.md 1 rule 3",
+  "catalogue": [
+   "A2",
+   "N1",
+   "N5"
+  ]
+ },
+ {
+  "id": "CS4",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "The focal is one place: the subject, the story light and the hardest value step",
+  "rule": "The subject, the brightest light and the hardest step coincide; the one hot accent only there; the lines lead, the light decides.",
+  "numbers": "A step >= 65 L* at the focal; below the band no other step over ~40 L* and no light within 10 L* of the focal's; the brightest 5 % below the sky within 134-288 px (0.07-0.15 H) of the subject; dE <= 6-8 elsewhere; <= 3 regions pull at >= 50 % of the strongest and only one at >= 70 %.",
+  "evidence": "our measurement (reels.md 0, 6: the light beat the lines in 12 of 20); in force as DIRECTION rules 2 and 5 and the playbook's PROPER LIGHT",
+  "source": "COMPOSITION_SHOTS.md 1 rule 4 (R3, R4, R11)",
+  "catalogue": [
+   "E2",
+   "E8",
+   "N7"
+  ]
+ },
+ {
+  "id": "CS5",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "Notan first: three masses, two quiet fields",
+  "rule": "Draw the 3-value notan of every shot before anything else: three big masses, two connected quiet fields, the things living in the belt between.",
+  "numbers": "At a 1 % squint in 3 values the three largest masses >= 85 % (<= 8 masses >= 1 %), one value group 40-55 %, the means >= 13 L* apart; <= 10 value pieces; <= 6 named objects; >= 65 % quiet in two fields (the sky with the band >= 30 %, the near ground >= 15 %), each patterned within +-4-6 L*; Pip >= 250 px from the focal.",
+  "evidence": "our measurement of the owner's references (organic/composition.md 1-2); in force as DIRECTION rules 2-3",
+  "source": "COMPOSITION_SHOTS.md 1 rule 5 (R1, R2, R5, R6, R10, R12)",
+  "catalogue": [
+   "N7",
+   "D1"
+  ]
+ },
+ {
+  "id": "CS6",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "The horizon off the half, declared per set",
+  "rule": "Each set declares setup A or B with its camera height and keeps it in every shot; thirds as proportions, never two equal halves of anything.",
+  "numbers": "Setup A y 1150-1300 or setup B y 690-860; never y 900-1020 (0.47-0.53 H); S1 at y 768, S5 at 883, S3 ~1402, S4 ~1574, K7 1114-1229.",
+  "evidence": "Smith 1797 via [S3]; the owner's references put the horizon at 0.57-0.85 H",
+  "source": "COMPOSITION_SHOTS.md 1 rule 6 (C2, C3, C14)",
+  "catalogue": [
+   "N3",
+   "A1"
+  ]
+ },
+ {
+  "id": "CS7",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "People stand by the horizon-cut rule; the 'you' is soft, at one side, looking in",
+  "rule": "Every standing figure is placed by the horizon-cut formula; the 'you' is one soft figure at one side, its sightline into the focal's box; strangers small and in groups.",
+  "numbers": "Feet at y_h + P*c/h, head at y_h - P*(h - c)/h; the 'you' 130-220 px, tier B (pull < 50 %), x 130-380 facing right or x 700-830 facing left, its head top above y ~1380; lead room 1.5-2x; mid walkers 110-260 px, far 15-60 px, in twos and threes.",
+  "evidence": "cinema.md 3.2, C9; our measurement (the reels' figures: 8 of 12 at 150-226 px)",
+  "source": "COMPOSITION_SHOTS.md 1 rule 7",
+  "catalogue": [
+   "E10",
+   "E4",
+   "N3",
+   "E1"
+  ]
+ },
+ {
+  "id": "CS8",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "One device per shot, and it delivers the eye to the focal",
+  "rule": "Name one device by its code; a second only when it points at the same focal; lines lead to the focal and stop there.",
+  "numbers": "Lines in 2-3 legs of >= 150 px alternating sides at ~40-60 degrees, the last leg within 40 px of the focal's box; no line corner to corner, across the band or into an empty vanishing point; the vanishing point within 60 px of the subject; an inner frame 15-30 %, its aperture >= 10 L* off its rim; a pattern within +-6 L* with one break.",
+  "evidence": "CONSENSUS (Smith, Dow, Poore, staging: C6, C7, C14); the reels teach one device per example",
+  "source": "COMPOSITION_SHOTS.md 1 rule 8",
+  "catalogue": [
+   "B1",
+   "B2",
+   "C1",
+   "D7",
+   "B8"
+  ]
+ },
+ {
+  "id": "CS9",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "One soft counterweight, high or on the far side",
+  "rule": "The near-centre focal is balanced by one big soft mass far out on the other side, never in the lower right where the app already weighs; the words on top balanced by the near dark mass.",
+  "numbers": "The focal 0-130 px off x 540; the counterweight >= 300 px out (x < 240 or > 840), bigger and softer, pull < 50 %; by default the hero cloud in the top gutter (y 0-290); never at x > 830 below y 790.",
+  "evidence": "CONSENSUS (the steelyard: Poore 1903, Payne 1941, via cinema.md S1); C8, R8, V11",
+  "source": "COMPOSITION_SHOTS.md 1 rule 9",
+  "catalogue": [
+   "D4"
+  ]
+ },
+ {
+  "id": "CS10",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "The near frame is a hint at the edges",
+  "rule": "Things are cut by the frame's edges; the near frame holds a few props inside its shade mass; one framing mass on one side; found edges only at the focal; no tangents.",
+  "numbers": ">= 2 things cut by the edges in every shot; the near frame <= 2 props within 8 L* of its shade mass; a framing mass on one side only, <= 216 px; never half the frame, never a blur; contours overlap >= ~10 px or keep >= ~20 px apart.",
+  "evidence": "the owner's words (the playbook: 'a small, subtle hint at the edges'); R6, R9, C13",
+  "source": "COMPOSITION_SHOTS.md 1 rule 10",
+  "catalogue": [
+   "C2",
+   "E5",
+   "B10"
+  ]
+ },
+ {
+  "id": "CS11",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "Sizes step 2-3x; an angle means something",
+  "rule": "Sizes are set on the beat's subject and step 2-3x; a plain cut changes size or angle enough to read as meant; eye level by default, other angles only for their meaning.",
+  "numbers": "Extreme wide ('you' 60-150 px), wide (the subject 15-35 % of the height), medium (270-460 px wide), close (>= 650 px), insert; a push <= 2x per panel; a plain cut >= 20 % in size (G3_ANIMATIC, in force; this library asks 1.5-2x) or >= 30 degrees, or the exact frame; low only on the quantity; high once, on crowds; overhead only as paper; no roll.",
+  "evidence": "C4, C5 (6-12 field [S16]; 20 mm / 30 degrees [S20])",
+  "source": "COMPOSITION_SHOTS.md 1 rule 11",
+  "catalogue": [
+   "Z1",
+   "Z2",
+   "Z3",
+   "N9",
+   "Z4",
+   "N11",
+   "N12",
+   "X5"
+  ]
+ },
+ {
+  "id": "CS12",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "A move is three designed frames, and the subject is its pivot",
+  "rule": "The start, middle and end frames each pass the rules; one variable per move on one ease; the subject holds its spot or travels one path; holds are locked or float; one speed budget.",
+  "numbers": "The middle (p 0.5) passes at least the band and tangent checks; the subject within +-40 px or on one path between two golden-box points; holds locked or the float at 8-15 px/s; ~15 px per frame at 60 fps.",
+  "evidence": "C12; DIRECTION rule 8; CINEMATIC_GUIDE rules 1-3; our measurement (17 of 23 reel shots locked or nearly)",
+  "source": "COMPOSITION_SHOTS.md 1 rule 12",
+  "catalogue": [
+   "I12",
+   "RM1",
+   "RM5",
+   "RM7"
+  ]
+ },
+ {
+  "id": "CS13",
+  "kind": "library rule (COMPOSITION_SHOTS 1)",
+  "name": "Frame 0 peaks after the swipe settles",
+  "rule": "The opening's bold event runs long enough and peaks after the page settles; one gist at a quarter second.",
+  "numbers": "The page settles in ~0.4 s (half its travel in 0.07 s); the event >= 1 s with its biggest change after 0.4 s; one subject on the axis >= 400 px wide with the hardest step; the first spoken line in the band from frame 0; nothing important in the bottom 400 px or the outer 98 px.",
+  "evidence": "MEASURED (the swipe on the owner's phone, vertical.md 4); V9",
+  "source": "COMPOSITION_SHOTS.md 1 rule 13",
+  "catalogue": [
+   "T",
+   "RM8"
+  ]
+ },
+ {
+  "id": "C1",
+  "kind": "cinema rule",
+  "name": "The focal's home",
+  "rule": "The beat's focal sits in the stage square's golden box; off it only for a declared reason (a left-third spiral, a scale shot, a chart).",
+  "numbers": "x 413-667, y 951-1187 (the eyes x 454-626, y 987-1133 its heart).",
+  "evidence": "STUDY (the centre bias [S7, S10]); R7's drop",
+  "source": "cinema.md 10 C1",
+  "catalogue": [
+   "A2"
+  ]
+ },
+ {
+  "id": "C2",
+  "kind": "cinema rule",
+  "name": "The horizon",
+  "rule": "The horizon sits near a third or a golden line of the full frame, never near the half; breathers and scale shots keep CINEMATIC_GUIDE's numbers.",
+  "numbers": "y 640-860 (setup B) or 1150-1300 (setup A); never y 900-1020.",
+  "evidence": "Smith's 2:1 and the half [S3]",
+  "source": "cinema.md 10 C2",
+  "catalogue": [
+   "N3"
+  ]
+ },
+ {
+  "id": "C3",
+  "kind": "cinema rule",
+  "name": "The camera height, per set",
+  "rule": "W1 declares the setup per set; every standing figure is placed by the horizon-cut rule.",
+  "numbers": "A: 0.9-1.6 m, horizon 0.60-0.68 H; B: 3-7 m, horizon 0.36-0.45 H; feet y_h + P*c/h, head y_h - P*(h - c)/h.",
+  "evidence": "the owner's references (horizon 0.57-0.85 H); CRAFT.md f.5",
+  "source": "cinema.md 10 C3",
+  "catalogue": [
+   "N3"
+  ]
+ },
+ {
+  "id": "C4",
+  "kind": "cinema rule",
+  "name": "The size ladder",
+  "rule": "Sizes step 2-3x; a plain cut between two shots of one subject changes size or angle enough, or keeps the exact frame.",
+  "numbers": "An F cut >= ~1.5-2x in size or >= 30 degrees in angle.",
+  "evidence": "6-12 field [S16]; the 20 mm / 30 degree guideline [S20]",
+  "source": "cinema.md 10 C4",
+  "catalogue": [
+   "Z1",
+   "Z2",
+   "Z3",
+   "N9",
+   "RJ2"
+  ]
+ },
+ {
+  "id": "C5",
+  "kind": "cinema rule",
+  "name": "Angles",
+  "rule": "Eye level is the default; a low angle only on the quantity; a high angle only on crowds, patterns and maps; overhead only as paper; never a Dutch tilt.",
+  "numbers": "(as N3, N11, N12, Z4)",
+  "evidence": "[S12, S13]; DIRECTION rule 8",
+  "source": "cinema.md 10 C5",
+  "catalogue": [
+   "N11",
+   "N12",
+   "X5",
+   "Z4"
+  ]
+ },
+ {
+  "id": "C6",
+  "kind": "cinema rule",
+  "name": "One device per shot",
+  "rule": "One device does the leading, pointing at the focal; a second only when it points at the same focal; the G3 panel names it.",
+  "numbers": "(see CS8)",
+  "evidence": "Smith, Dow, Poore, staging [S1-S3, S5, S6]",
+  "source": "cinema.md 10 C6",
+  "catalogue": []
+ },
+ {
+  "id": "C7",
+  "kind": "cinema rule",
+  "name": "The eye's path",
+  "rule": "The path enters from the near band or the words, zigzags in a few legs and ends on the focal; never straight out.",
+  "numbers": "2-3 zigzag legs of >= 150 px; the last leg within 40 px of the focal's box; no line corner to corner, none through the band; no empty vanishing point behind the focal.",
+  "evidence": "Poore's entrance and exit [S1]; layout pathways [S16]",
+  "source": "cinema.md 10 C7",
+  "catalogue": [
+   "B1",
+   "B8"
+  ]
+ },
+ {
+  "id": "C8",
+  "kind": "cinema rule",
+  "name": "The steelyard",
+  "rule": "The near-centre focal is balanced by one far, bigger, softer counterweight; the words on top balanced by the near dark mass.",
+  "numbers": "The focal <= 130 px off x 540; the counterweight >= 300 px out on the other side, < 50 % of the focal's pull, never isolated and crisp.",
+  "evidence": "Poore's balance [S1]; R8",
+  "source": "cinema.md 10 C8",
+  "catalogue": [
+   "D4"
+  ]
+ },
+ {
+  "id": "C9",
+  "kind": "cinema rule",
+  "name": "Facing and lead room",
+  "rule": "A facing or moving subject gets more room in front; the 'you' beside the subject stands outside the axis on the side it looks from, facing in.",
+  "numbers": "1.5-2x room in front (facing right at x 380-430, facing left at 650-700); the 'you' at x 120-380 or 700-900, its sightline through the focal's box.",
+  "evidence": "lead room [S14]; the inward bias [S10]; gaze cues [S9]",
+  "source": "cinema.md 10 C9",
+  "catalogue": [
+   "E4",
+   "E10"
+  ]
+ },
+ {
+  "id": "C10",
+  "kind": "cinema rule",
+  "name": "The G3 panel is a layout",
+  "rule": "Each panel declares what a 2D layout holds.",
+  "numbers": "Eight declarations: size and setup; vanishing point, device and path; focal box and counterweight; planes (4-6, each top's y and float factor); a 3-value notan; the 'you' and Pip; the move's three frames; the hook-up.",
+  "evidence": "2D layout practice [S16]",
+  "source": "cinema.md 10 C10",
+  "catalogue": []
+ },
+ {
+  "id": "C11",
+  "kind": "cinema rule",
+  "name": "The value script and the colour script",
+  "rule": "One strip per film plans the intensity curve in value, then colour; the key changes only on a story turn, carried by light.",
+  "numbers": "One 108 x 192 px thumbnail per beat (~8-14 a film), values at W1/G3, colour at G4; affinity in cozy beats, contrast at the hook, the turn and the payoff; an ordinary join keeps the colour shift <= 15.",
+  "evidence": "colour scripts [S18]; contrast and affinity [S17]",
+  "source": "cinema.md 10 C11",
+  "catalogue": [
+   "J11"
+  ]
+ },
+ {
+  "id": "C12",
+  "kind": "cinema rule",
+  "name": "Moves",
+  "rule": "A camera move is a sequence of compositions: three designed frames, one variable, the subject the pivot, lead room growing, the band a fixed mat, tangents passing quickly.",
+  "numbers": "Start, middle, end; the pivot +-40 px or one path between two golden points; a push scales about the target's centre; tangents pass in <= ~0.1 s.",
+  "evidence": "cinema.md 8 [S6, S14-S17]",
+  "source": "cinema.md 10 C12",
+  "catalogue": [
+   "I12"
+  ]
+ },
+ {
+  "id": "C13",
+  "kind": "cinema rule",
+  "name": "Staging",
+  "rule": "An action reads in silhouette; one actor at a time; overlap or air, never a kiss; the background read in a glance.",
+  "numbers": "The silhouette test at 0.25 scale (270 px wide); action in profile or 3/4 back, the acting part >= ~12 px outside the body; contours overlap >= ~10 px or keep >= ~20 px apart; the background gets ~0.25 s of a 3.5 s shot.",
+  "evidence": "staging [S5, S6]; eye tracking [S9]; layout [S16]",
+  "source": "cinema.md 10 C13",
+  "catalogue": []
+ },
+ {
+  "id": "C14",
+  "kind": "cinema rule",
+  "name": "Rhythm and symmetry",
+  "rule": "A repeated motif is one texture with one break, the break being the call; full symmetry is rare; never two equal halves of anything.",
+  "numbers": "Full symmetry in at most two shots a film, for formal beats.",
+  "evidence": "Smith [S3]; Dow [S2]; Block [S17]",
+  "source": "cinema.md 10 C14",
+  "catalogue": [
+   "D7",
+   "A7"
+  ]
+ },
+ {
+  "id": "V1",
+  "kind": "vertical rule",
+  "name": "Design to the feed's visible frame",
+  "rule": "On the owner's feed only the middle of the frame's width is seen: key reads stay inside it, and anything cut by the edge must still read.",
+  "numbers": "Visible x 98-982 (52 px a side on a profile, up to 108 on 20:9 phones); key reads inside x 130-945.",
+  "evidence": "MEASURED (the owner's phone, vertical.md 1.1, 1.5)",
+  "source": "vertical.md 7.2 V1",
+  "catalogue": []
+ },
+ {
+  "id": "V2",
+  "kind": "vertical rule",
+  "name": "The rails, measured",
+  "rule": "Nothing to read under the right rails.",
+  "numbers": "x > 945 from y 790 (TikTok x 948-1059 from y 797) and x > 870 from y 860 (Instagram's Reels tab x 877-954 from y 1032, ~860 with a repost button), down to y 1520.",
+  "evidence": "MEASURED; [V14]",
+  "source": "vertical.md 7.2 V2",
+  "catalogue": []
+ },
+ {
+  "id": "V3",
+  "kind": "vertical rule",
+  "name": "The top, measured",
+  "rule": "Nothing to read under the header and its scrim.",
+  "numbers": "Above y 240 (the header to y 218-235, a 10 % scrim to ~240); the band from y 290 stays.",
+  "evidence": "MEASURED",
+  "source": "vertical.md 7.2 V3",
+  "catalogue": []
+ },
+ {
+  "id": "V4",
+  "kind": "vertical rule",
+  "name": "The bottom, measured",
+  "rule": "Under the app's text, one quiet dark-mid mass with no light detail and no call.",
+  "numbers": "The app's text from y 1519; the scrim darkens the bottom a further 10-20 %.",
+  "evidence": "MEASURED; R5, R10",
+  "source": "vertical.md 7.2 V4",
+  "catalogue": [
+   "C2"
+  ]
+ },
+ {
+  "id": "V5",
+  "kind": "vertical rule",
+  "name": "Caption lines <= 780 px",
+  "rule": "Caption lines stay short enough for every crop.",
+  "numbers": "Lines <= 780 px (x 130-910 on the x 520 centre line, ~23 characters at 98 px), <= 2 lines.",
+  "evidence": "MEASURED; BBC [V7]",
+  "source": "vertical.md 7.2 V5",
+  "catalogue": []
+ },
+ {
+  "id": "V6",
+  "kind": "vertical rule",
+  "name": "Caption pace",
+  "rule": "A page stays long enough to read.",
+  "numbers": "A page's characters <= 20 x its seconds on screen.",
+  "evidence": "[V8], [V7]",
+  "source": "vertical.md 7.2 V6",
+  "catalogue": []
+ },
+ {
+  "id": "V7",
+  "kind": "vertical rule",
+  "name": "Sizes by angle",
+  "rule": "Words, lines and cover titles are sized by the angle they make on the phone.",
+  "numbers": "A word's x-height >= 0.2 degrees on the feed (>= 17 px; our 56 px floor keeps 1.5x over it); lines >= 2 px; a cover title meant for a grid tile ~115-130 px.",
+  "evidence": "[V10]",
+  "source": "vertical.md 7.2 V7",
+  "catalogue": []
+ },
+ {
+  "id": "V8",
+  "kind": "vertical rule",
+  "name": "The centre column and the focal's home",
+  "rule": "Key reads in the centre column; the focal centred in the visible stage's golden box, a short drop under the words.",
+  "numbers": "Key reads x 130-945 from the band to y 860 and x 130-870 from y 860 to 1519; the focal in x 436-644, y 951-1168; the drop 300-450 px preferred, 650 at most.",
+  "evidence": "STUDY [V5, V6, V9]",
+  "source": "vertical.md 7.2 V8",
+  "catalogue": [
+   "A2",
+   "N1",
+   "N5"
+  ]
+ },
+ {
+  "id": "V9",
+  "kind": "vertical rule",
+  "name": "Frame 0 in the swipe",
+  "rule": "The opening's bold event lasts long enough and peaks after the page settles.",
+  "numbers": "The event >= 1 s, peaking after 0.4 s; the subject (tier A) >= 400 px wide on the axis with the hardest value step; the first spoken line in the band from frame 0.",
+  "evidence": "MEASURED (the swipe); [V1, V2, V4, V12]",
+  "source": "vertical.md 7.2 V9",
+  "catalogue": [
+   "T",
+   "RM8"
+  ]
+ },
+ {
+  "id": "V10",
+  "kind": "vertical rule",
+  "name": "One stage, no split screens",
+  "rule": "A comparison is a sequence, or one frame with the subject at the seam.",
+  "numbers": "(one stage under the band)",
+  "evidence": "STUDY [V5, V6]",
+  "source": "vertical.md 7.2 V10",
+  "catalogue": [
+   "X4",
+   "D6",
+   "N14"
+  ]
+ },
+ {
+  "id": "V11",
+  "kind": "vertical rule",
+  "name": "The interface is in the picture",
+  "rule": "Our own pulls stay out of the interface's way; leading lines never end at the name block.",
+  "numbers": "No call of ours at x > 830 below y 790 or below y 1480; the counterweight high or left.",
+  "evidence": "MEASURED (vertical.md 3.3)",
+  "source": "vertical.md 7.2 V11",
+  "catalogue": [
+   "D4"
+  ]
+ },
+ {
+  "id": "V12",
+  "kind": "vertical rule",
+  "name": "Review as the feed shows it",
+  "rule": "Every review is also checked at the Reels tab's crop and scale with its interface drawn over it.",
+  "numbers": "Visible x 98-982, our frame 1.22x its fit-to-screen size.",
+  "evidence": "MEASURED; [V14]",
+  "source": "vertical.md 7.2 V12",
+  "catalogue": []
+ },
+ {
+  "id": "V13",
+  "kind": "vertical rule",
+  "name": "Reference sizes through the feed",
+  "rule": "A landscape reference shown at full phone width maps its width to 883 of our px on the owner's feed, not 1080.",
+  "numbers": "x 0.82 for what the owner sees.",
+  "evidence": "MEASURED (arithmetic)",
+  "source": "vertical.md 7.2 V13",
+  "catalogue": []
+ },
+ {
+  "id": "V14",
+  "kind": "vertical rule",
+  "name": "Ads",
+  "rule": "Key reads stay inside the intersection of the platforms' official safe areas.",
+  "numbers": "x 120-887, y 288-1247, with x <= 780 below y 840.",
+  "evidence": "OFFICIAL [V1, V2, V3]",
+  "source": "vertical.md 7.2 V14",
+  "catalogue": []
+ },
+ {
+  "id": "R1",
+  "kind": "organic composition rule",
+  "name": "Design the notan first",
+  "rule": "Three value masses hold most of the frame; one value group dominates; the groups are well apart; a notan of every exterior shot at G3.",
+  "numbers": "At a 1 % squint in 3 values the three masses >= 85 % (<= 8 masses >= 1 %); one group 40-55 %; the means >= 13 L* apart.",
+  "evidence": "our measurement (the references 86-97 %); Dow's notan (1899)",
+  "source": "organic/composition.md 4 R1",
+  "catalogue": [
+   "N7"
+  ]
+ },
+ {
+  "id": "R2",
+  "kind": "organic composition rule",
+  "name": "Few pieces",
+  "rule": "Few value pieces; the rest is texture inside a mass.",
+  "numbers": "<= 10 value pieces (0.02-1 % of the frame each); variation within a mass 2-8 L*.",
+  "evidence": "our measurement (the references 2-7; v6 32)",
+  "source": "organic/composition.md 4 R2",
+  "catalogue": []
+ },
+ {
+  "id": "R3",
+  "kind": "organic composition rule",
+  "name": "One call",
+  "rule": "Few regions pull, and only the focal pulls hard, in value and in colour.",
+  "numbers": "<= 3 regions at >= 50 % of the strongest, only one at >= 70 %.",
+  "evidence": "our measurement (the painted models 1-2 calls; v6 10); staging (Thomas and Johnston 1981)",
+  "source": "organic/composition.md 4 R3",
+  "catalogue": []
+ },
+ {
+  "id": "R4",
+  "kind": "organic composition rule",
+  "name": "The focal is the subject, the story light and the frame's hardest value step",
+  "rule": "Counterchange at the one spot: light against dark.",
+  "numbers": "A step >= 65 L* (the lit doorway L* >= 95, her silhouette <= 28); below the band no other step over ~40 L*, nothing within 10 L* of the door's light; the brightest 5 % below the sky within 0.07-0.15 H of her.",
+  "evidence": "our measurement of the references",
+  "source": "organic/composition.md 4 R4",
+  "catalogue": [
+   "E2",
+   "N7"
+  ]
+ },
+ {
+  "id": "R5",
+  "kind": "organic composition rule",
+  "name": "Big quiet",
+  "rule": "Most of the frame is quiet at a squint, in two connected masses; quiet is never empty.",
+  "numbers": ">= 65 % quiet: the sky field >= 30 % (the band inside it) and the near ground >= 15 %, each patterned within +-4-6 L*.",
+  "evidence": "our measurement (the painted models 67-91 %; v6 61 %)",
+  "source": "organic/composition.md 4 R5",
+  "catalogue": [
+   "D1"
+  ]
+ },
+ {
+  "id": "R6",
+  "kind": "organic composition rule",
+  "name": "How many props",
+  "rule": "Few named objects; the near frame a hint; the far side full as texture.",
+  "numbers": "<= 6 named objects at phone size; the near frame <= 2 props, cut by an edge, within 8 L* of the near shade mass; far density within +-6 L* of its band.",
+  "evidence": "our measurement (the references 4-6; v6 ~40); the owner's words (2026-10-29)",
+  "source": "organic/composition.md 4 R6",
+  "catalogue": [
+   "C2"
+  ]
+ },
+ {
+  "id": "R7",
+  "kind": "organic composition rule",
+  "name": "The caption band sits in the light quiet mass, and the focal sits just under it",
+  "rule": "The eye reads the words, then drops once, a short way, to the light; nothing calls between.",
+  "numbers": "The band y 290-600 flat (dL* <= 1.5, ink >= 7:1); the focal's centre y 860-1200, x 380-700, <= 0.2 W off x 520, 300-650 px below y 556; the glow stops >= 10 px outside the band.",
+  "evidence": "LAYOUT's read zone; our reading of the city posters",
+  "source": "organic/composition.md 4 R7",
+  "catalogue": [
+   "N5",
+   "A2"
+  ]
+ },
+ {
+  "id": "R8",
+  "kind": "organic composition rule",
+  "name": "One counterweight",
+  "rule": "One big, soft, quiet secondary mass balances the small loud focal from the other side.",
+  "numbers": "The hero cloud in the top gutter (y 0-290) and the side gutter (x > 945), pull < 50 % of the focal's, its lit side toward the key.",
+  "evidence": "Payne 1941 (the steelyard); the painted models",
+  "source": "organic/composition.md 4 R8",
+  "catalogue": [
+   "D4"
+  ]
+ },
+ {
+  "id": "R9",
+  "kind": "organic composition rule",
+  "name": "Edges: found at the focal, lost elsewhere",
+  "rule": "The crispest edges and the hardest step only at the focal; where two masses are close in value the edge goes soft or lost.",
+  "numbers": "Edges 0.5-1.5 px at the focal; lost wherever two masses sit within ~10 L*.",
+  "evidence": "PAINT_RECIPES.md 1.6; the playbook (edges lost and found)",
+  "source": "organic/composition.md 4 R9",
+  "catalogue": []
+ },
+ {
+  "id": "R10",
+  "kind": "organic composition rule",
+  "name": "A real dark mass",
+  "rule": "The darkest value group is a real, connected mass below the band.",
+  "numbers": "15-40 % of the frame, mean L* <= 45, >= 80 % of it in one or two connected masses below the band.",
+  "evidence": "our measurement (the references 17-36 % at L* 8-35)",
+  "source": "organic/composition.md 4 R10",
+  "catalogue": []
+ },
+ {
+  "id": "R11",
+  "kind": "organic composition rule",
+  "name": "Colour follows the value plan",
+  "rule": "The hot accent only at the focal; everything else tone-on-tone inside its mass.",
+  "numbers": "dE <= 6-8 elsewhere; far lit windows +6-8 L* inside the facade's mass, never a saturated yellow unless one is the subject.",
+  "evidence": "our measurement (v6's yellow windows were the colour's strongest call)",
+  "source": "organic/composition.md 4 R11",
+  "catalogue": [
+   "E8"
+  ]
+ },
+ {
+  "id": "R12",
+  "kind": "organic composition rule",
+  "name": "Pip and the eye path",
+  "rule": "Pip hides tone-on-tone inside a mass of the busy belt, off the eye path.",
+  "numbers": ">= 250 px from the focal; never between the words and the focal or on a leading line into it.",
+  "evidence": "the playbook (Pip); our analysis of v6",
+  "source": "organic/composition.md 4 R12",
+  "catalogue": []
+ }
+]

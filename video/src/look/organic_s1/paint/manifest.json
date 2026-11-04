@@ -1,0 +1,41 @@
+{
+ "about": "the organic proof's four pieces (scripts/look/organic/organic_proof.py; docs/look/organic/organic_proof.md)",
+ "pieces": {
+  "cloud": {
+   "box": [
+    560,
+    0,
+    520,
+    345
+   ],
+   "md5": "f5374e2cab697399519bea6ae7491ec1"
+  },
+  "tree": {
+   "box": [
+    -60,
+    1226,
+    440,
+    324
+   ],
+   "md5": "777af7b3637e8a6a18102e2541cde406"
+  },
+  "facade": {
+   "box": [
+    300,
+    575,
+    780,
+    525
+   ],
+   "md5": "b2e54e3deb234f3da2fc74745f14b25a"
+  },
+  "paving": {
+   "box": [
+    0,
+    1140,
+    1080,
+    780
+   ],
+   "md5": "0925886ff11dd84b6e030d959bb1d46d"
+  }
+ }
+}

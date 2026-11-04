@@ -178,7 +178,7 @@ back to page 1 at `captionAt`. Render states: `<Look fills="paper">` (line art),
 ## 5. QA tools and exact commands (from `video/`; E=--entry=src/entry-v2r-film.tsx, or whatever the entry is named)
 
 ```bash
-npx tsc --noEmit                                                        # clean before any render
+npm run typecheck                                                       # clean before any render (never npx tsc)
 node scripts/render-frames.mjs FilmN-S3 /tmp/s3 0.2,1.0,1.8 $E --scale=0.5          # stills (frame = round(t*60))
 scripts/sheet.sh FilmN-S3 0 2 8 /tmp/s3.png $E --scale=0.35             # contact sheet + caption mask check (3:1)
 python3 -I scripts/qa/gate_check.py --mp4 out/v2r.mp4 --scenes <film>/scenes.json --captions <film>/captions.json \
@@ -195,8 +195,8 @@ node scripts/render-frames.mjs MascotSheet <dir> 0.34                  # also Ki
 ```
 `scripts/qa/run_all.sh` (archived in `archive/v1/`) knows only `Main`, v1 scene ids and dev comps (call the tools on
 the MP4 as above);
-`scripts/strip.sh` samples 30 fps from `src/index.ts` (archived in `archive/v1/`; for 60 fps motion list every frame
-time in `render-frames.mjs`).
+`scripts/strip.sh` renders every frame at the composition's fps (pass `$E`; since 2026-10-29 it is no longer v1-only
+and no longer samples 30 fps): `scripts/strip.sh FilmN-S3 0.5 1.0 /tmp/s3_strip.png $E --scale=0.33`.
 Gates (QA.md §5): life >= 8/10 per scene, no dead run > 0.40 s, no framecheck ERROR; density ev/s >= 5, gap <= 1.0 s.
 
 ## 6. Gaps: what a fresh v2 film must build new
@@ -222,6 +222,9 @@ Gates (QA.md §5): life >= 8/10 per scene, no dead run > 0.40 s, no framecheck E
 8. **Edges at the final:** `paint-subtle` via Film `edges` (no top paper) with optional per-scene `EDGE_HINTS`.
 
 ## 7. Render times (measured 2026-10-27 on this 4-CPU box, concurrency 2, load 0.3-8 from other agents)
+
+> History (2026-10-27): the CLI no longer uses `swangle` (2026-10-29); masters render with `render-media.mjs --master`
+> (PIPELINE_V2 "Master encode"), gate videos with `--master --parallel`; the TV-range pass below is retired.
 
 | what | GL | wall time | per frame |
 |---|---|---|---|

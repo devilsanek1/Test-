@@ -1,0 +1,1817 @@
+{
+ "_about": "Earlier scores for the catalogue entries (catalogue.json), kept apart so the three judges score blind. Keys are catalogue ids; each record names its scale and the doc it comes from. \"via\" names the code the score was given to when it now lives inside another entry (e.g. I8 inside RM1). Entries with no record were never scored. The scales differ and are NOT comparable: attention.md 1-5 (attention only), modern.md 0-15, motion.md 0-12, CINEMATIC_GUIDE reviewer marks out of 10.",
+ "unscored": [
+  "X1",
+  "X2",
+  "N2",
+  "N5",
+  "N7",
+  "N9",
+  "N13",
+  "N14",
+  "N15",
+  "Z1",
+  "Z2",
+  "Z3",
+  "Z4",
+  "K8",
+  "X4",
+  "X5",
+  "X7",
+  "X8",
+  "RM6",
+  "RM9",
+  "X6",
+  "X9",
+  "X10",
+  "RJ1",
+  "X3",
+  "T2",
+  "X11"
+ ],
+ "A1": [
+  {
+   "score": 1,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 15,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M1",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 1,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "A2": [
+  {
+   "score": 3,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 15,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M1",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 1,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "A3": [
+  {
+   "score": 1,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  }
+ ],
+ "A4": [
+  {
+   "score": 1,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M14",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 11,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "A5": [
+  {
+   "score": 1,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  }
+ ],
+ "A6": [
+  {
+   "score": 3,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M2",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 8,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "A7": [
+  {
+   "score": 4,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M4",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 21,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "B1": [
+  {
+   "score": 3,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M5",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 9,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M14",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 11,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "B2": [
+  {
+   "score": 4,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 15,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M1",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 1,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M13",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 16,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "B3": [
+  {
+   "score": 3,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  }
+ ],
+ "B4": [
+  {
+   "score": 4,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M21",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 17,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "B5": [
+  {
+   "score": 1,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 9,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M18",
+   "parts": {
+    "impact": 1,
+    "fit": 3,
+    "evidence": 1,
+    "cost": 3
+   },
+   "rank_in_lane": 29,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "B6": [
+  {
+   "score": 2,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M7",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 23,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "B7": [
+  {
+   "score": 2,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  }
+ ],
+ "B8": [
+  {
+   "score": 2,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 12,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M15",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 20,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "B9": [
+  {
+   "score": 2,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  }
+ ],
+ "B10": [
+  {
+   "score": 2,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 10,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M3",
+   "parts": {
+    "impact": 2,
+    "fit": 1,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 26,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "B11": [
+  {
+   "score": 3,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  }
+ ],
+ "B12": [
+  {
+   "score": 2,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M7",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 23,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "B13": [
+  {
+   "score": 2,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M21",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 17,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "C1": [
+  {
+   "score": 5,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7",
+   "detail": "5 when lit (with E2), 3 unlit"
+  },
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M6",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 22,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M21",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 17,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "C2": [
+  {
+   "score": 1,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M6",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 22,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  },
+  {
+   "score": 10,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M22",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 27,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "C3": [
+  {
+   "score": 2,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M5",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 9,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "D1": [
+  {
+   "score": 4,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M2",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 8,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  },
+  {
+   "mark": "three reviewers: average 6.9 of 10, only if the clouds stay 2-3 big calm masses",
+   "via": "S3",
+   "from": "CINEMATIC_GUIDE.md S3 (confidence line)"
+  },
+  {
+   "mark": "three reviewers: average 7.0 of 10 for both references; use it once",
+   "via": "S4",
+   "from": "CINEMATIC_GUIDE.md S4 (confidence line)"
+  }
+ ],
+ "D2": [
+  {
+   "score": 4,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M7",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 23,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M14",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 11,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "D3": [
+  {
+   "score": 1,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  }
+ ],
+ "D4": [
+  {
+   "score": 3,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 10,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M3",
+   "parts": {
+    "impact": 2,
+    "fit": 1,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 26,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "D5": [
+  {
+   "score": 2,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  }
+ ],
+ "D6": [
+  {
+   "score": 2,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M20",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 12,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  },
+  {
+   "score": 10,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M24",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 3,
+    "cost": 1
+   },
+   "rank_in_lane": 25,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "D7": [
+  {
+   "score": 5,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M2",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 8,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  },
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M11",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 2
+   },
+   "rank_in_lane": 6,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "E1": [
+  {
+   "score": 5,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M2",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 8,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  },
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M7",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 23,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "E2": [
+  {
+   "score": 5,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M9",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 15,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "E3": [
+  {
+   "score": 4,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M13",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 16,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  },
+  {
+   "score": 15,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M19",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 2,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "E4": [
+  {
+   "score": 3,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 10,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M3",
+   "parts": {
+    "impact": 2,
+    "fit": 1,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 26,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "E5": [
+  {
+   "score": 3,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M10",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 24,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "E6": [
+  {
+   "score": 3,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M10",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 24,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "E7": [
+  {
+   "score": 4,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M14",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 11,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "E8": [
+  {
+   "score": 4,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M8",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 10,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M20",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 12,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "E9": [
+  {
+   "score": 5,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M13",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 16,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "E10": [
+  {
+   "score": 3,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7",
+   "detail": "3, marked risky (a big near body can out-pull the subject)"
+  },
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M5",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 9,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "E11": [
+  {
+   "score": 4,
+   "scale": "1-5, attention only (how strongly the device by itself lands the eye on its focal in the first second)",
+   "from": "attention.md 7"
+  },
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M7",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 23,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "T": [
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M27",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 2
+   },
+   "rank_in_lane": 7,
+   "from": "modern.md 5 (the principle that carries this owner idea, modern.md 2; its proposal: an owner idea takes the best rank of its carriers)"
+  }
+ ],
+ "N1": [
+  {
+   "score": 15,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M1",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 1,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  }
+ ],
+ "N3": [
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M7",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 23,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  }
+ ],
+ "N6": [
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M5",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 9,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  }
+ ],
+ "N11": [
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M7",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 23,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  }
+ ],
+ "N12": [
+  {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M7",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 23,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  }
+ ],
+ "M3": [
+  {
+   "score": 10,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M3",
+   "parts": {
+    "impact": 2,
+    "fit": 1,
+    "evidence": 2,
+    "cost": 3
+   },
+   "rank_in_lane": 26,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  }
+ ],
+ "S2": [
+  {
+   "mark": "three reviewers: average 7.9 of 10 (one reviewer 5, since v1 already had the big sun)",
+   "via": "S2",
+   "from": "CINEMATIC_GUIDE.md S2 (confidence line)"
+  }
+ ],
+ "RM1": [
+  {
+   "score": 12,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I8",
+   "parts": {
+    "evidence": 3,
+    "fit": 3,
+    "story": 3,
+    "readiness": 3
+   },
+   "rank_in_lane": 1,
+   "dose_per_film": "the default inside a shot",
+   "from": "motion.md 8"
+  }
+ ],
+ "RM2": [
+  {
+   "score": 9,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I9",
+   "parts": {
+    "evidence": 2,
+    "fit": 3,
+    "story": 1,
+    "readiness": 3
+   },
+   "rank_in_lane": 12,
+   "dose_per_film": "as texture, in one band",
+   "from": "motion.md 8"
+  }
+ ],
+ "RM3": [
+  {
+   "score": 8,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I7",
+   "parts": {
+    "evidence": 1,
+    "fit": 2,
+    "story": 2,
+    "readiness": 3
+   },
+   "rank_in_lane": 16,
+   "dose_per_film": "when the thread travels; never two in a row",
+   "from": "motion.md 8"
+  }
+ ],
+ "RM4": [
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M14",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 11,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  },
+  {
+   "score": 11,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I3",
+   "parts": {
+    "evidence": 3,
+    "fit": 2,
+    "story": 3,
+    "readiness": 3
+   },
+   "rank_in_lane": 4,
+   "dose_per_film": "one per beat at most, on its word",
+   "from": "motion.md 8"
+  }
+ ],
+ "RM5": [
+  {
+   "score": 11,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I2",
+   "parts": {
+    "evidence": 3,
+    "fit": 3,
+    "story": 2,
+    "readiness": 3
+   },
+   "rank_in_lane": 4,
+   "dose_per_film": "every hold that does not lock",
+   "from": "motion.md 8"
+  }
+ ],
+ "RM7": [
+  {
+   "score": 11,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I1",
+   "parts": {
+    "evidence": 3,
+    "fit": 3,
+    "story": 2,
+    "readiness": 3
+   },
+   "rank_in_lane": 4,
+   "dose_per_film": "most shots, with a mover",
+   "from": "motion.md 8"
+  }
+ ],
+ "RM8": [
+  {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M27",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 2
+   },
+   "rank_in_lane": 7,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  },
+  {
+   "score": 12,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I10",
+   "parts": {
+    "evidence": 3,
+    "fit": 3,
+    "story": 3,
+    "readiness": 3
+   },
+   "rank_in_lane": 1,
+   "dose_per_film": "frame 0, then wherever the drawing is the beat",
+   "from": "motion.md 8"
+  }
+ ],
+ "I4": [
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M14",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 11,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  },
+  {
+   "score": 12,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I4",
+   "parts": {
+    "evidence": 3,
+    "fit": 3,
+    "story": 3,
+    "readiness": 3
+   },
+   "rank_in_lane": 1,
+   "dose_per_film": "once (S1 or S5)",
+   "from": "motion.md 8"
+  },
+  {
+   "mark": "no reviewers' mark: the owner's pick (2026-10-26), 'it has pretty much everything'",
+   "via": "S5",
+   "from": "CINEMATIC_GUIDE.md S5 (confidence line)"
+  }
+ ],
+ "I5": [
+  {
+   "score": 8,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I5",
+   "parts": {
+    "evidence": 2,
+    "fit": 2,
+    "story": 2,
+    "readiness": 2
+   },
+   "rank_in_lane": 16,
+   "dose_per_film": "1-2 (the scale moments)",
+   "from": "motion.md 8"
+  }
+ ],
+ "I6": [
+  {
+   "score": 9,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I6",
+   "parts": {
+    "evidence": 2,
+    "fit": 2,
+    "story": 2,
+    "readiness": 3
+   },
+   "rank_in_lane": 12,
+   "dose_per_film": "the one big move when it is S1",
+   "from": "motion.md 8"
+  },
+  {
+   "mark": "three reviewers: min 7, average 7.7 of 10; the only shot all three passed",
+   "via": "S1",
+   "from": "CINEMATIC_GUIDE.md S1 (confidence line)"
+  }
+ ],
+ "I11": [
+  {
+   "score": 8,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I11",
+   "parts": {
+    "evidence": 2,
+    "fit": 3,
+    "story": 2,
+    "readiness": 1
+   },
+   "rank_in_lane": 16,
+   "dose_per_film": "on a two-subject frame or a turn",
+   "from": "motion.md 8"
+  }
+ ],
+ "I12": [
+  {
+   "score": 10,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "I12",
+   "parts": {
+    "evidence": 2,
+    "fit": 3,
+    "story": 2,
+    "readiness": 3
+   },
+   "rank_in_lane": 9,
+   "dose_per_film": "every camera move",
+   "from": "motion.md 8"
+  }
+ ],
+ "RJ2": [
+  {
+   "score": 8,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J14",
+   "parts": {
+    "evidence": 2,
+    "fit": 1,
+    "story": 2,
+    "readiness": 3
+   },
+   "rank_in_lane": 16,
+   "dose_per_film": "at most 2, on a 'But'",
+   "from": "motion.md 8"
+  }
+ ],
+ "RJ3": [
+  {
+   "score": 10,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J12",
+   "parts": {
+    "evidence": 2,
+    "fit": 3,
+    "story": 2,
+    "readiness": 3
+   },
+   "rank_in_lane": 9,
+   "dose_per_film": "the open and the loop",
+   "from": "motion.md 8"
+  }
+ ],
+ "RJ4": [
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M13",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 16,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  },
+  {
+   "score": 11,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J1",
+   "parts": {
+    "evidence": 3,
+    "fit": 2,
+    "story": 3,
+    "readiness": 3
+   },
+   "rank_in_lane": 4,
+   "dose_per_film": "most joins inside one place",
+   "from": "motion.md 8"
+  }
+ ],
+ "J2": [
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M21",
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 17,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  },
+  {
+   "score": 10,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J2",
+   "parts": {
+    "evidence": 2,
+    "fit": 3,
+    "story": 3,
+    "readiness": 2
+   },
+   "rank_in_lane": 9,
+   "dose_per_film": "every opening into another place",
+   "from": "motion.md 8"
+  }
+ ],
+ "J3": [
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M20",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 12,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  },
+  {
+   "score": 11,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J3",
+   "parts": {
+    "evidence": 3,
+    "fit": 3,
+    "story": 3,
+    "readiness": 2
+   },
+   "rank_in_lane": 4,
+   "dose_per_film": "the thread's joins",
+   "from": "motion.md 8"
+  }
+ ],
+ "J4": [
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M20",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 12,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  },
+  {
+   "score": 9,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J4",
+   "parts": {
+    "evidence": 2,
+    "fit": 3,
+    "story": 2,
+    "readiness": 2
+   },
+   "rank_in_lane": 12,
+   "dose_per_film": "with J3",
+   "from": "motion.md 8"
+  }
+ ],
+ "J5": [
+  {
+   "score": 8,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J5",
+   "parts": {
+    "evidence": 3,
+    "fit": 1,
+    "story": 1,
+    "readiness": 3
+   },
+   "rank_in_lane": 16,
+   "dose_per_film": "rare (it counts as F unless the thread crosses)",
+   "from": "motion.md 8"
+  }
+ ],
+ "J6": [
+  {
+   "score": 9,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J6",
+   "parts": {
+    "evidence": 2,
+    "fit": 2,
+    "story": 2,
+    "readiness": 3
+   },
+   "rank_in_lane": 12,
+   "dose_per_film": "where a 'you' looks",
+   "from": "motion.md 8"
+  }
+ ],
+ "J7": [
+  {
+   "score": 7,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J7",
+   "parts": {
+    "evidence": 1,
+    "fit": 2,
+    "story": 2,
+    "readiness": 2
+   },
+   "rank_in_lane": 24,
+   "dose_per_film": "when a traveller leaves",
+   "from": "motion.md 8"
+  }
+ ],
+ "J8": [
+  {
+   "score": 10,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M22",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 2
+   },
+   "rank_in_lane": 27,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  },
+  {
+   "score": 6,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J8",
+   "parts": {
+    "evidence": 3,
+    "fit": 1,
+    "story": 1,
+    "readiness": 1
+   },
+   "rank_in_lane": 25,
+   "dose_per_film": "1-2, for a jump that must not show",
+   "from": "motion.md 8"
+  }
+ ],
+ "J9": [
+  {
+   "score": 2,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J9",
+   "parts": {
+    "evidence": 1,
+    "fit": 0,
+    "story": 1,
+    "readiness": 0
+   },
+   "rank_in_lane": 27,
+   "dose_per_film": "never, unless declared",
+   "from": "motion.md 8"
+  }
+ ],
+ "J10": [
+  {
+   "score": 10,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M24",
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 3,
+    "cost": 1
+   },
+   "rank_in_lane": 25,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  },
+  {
+   "score": 8,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J10",
+   "parts": {
+    "evidence": 3,
+    "fit": 1,
+    "story": 3,
+    "readiness": 1
+   },
+   "rank_in_lane": 16,
+   "dose_per_film": "0-2, never two in a row",
+   "from": "motion.md 8"
+  }
+ ],
+ "J11": [
+  {
+   "score": 8,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J11",
+   "parts": {
+    "evidence": 2,
+    "fit": 3,
+    "story": 2,
+    "readiness": 1
+   },
+   "rank_in_lane": 16,
+   "dose_per_film": "the time-passing joins; the key's one change",
+   "from": "motion.md 8"
+  }
+ ],
+ "J13": [
+  {
+   "score": 5,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J13",
+   "parts": {
+    "evidence": 1,
+    "fit": 1,
+    "story": 2,
+    "readiness": 1
+   },
+   "rank_in_lane": 26,
+   "dose_per_film": "paper only",
+   "from": "motion.md 8"
+  }
+ ],
+ "J15": [
+  {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost, each 0-3)",
+   "via": "M23",
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "rank_in_lane": 13,
+   "from": "modern.md 5 (a principle merged into this entry)"
+  },
+  {
+   "score": 8,
+   "scale": "0-12 (Evidence + Fit + Story + Readiness, each 0-3)",
+   "via": "J15",
+   "parts": {
+    "evidence": 3,
+    "fit": 2,
+    "story": 2,
+    "readiness": 1
+   },
+   "rank_in_lane": 16,
+   "dose_per_film": "one per join, where the place has a sound",
+   "from": "motion.md 8"
+  }
+ ],
+ "_principles": {
+  "M1": {
+   "score": 15,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 1,
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M5": {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 9,
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M7": {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 23,
+   "parts": {
+    "impact": 2,
+    "fit": 2,
+    "evidence": 2,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M8": {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 10,
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M9": {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 15,
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "from": "modern.md 5"
+  },
+  "M10": {
+   "score": 11,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 24,
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "from": "modern.md 5"
+  },
+  "M11": {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 6,
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 2
+   },
+   "from": "modern.md 5"
+  },
+  "M12": {
+   "score": 15,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 3,
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M14": {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 11,
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M15": {
+   "score": 12,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 20,
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M16": {
+   "score": 9,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 28,
+   "parts": {
+    "impact": 1,
+    "fit": 3,
+    "evidence": 2,
+    "cost": 2
+   },
+   "from": "modern.md 5"
+  },
+  "M17": {
+   "score": 12,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 18,
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 2
+   },
+   "from": "modern.md 5"
+  },
+  "M18": {
+   "score": 9,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 29,
+   "parts": {
+    "impact": 1,
+    "fit": 3,
+    "evidence": 1,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M19": {
+   "score": 15,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 2,
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M23": {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 13,
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M25": {
+   "score": 15,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 4,
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M26": {
+   "score": 15,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 5,
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  },
+  "M27": {
+   "score": 14,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 7,
+   "parts": {
+    "impact": 3,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 2
+   },
+   "from": "modern.md 5"
+  },
+  "M28": {
+   "score": 12,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 19,
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 2
+   },
+   "from": "modern.md 5"
+  },
+  "M29": {
+   "score": 13,
+   "scale": "0-15 (2 x Impact + Fit + Evidence + Cost)",
+   "rank_in_lane": 14,
+   "parts": {
+    "impact": 2,
+    "fit": 3,
+    "evidence": 3,
+    "cost": 3
+   },
+   "from": "modern.md 5"
+  }
+ },
+ "_principles_note": "attention.md L1-L15 are numbered in their rank order (evidence grade x size of effect x how often the lever acts, attention.md 3); motion.md MR1-MR24 and attention.md AR1-AR18 carry no scores."
+}

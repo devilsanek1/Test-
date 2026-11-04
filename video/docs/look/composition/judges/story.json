@@ -1,0 +1,934 @@
+{
+ "lens": "STORY CLARITY AND FLOW: does the entry make ONE subject plain at a time, carry the story's thread across a join, explain without clutter (the owner: 'our scene is very busy'), and serve a beat of an explainer (hook, setup, explain, turn, reveal, payoff, loop)? Grounded in DIRECTION.md (rules 1-3: one flowing story, one subject at a time), modern.md (the explainer-learning evidence, M12-M28) and cinema.md.",
+ "scores": [
+  {
+   "id": "A1",
+   "score": 3,
+   "reason": "As 2:1 proportions it keeps one mass principal (Smith 1797, cinema.md 4.1), but as a placement it puts the focal on x 360/720, ~180 px off the centre where the first look lands [S7] and where the last shot's focal sat (M19: 150 px); grid conformity 'plays only a minor, if any, role' [S3].",
+   "best_beats": [
+    "setup",
+    "explain"
+   ]
+  },
+  {
+   "id": "A2",
+   "score": 4,
+   "reason": "It is our focal home (x 413-667, y 951-1187): one fixed place the eye finds after every join (M19: 'mostly holds for free'); its pull is the centre's (N1), not phi's: the golden ratio is 'a nudge, not a law', Fechner's preference 'at best inconclusive' (cinema.md 4.2).",
+   "best_beats": [
+    "setup",
+    "explain",
+    "payoff"
+   ]
+  },
+  {
+   "id": "A3",
+   "score": 3,
+   "reason": "A two-step read from a big form down to the small subject at its foot stages a small discovery, but the big form is a rival mass that must stay under 50 % of the focal's pull (R3; cinema.md 4.4); modern practice adds nothing (modern.md 2).",
+   "best_beats": [
+    "reveal",
+    "setup"
+   ]
+  },
+  {
+   "id": "A4",
+   "score": 2,
+   "reason": "Its pole on the subject gathers the eye, but a log spiral is rarely seen at phone size, needs several masses laid along the arc (more pieces to manage) and has weak evidence ('a deliberate variant, never the default', cinema.md 4.2); a push to its eye (M14) or an S-path (B8) does the job more plainly.",
+   "best_beats": [
+    "reveal"
+   ]
+  },
+  {
+   "id": "A5",
+   "score": 2,
+   "reason": "Two related points on one slope is a second call to keep under the focal (DIRECTION 2: one rival at most); reels.md finds it weak as a grid and modern practice adds nothing; its diagonal is better spent once, on the turn (B6).",
+   "best_beats": [
+    "turn"
+   ]
+  },
+  {
+   "id": "A6",
+   "score": 4,
+   "reason": "One upright crossing a level horizon with no other vertical near it reads in one glance (the lone upright in a big quiet field: modern.md 2 and M2; verticals 'height and grandeur' [S3]) and states 'this stands here' for a tower, a mast or a person.",
+   "best_beats": [
+    "setup",
+    "reveal",
+    "payoff"
+   ]
+  },
+  {
+   "id": "A7",
+   "score": 4,
+   "reason": "A centred mirror frame is processed fluently (STUDY N15) and puts the subject where the eye already is [S10]; its break, ONE change at the axis on the turn's word (M4), is one of the plainest turns we have; at most two a film.",
+   "best_beats": [
+    "payoff",
+    "turn",
+    "loop"
+   ]
+  },
+  {
+   "id": "B1",
+   "score": 4,
+   "reason": "'Go there': lines delivering the eye in 2-3 legs to within 40 px of the focal's box (Poore's entrance, cinema.md 4.5) also give a push its path (M14); but lines only mark the place: in 12 of 20 reel examples a brighter patch beat the subject the lines pointed at (reels.md 0), so the story light must sit at their end.",
+   "best_beats": [
+    "setup",
+    "explain",
+    "reveal"
+   ]
+  },
+  {
+   "id": "B2",
+   "score": 4,
+   "reason": "Every receding line meeting on the subject (within 60 px) makes one destination; on the centre line it survives every crop (M1) and invites the push down the axis into the next shot (M13, J2); most production layouts are one point [S16]; never an empty vanishing point in the sky, where the eye leaves (cinema.md 4.12).",
+   "best_beats": [
+    "setup",
+    "reveal",
+    "payoff"
+   ]
+  },
+  {
+   "id": "B3",
+   "score": 3,
+   "reason": "Rays meeting on the subject say 'it all comes from this cause', an explainer's idea, but 5-9 rays add lines across the stage that must stay tone-on-tone ('many lines without a clear subject-point suggest chaos' [S3], cinema.md 4.5).",
+   "best_beats": [
+    "explain",
+    "reveal"
+   ]
+  },
+  {
+   "id": "B4",
+   "score": 4,
+   "reason": "One lit opening at the end of a dark passage (15-25 % of the frame) is a single place to look and the ready start frame of the push-through (M21, carrier A): the frame itself promises the next shot.",
+   "best_beats": [
+    "setup",
+    "reveal"
+   ]
+  },
+  {
+   "id": "B5",
+   "score": 3,
+   "reason": "Lines that hold while things pass along them keep the eye on a track ('the eye is never lost', with RM3), fit for a mechanism on its way, but they point at no one subject, and any sideways run reads fast in 9:16 (M18).",
+   "best_beats": [
+    "explain"
+   ]
+  },
+  {
+   "id": "B6",
+   "score": 3,
+   "reason": "One dominant diagonal (30-45 degrees) broken by the focal is contrast, Block's intensity (cinema.md 4.9 [S17]): a clean signal for the turn or a climb, never for the cozy beats that fill >= 50 % of the runtime.",
+   "best_beats": [
+    "turn"
+   ]
+  },
+  {
+   "id": "B7",
+   "score": 2,
+   "reason": "An X of two flows splits the stage into four arms and needs a raised view (once a film); 'two flows meeting' is rarely a one-subject explainer's point; reels.md: weak.",
+   "best_beats": [
+    "explain"
+   ]
+  },
+  {
+   "id": "B8",
+   "score": 3,
+   "reason": "A winding way in (2-3 bends ending on the focal) delivers the eye gently and gives the thread an arc to travel (M15), but it reads slower than a straight lead in a 30-45 s film and serves mostly the arrival.",
+   "best_beats": [
+    "setup"
+   ]
+  },
+  {
+   "id": "B9",
+   "score": 3,
+   "reason": "A curve wrapping the focal keeps the eye circling inside the circuit, never outside it (Poore [S1], cinema.md 4.11): a held home view with one subject, whose job is mood more than meaning.",
+   "best_beats": [
+    "setup",
+    "payoff"
+   ]
+  },
+  {
+   "id": "B10",
+   "score": 3,
+   "reason": "One side mass and the ground frame the open view (DIRECTION 7's cozy framing) and push the eye toward the inner corner; a support for the home place, not a story device.",
+   "best_beats": [
+    "setup"
+   ]
+  },
+  {
+   "id": "B11",
+   "score": 3,
+   "reason": "Two masses funnelling to one point within 60 px of the focal concentrate the eye; inverted it is a clean 'But' (cinema.md 4.10); a canyon >= 2:1 confines, so it fits one beat, not the cozy home.",
+   "best_beats": [
+    "turn",
+    "explain"
+   ]
+  },
+  {
+   "id": "B12",
+   "score": 2,
+   "reason": "The reel's stair seen from straight above is a top-down view we keep for paper only (cinema.md 3.1 and 9: 'not for a film frame'); at eye level it is just a pathway, with people on it as texture that easily turns into many calls.",
+   "best_beats": [
+    "reveal"
+   ]
+  },
+  {
+   "id": "B13",
+   "score": 3,
+   "reason": "A round opening holding the subject is a strong single focal and a portal (M21); the ring-of-things version from a raised camera puts many pieces round the subject; useful, but narrower than C1.",
+   "best_beats": [
+    "setup",
+    "explain"
+   ]
+  },
+  {
+   "id": "C1",
+   "score": 5,
+   "reason": "One aperture of 15-30 % holding the focal says 'look in here' and quiets everything round it (cinema.md 4.6), and it is the ready start of the reveal and of the push-through join (M21, carrier A); reels.md's best fit (v6's lit door).",
+   "best_beats": [
+    "hook",
+    "setup",
+    "explain",
+    "reveal"
+   ]
+  },
+  {
+   "id": "C2",
+   "score": 2,
+   "reason": "A near hint ('you are here') adds depth but no meaning, and each near prop is one more named object at the edge (DIRECTION 7: at most 2, a small subtle hint; the owner rejected the half-frame terrace); its story use is as the source of a wipe (J8).",
+   "best_beats": [
+    "setup"
+   ]
+  },
+  {
+   "id": "C3",
+   "score": 4,
+   "reason": "Cause on one level and effect on the other shows the mechanism whole in one view (M28: cause and effect in one frame), and the tall frame is two stacked squares made for it (cinema.md 9); it needs the light to hand the focal over (I11), or the two levels are two calls.",
+   "best_beats": [
+    "explain",
+    "reveal"
+   ]
+  },
+  {
+   "id": "D1",
+   "score": 5,
+   "reason": "One small subject in a big quiet field reads in one glance (fluency, STUDY N15; M2, 14/15 in modern.md 5) and is the owner's own fix for 'our scene is very busy' (SCENE COMPOSITION); our sky with the caption band already is that field (60-68 % in setup A).",
+   "best_beats": [
+    "setup",
+    "reveal",
+    "payoff"
+   ]
+  },
+  {
+   "id": "D2",
+   "score": 4,
+   "reason": "A known-size figure beside a huge thing turns an explainer's number into a picture, 'it is bigger than you thought' ('We feel the vastness of a scene by the presence of a lone figure' [S1]); 1-2 a film (DIRECTION 7).",
+   "best_beats": [
+    "reveal",
+    "payoff"
+   ]
+  },
+  {
+   "id": "D3",
+   "score": 2,
+   "reason": "Two equal masses are two equal calls (reels.md), against Smith's 'two distinct, equal lights should never appear in the same picture' (cinema.md 0); usable only as the quiet frame of a centred subject, once a film.",
+   "best_beats": [
+    "payoff"
+   ]
+  },
+  {
+   "id": "D4",
+   "score": 3,
+   "reason": "It keeps the subject on the axis and one soft counterweight under 50 % of its pull (Poore's steelyard, cinema.md 4.4; R8): a calm single-subject frame, a balancing rule that keeps the focal unrivalled rather than a story device.",
+   "best_beats": [
+    "setup",
+    "explain"
+   ]
+  },
+  {
+   "id": "D5",
+   "score": 3,
+   "reason": "The apex on the focal with the many below states hierarchy, 'one cause at the top' (cinema.md 4.10), a fair explain frame; three spots at unequal distances keep one principal.",
+   "best_beats": [
+    "explain",
+    "payoff"
+   ]
+  },
+  {
+   "id": "D6",
+   "score": 3,
+   "reason": "This against that in one frame, the subject on the seam, reads fast when each field is one value, but two fields split the stage ('never two equal halves', cinema C14); modern practice prefers the matched pair across time (M20; N14).",
+   "best_beats": [
+    "turn",
+    "explain"
+   ]
+  },
+  {
+   "id": "D7",
+   "score": 5,
+   "reason": "A repeated set as ONE texture with ONE break makes the break the call (cinema.md 4.15, C14) and turns a busy facade into one place to look (M11: design complexity up, feature complexity down, STUDY N16); it says 'this one' and 'how many', the break arriving on its word (a window lights in 0.1-0.3 s).",
+   "best_beats": [
+    "explain",
+    "reveal",
+    "payoff"
+   ]
+  },
+  {
+   "id": "E1",
+   "score": 3,
+   "reason": "A human anchor at the focal gives scale and empathy [S1], but our subject is usually a thing: a figure at the focal is either the beat's subject or its rival on the line of heads (cinema.md 3.3), so it fits the scale beats more than the explain beats.",
+   "best_beats": [
+    "reveal",
+    "setup"
+   ]
+  },
+  {
+   "id": "E2",
+   "score": 5,
+   "reason": "Subject, story light and hardest value step in one place is DIRECTION 2's definition of the ONE focal, and light decides where the eye lands (12 of 20 reel examples: the brighter patch beat the lines, reels.md 0; R4's >= 65 L* step); nothing else in the frame needs to compete.",
+   "best_beats": [
+    "hook",
+    "setup",
+    "explain",
+    "payoff"
+   ]
+  },
+  {
+   "id": "E3",
+   "score": 3,
+   "reason": "The still thing among movers wins the eye [S6], so the subject stays plain while time passes, but the passing world is many onsets that must stay slow and low (DIRECTION 3: 3-4 movers, taking turns); a pause beat, narrower than its moving form, the pivot (I12).",
+   "best_beats": [
+    "setup",
+    "turn"
+   ]
+  },
+  {
+   "id": "E4",
+   "score": 4,
+   "reason": "Where the figure looks the viewer looks: a gaze sends attention along the sightline to its target [S9] and facing into the frame is preferred [S10]; the 'you''s sightline through the focal's box steers the eye to the subject in every shot that holds a figure.",
+   "best_beats": [
+    "setup",
+    "explain"
+   ]
+  },
+  {
+   "id": "E5",
+   "score": 2,
+   "reason": "It keeps the near world from competing (within 8 L*, lost edges) but carries no story: a restraint on a depth layer, drawn instead of blurred (M10), not a tool for a beat.",
+   "best_beats": [
+    "setup"
+   ]
+  },
+  {
+   "id": "E6",
+   "score": 3,
+   "reason": "Far planes lighter, softer and simpler keep the far the calmest part of the frame, so the subject never melts into it (DIRECTION 2's depth and separation), and give the scale beats their air; environment craft more than story.",
+   "best_beats": [
+    "reveal",
+    "setup"
+   ]
+  },
+  {
+   "id": "E7",
+   "score": 4,
+   "reason": "One sight line ended by one object makes 'the end is the subject': the eye arrives and stays instead of leaving through an open vanishing point (Poore [S1], cinema.md 4.12); the natural target of the push to the vista (M14).",
+   "best_beats": [
+    "setup",
+    "reveal",
+    "payoff"
+   ]
+  },
+  {
+   "id": "E8",
+   "score": 5,
+   "reason": "A lone saturated colour pops out of its field (STUDY N13, its capture against the viewer's goal contested) and, carried on the thread object across the joins (M8, M20; repeated colour speeds re-orientation, STUDY N9), marks 'this one' in every shot; v6's four yellow windows show it wins wherever it sits, so it sits only on the subject.",
+   "best_beats": [
+    "hook",
+    "explain",
+    "payoff",
+    "loop"
+   ]
+  },
+  {
+   "id": "E9",
+   "score": 5,
+   "reason": "'If there is only one point of motion, all viewers will look at the motion' [S9]: the one subject travelling the device's line in a locked frame is our clearest motion and literally carries 'this goes there'; 17 of the reels' 23 example shots are locked or nearly (motion.md 1.2-1.3).",
+   "best_beats": [
+    "setup",
+    "explain",
+    "payoff"
+   ]
+  },
+  {
+   "id": "E10",
+   "score": 4,
+   "reason": "The card's one 'you' (DIRECTION 1) in the frame, soft and from behind, its sightline through the focal's box [S9], makes the viewer's stake visible and points at the subject; it must stay tier B (< 50 % of the focal's pull) or it becomes the second call on the line of heads (cinema.md 3.3).",
+   "best_beats": [
+    "setup",
+    "explain",
+    "payoff"
+   ]
+  },
+  {
+   "id": "E11",
+   "score": 4,
+   "reason": "The effect landing in the viewer's own hand makes 'for you' physical in one picture (the playbook's hook made physical; first-person framing native to the feed, M7); one strong use at the hook or the payoff, the hand a second element to keep quiet.",
+   "best_beats": [
+    "hook",
+    "payoff"
+   ]
+  },
+  {
+   "id": "T",
+   "score": 5,
+   "reason": "'Here is the idea': the structure drawn first, then the world it explains, is our opening (DIRECTION 9) and the learning evidence's live drawing (M27: watching the hand draw raised transfer, d = 0.35); every later draw-on is a beat where the drawing IS the explanation.",
+   "best_beats": [
+    "hook",
+    "explain",
+    "loop"
+   ]
+  },
+  {
+   "id": "X1",
+   "score": 1,
+   "reason": "Unusable for us: our look has no blur (DIRECTION 5) and blur turns to mush at phone size (M10); the separation it would give comes from value (E5) and from moving the light (I11).",
+   "best_beats": []
+  },
+  {
+   "id": "X2",
+   "score": 1,
+   "reason": "Text pulls the eye 11x a control region (STUDY N14): a title over the picture is a second subject fighting the captions and the focal; the core line goes on the cover (the playbook).",
+   "best_beats": []
+  },
+  {
+   "id": "N1",
+   "score": 5,
+   "reason": "The first look at every new shot goes to the centre [S7] and a centred subject in vertical video gets longer fixations and fewer saccades [V5]; with the focal near (540, 960) in every shot, the eye lands on the subject after each join with no search (M1 and M19, both 15/15 in modern.md 5).",
+   "best_beats": [
+    "hook",
+    "setup",
+    "explain",
+    "payoff",
+    "loop"
+   ]
+  },
+  {
+   "id": "N2",
+   "score": 4,
+   "reason": "Words above, story below: a stage the eye always knows where to find, the vertical explainers' shared grammar (vertical.md 6); every caption page sends the eye down into the same square, so the picture stays where the words point.",
+   "best_beats": [
+    "setup",
+    "explain"
+   ]
+  },
+  {
+   "id": "N3",
+   "score": 3,
+   "reason": "Declaring setup A or B per set keeps one mass principal (no horizon at the half [S3]) and stops the 'you' standing level with the focal as a second call (cinema.md 3.3); a geometric decision with an indirect story effect.",
+   "best_beats": [
+    "setup"
+   ]
+  },
+  {
+   "id": "N5",
+   "score": 4,
+   "reason": "The drop from the caption block to the focal (300-450 px, 650 at most, nothing calling in it) is the path the eye travels every 1.1-1.5 s between the words and what they describe; a short quiet drop keeps word and picture one read (R7; cinema.md 4.7).",
+   "best_beats": [
+    "hook",
+    "explain"
+   ]
+  },
+  {
+   "id": "N6",
+   "score": 3,
+   "reason": "Near-low, far-high staging keeps two figures from standing side by side as equal calls (M5: vertical makers stack people) and gives Z moves room; it is depth more than story.",
+   "best_beats": [
+    "setup",
+    "reveal"
+   ]
+  },
+  {
+   "id": "N7",
+   "score": 5,
+   "reason": "The subject as ONE closed shape on a field of the other value is the gist in a glance (fluency, STUDY N15; Disney's silhouette staging [S6]; the silhouette test at 0.25 scale) and the first check against 'very busy' (DIRECTION 2: a 2- and 3-value notan first).",
+   "best_beats": [
+    "hook",
+    "explain",
+    "payoff"
+   ]
+  },
+  {
+   "id": "N9",
+   "score": 4,
+   "reason": "One object >= 60 % W on a quiet backing with no rival within ~150-220 px says 'this, up close' beyond doubt; size makes importance [S12], but 'if overused, close-ups may leave viewers uncertain as to what they are seeing' [S12], so it needs the wide around it.",
+   "best_beats": [
+    "explain",
+    "turn",
+    "payoff"
+   ]
+  },
+  {
+   "id": "N11",
+   "score": 3,
+   "reason": "On the quantity it says 'it towers over you' with one dominant mass, a clean scale beat, but power and threat are rarely an explainer's meaning (cinema C5: never on the thing under critique) and D2 states the size more plainly.",
+   "best_beats": [
+    "reveal"
+   ]
+  },
+  {
+   "id": "N12",
+   "score": 3,
+   "reason": "An overview shows the system or the pattern in one frame, but a raised view spreads more ground and more things (cinema.md 3.3: setup B 'busier') and on a person reads as smallness; once a film, on a crowd or a crossing.",
+   "best_beats": [
+    "explain",
+    "reveal"
+   ]
+  },
+  {
+   "id": "N13",
+   "score": 3,
+   "reason": "An enclosing mass with one opening (15-30 %) gives a held home view and one direction to look; its job is the cozy feeling (DIRECTION 7), not the explaining.",
+   "best_beats": [
+    "setup"
+   ]
+  },
+  {
+   "id": "N14",
+   "score": 5,
+   "reason": "The same frame with ONE change at the focal makes the change the only thing to see: before and after, consequence and callback in the plainest form (cinema.md 7; STORYBOARD_STYLE 7; M20's one change), and the tool that closes the loop on frame 0.",
+   "best_beats": [
+    "explain",
+    "turn",
+    "payoff",
+    "loop"
+   ]
+  },
+  {
+   "id": "N15",
+   "score": 3,
+   "reason": "One heavy side with nothing against it is felt as 'But' (cinema.md 9's reading of the unbalanced reel): a clear turn that still keeps one subject; the focal at x 250-380 or 700-830 (160-290 px off the centre) costs a saccade (M19), fine once or twice, at the turn.",
+   "best_beats": [
+    "turn"
+   ]
+  },
+  {
+   "id": "M3",
+   "score": 2,
+   "reason": "Breaking lead room is felt (the inward bias, STUDY [S10]), but a subject looking out of the frame sends the eye along its sightline off the focal ([S9]; cinema.md 5: never look out of the frame while the subject is in it): heavier unease than an explainer's 'But' needs; N15 or B6 turn more gently.",
+   "best_beats": [
+    "turn"
+   ]
+  },
+  {
+   "id": "Z1",
+   "score": 3,
+   "reason": "'Here is the whole' is the scale reveal, but the subject is at its smallest and the frame at its fullest, so it reads only with the simplest masses of all (three masses, one call: cinema.md 2, 'the wider the shot, the simpler its masses'); 1-2 a film.",
+   "best_beats": [
+    "reveal",
+    "payoff"
+   ]
+  },
+  {
+   "id": "Z2",
+   "score": 4,
+   "reason": "The home view (the subject 15-35 % of the height in its place, the 'you' near) sets up the one subject in its one home place (ONE SUBJECT, GONE DEEP; >= 50 % of the runtime); its background is caught in ~1/4 s [S16], so it must read as three masses and one call.",
+   "best_beats": [
+    "setup",
+    "explain",
+    "payoff"
+   ]
+  },
+  {
+   "id": "Z3",
+   "score": 4,
+   "reason": "The explainer's working size: the subject and its action (270-460 px wide) on one backing with at most two props, so the mechanism reads with just enough setting (cinema.md 2 [S12, S13]).",
+   "best_beats": [
+    "explain"
+   ]
+  },
+  {
+   "id": "Z4",
+   "score": 4,
+   "reason": "One detail filling the stage, 'exactly this', is the proof and the payoff number in the plainest form (a number 120-160 px on what it measures), kept in the home place as paper (DIRECTION 1: a chart is paper where you already are) and joined by E or A.",
+   "best_beats": [
+    "explain",
+    "payoff"
+   ]
+  },
+  {
+   "id": "S2",
+   "score": 2,
+   "reason": "Three values make a very clean frame, but its subject is the sun, off the thread unless the story is about light; a breather or an ending held 2.5-3 s, at most once a film.",
+   "best_beats": [
+    "payoff"
+   ]
+  },
+  {
+   "id": "K8",
+   "score": 2,
+   "reason": "One pool of light singling out one figure is a single focal, but its subject is a lone person, its mood (solitude, grace) rarely the explainer's point, and the shaft risks the volumetric show we reject (CINEMATIC_GUIDE 'Not for us').",
+   "best_beats": [
+    "reveal"
+   ]
+  },
+  {
+   "id": "X4",
+   "score": 1,
+   "reason": "Two stages stacked are two subjects, attention 'segmented' between streams (vertical.md V10); a comparison reads better as a matched pair in sequence (N14) or as one seam (D6).",
+   "best_beats": []
+  },
+  {
+   "id": "X5",
+   "score": 1,
+   "reason": "A canted horizon in a tall frame reads as a mistake and says 'psychological unrest', nothing an explainer needs (DIRECTION 8: no roll); the turn's unease comes from one diagonal in the world (B6).",
+   "best_beats": []
+  },
+  {
+   "id": "X7",
+   "score": 2,
+   "reason": "A system map is clear, which is why explainers use it, but a second projection breaks the one camera and the 'you' (DIRECTION 7), so the thread cannot cross into it; its clarity reaches us only as paper in the place (Z4).",
+   "best_beats": [
+    "explain"
+   ]
+  },
+  {
+   "id": "X8",
+   "score": 1,
+   "reason": "Converging verticals add vertigo and action drama with no explanatory meaning (CINEMATIC_GUIDE 'Not for us'); a low angle's size shows in the camera's height and the horizon (N11).",
+   "best_beats": []
+  },
+  {
+   "id": "RM1",
+   "score": 5,
+   "reason": "The one mover is where every eye goes [S9]: the subject travelling the device's line in a locked frame (55-150 px/s, its onset on its word) shows 'this goes there' and carries the thread out of the shot (into J7 or J2); the reels' commonest motion and our default (motion.md 1.3).",
+   "best_beats": [
+    "setup",
+    "explain",
+    "payoff"
+   ]
+  },
+  {
+   "id": "RM2",
+   "score": 3,
+   "reason": "A held subject with the world flowing behind says 'time passes, the subject stays', the still one winning [S6], but the flow is many movers to keep slow, low and taking turns (DIRECTION 3; never one mover right behind the subject); a narrow pause beat.",
+   "best_beats": [
+    "turn",
+    "setup"
+   ]
+  },
+  {
+   "id": "RM3",
+   "score": 4,
+   "reason": "Following the thread or the mechanism with its lines held keeps the subject within +-40 px while the world slides by ('the eye is never lost'), the continuous camera's working form (M13); sideways costs more in 9:16 (M18), and never two follows in a row.",
+   "best_beats": [
+    "explain",
+    "setup"
+   ]
+  },
+  {
+   "id": "RM4",
+   "score": 5,
+   "reason": "A push says 'this matters': looming captures attention (STUDY N11) and, landing on its word with the picture ~0.1 s ahead, it signals the beat's key point (signalling g = 0.53, META N19; M14, M26); one per beat, >= 3 % in <= 2 s, and the first half of the push-through join.",
+   "best_beats": [
+    "hook",
+    "explain",
+    "payoff"
+   ]
+  },
+  {
+   "id": "RM5",
+   "score": 2,
+   "reason": "The parallax float keeps a hold alive under the capture threshold on purpose, so it never competes with the subject, but it has no story job; it serves the flow only by being home again on every join.",
+   "best_beats": [
+    "setup"
+   ]
+  },
+  {
+   "id": "RM6",
+   "score": 4,
+   "reason": "A light switching on at the focal is one luminance onset at its place (attention.md 8; motion onset is the strongest capture lever, STUDY N11) and the effect landing on its word (M26): 'now'; one at a time, >= 0.5 s from any other onset.",
+   "best_beats": [
+    "reveal",
+    "payoff",
+    "explain"
+   ]
+  },
+  {
+   "id": "RM7",
+   "score": 4,
+   "reason": "A locked frame hands all motion to the subject, whose onset then takes the eye [S9]: the base that makes one change at a time readable (the reels hold 1.3-2.6 s with nothing else moving, motion.md 1.2), as long as slow life keeps it from dying (never > 1 s without a mover).",
+   "best_beats": [
+    "explain",
+    "setup",
+    "payoff"
+   ]
+  },
+  {
+   "id": "RM8",
+   "score": 5,
+   "reason": "The live pen tip draws the subject's line, then the world floods in under it: the learning evidence's visible agent (watching the hand draw raised transfer, d = 0.35; the drawing appearing without the hand did not, d = -0.16: M27) and the mechanism built piece by piece, separate reads >= 0.5 s apart, slow enough to see (M28).",
+   "best_beats": [
+    "hook",
+    "explain",
+    "loop"
+   ]
+  },
+  {
+   "id": "RM9",
+   "score": 1,
+   "reason": "An unmotivated wobble moves every plane, so nothing is still to win the eye and no move means anything (DIRECTION 8: holds are locked or a slow float).",
+   "best_beats": []
+  },
+  {
+   "id": "I4",
+   "score": 4,
+   "reason": "The one big pull-back keeps the subject as its pivot and opens its world, 'it is bigger than you thought', the film's reveal; but receding motion does not capture (STUDY N11), so the pull needs its own event (M14), and a whole world arriving is the fullest frame we make; once a film.",
+   "best_beats": [
+    "reveal",
+    "payoff"
+   ]
+  },
+  {
+   "id": "I5",
+   "score": 4,
+   "reason": "A tilt up a tall thing reveals a height in the frame's own direction (600-900 px, front-loaded): one variable, one subject, 'it keeps going'; 1-2 a film.",
+   "best_beats": [
+    "reveal",
+    "setup"
+   ]
+  },
+  {
+   "id": "I6",
+   "score": 3,
+   "reason": "Rising over a near ledge says 'here it all is', the arrival in the home place, but what it reveals is a whole world at once (the subject is the place), so it reads only with the simplest masses; once a film.",
+   "best_beats": [
+    "setup",
+    "reveal"
+   ]
+  },
+  {
+   "id": "I11",
+   "score": 5,
+   "reason": "The light moves from one thing to the next while nothing else changes: 'look here now' with no cut, the focal passed in turns (cinema.md 5: one idea per beat, in turns), cause to effect told by light ('the eye always follows the course of light', Poore [S1]); it replaces the rack focus.",
+   "best_beats": [
+    "explain",
+    "turn",
+    "reveal"
+   ]
+  },
+  {
+   "id": "I12",
+   "score": 5,
+   "reason": "During any camera move the subject holding its screen spot (+-40 px) is the still point among moving planes, the strongest call [S6]; it keeps a continuous camera legible and lands the eye where it already is at the end of every move (M19).",
+   "best_beats": [
+    "reveal",
+    "explain",
+    "setup"
+   ]
+  },
+  {
+   "id": "X6",
+   "score": 1,
+   "reason": "Disorientation and dread from a compound move (DIRECTION 8: one variable per move): feeling with no explanatory meaning.",
+   "best_beats": []
+  },
+  {
+   "id": "X9",
+   "score": 1,
+   "reason": "A zoom on every hold is motion with no meaning: it spends the looming response on nothing and blunts the one story push that should say 'this matters' (DIRECTION 8 and its Retired list).",
+   "best_beats": []
+  },
+  {
+   "id": "X10",
+   "score": 1,
+   "reason": "A jolt on every key word spends the viewer's orienting response on nothing, and fast arousing pacing overloads viewers so recall drops (STUDY N4); one push on the payoff word (RM4) does the emphasis.",
+   "best_beats": []
+  },
+  {
+   "id": "RJ1",
+   "score": 1,
+   "reason": "A black card between ideas is a list's chapter break: it resets the eye and drops the thread at every idea (DIRECTION 1; the playbook's 'a list wearing a story's clothes'), and unrelated cuts cost more processing and leave weaker memory (STUDY N3); only its 2-3 s idea rhythm and the line first (T) carry over.",
+   "best_beats": []
+  },
+  {
+   "id": "X3",
+   "score": 1,
+   "reason": "A cross-fade shows two half-contrast pictures with no single place to look and carries nothing (DIRECTION 1: a dissolve is no carrier; DIRECTION 8: no opacity fades); time passing goes by light in place (J11).",
+   "best_beats": []
+  },
+  {
+   "id": "RJ2",
+   "score": 3,
+   "reason": "The plain cut is the one deliberate jolt for the 'But' turn (at most 2 a film, the thread on both sides, the new focal near (540, 960)), but every plain cut is an orienting cost and an unrelated one leaves weaker memory (STUDY N3); out again by a carrier, never a second plain cut.",
+   "best_beats": [
+    "turn"
+   ]
+  },
+  {
+   "id": "RJ3",
+   "score": 4,
+   "reason": "Ending on frame 0's drawing state closes the story where it began and starts the rewatch with no seam (DIRECTION 9); the loop's one tool, so it serves one beat.",
+   "best_beats": [
+    "loop",
+    "payoff"
+   ]
+  },
+  {
+   "id": "RJ4",
+   "score": 5,
+   "reason": "One continuous camera joins views with no cut to notice (continuity cuts go unnoticed: match-action cuts missed 32.4 % of the time vs 9.4 % for unrelated ones, STUDY N6): 'still here, still going' in one place, the C carrier and the modern long take (M13), the subject as pivot (+-40 px) keeping the eye where it was.",
+   "best_beats": [
+    "hook",
+    "setup",
+    "explain",
+    "reveal"
+   ]
+  },
+  {
+   "id": "J2",
+   "score": 5,
+   "reason": "Pushing into an opening and out of the next shot's own opening carries the eye through the join (the next focal where the aperture's centre was, within 150 px: M19, M21) and says 'going inside', the explainer's step from the place to the thing in it; looming captures (STUDY N11).",
+   "best_beats": [
+    "explain",
+    "reveal",
+    "setup"
+   ]
+  },
+  {
+   "id": "J3",
+   "score": 5,
+   "reason": "A shape holding its spot across a hard cut (within 150 px and 1.5x, ONE change) keeps the eye in place (eye trace, M19; repeated features speed re-orientation, STUDY N9) and states 'this is like that', the explainer's analogy, in one pair of frames.",
+   "best_beats": [
+    "explain",
+    "setup",
+    "payoff"
+   ]
+  },
+  {
+   "id": "T2",
+   "score": 3,
+   "reason": "One anchor pinned at its spot through 2-4 quick cuts keeps the eye still while time compresses round it ('meanwhile, still this'), each cut a related B join; but 2-4 cuts of ~0.33-0.5 s are 2-4 orienting responses in a film whose panels average >= 3.5 s (DIRECTION 1; M12).",
+   "best_beats": [
+    "explain"
+   ]
+  },
+  {
+   "id": "J4",
+   "score": 4,
+   "reason": "The bright shape or the hot accent held within 190 px (and 1.5x) across the cut lets the light carry the eye (repeated colour speeds re-orientation, STUDY N9; Arcane's light-match layouts correlate 0.81-0.90) and keeps the thread's colour continuous; it says less than the shape match ('the same light, elsewhere').",
+   "best_beats": [
+    "setup",
+    "explain",
+    "payoff"
+   ]
+  },
+  {
+   "id": "J5",
+   "score": 3,
+   "reason": "An action running on across the cut hides the join (match-action cuts missed 32.4 % of the time, STUDY N6) and lets the viewer finish it, but our size changes come by pushes, so it is rare, and without the thread crossing it counts as a plain cut.",
+   "best_beats": [
+    "explain"
+   ]
+  },
+  {
+   "id": "J6",
+   "score": 4,
+   "reason": "The 'you' looks and the next view is what it sees: gaze carries attention along the sightline to its target [S9], so the eye arrives already pointed (the look held >= 0.5 s, the next focal within 150 px of where it pointed); usually a push along the sightline (J2).",
+   "best_beats": [
+    "setup",
+    "explain",
+    "reveal"
+   ]
+  },
+  {
+   "id": "J7",
+   "score": 4,
+   "reason": "The thread itself leaves one edge and enters the opposite one at the same speed and direction: 'it went there', the most literal carry of the story's thread (carrier D); but the eye must jump edge to edge, and travel between places is rare under ONE SUBJECT, GONE DEEP.",
+   "best_beats": [
+    "setup",
+    "explain"
+   ]
+  },
+  {
+   "id": "J8",
+   "score": 3,
+   "reason": "A near mass hides a jump too big to show and keeps the camera's motion continuous (carrier D, better than a plain cut), but it carries nothing of the story ('nothing in itself') and for <= 0.5 s the stage holds no subject; 1-2 a film.",
+   "best_beats": [
+    "reveal"
+   ]
+  },
+  {
+   "id": "J9",
+   "score": 2,
+   "reason": "A whip carries direction and speed, but its smear frame has no place to look and its energy fights 'alive but calm' (motion.md J9: rejected unless declared).",
+   "best_beats": []
+  },
+  {
+   "id": "J10",
+   "score": 5,
+   "reason": "One object turning into the next in stages ('this IS that') keeps a single subject through the join and shows the equivalence itself: staged animated transitions improved tracking and the judging of change over static jumps (STUDY N23), when congruent and slow enough to see (N22); the object stays the brightest, hottest thing throughout.",
+   "best_beats": [
+    "explain",
+    "reveal",
+    "payoff"
+   ]
+  },
+  {
+   "id": "J11",
+   "score": 4,
+   "reason": "The same frame with its light changed tells 'later' or 'now it changes' with no cut, so nothing has to be found again; the key changes only on a story turn (cinema.md 7, colour scripts [S18]); a lamp in 0.1-0.3 s, a sky in ~0.8-1.5 s.",
+   "best_beats": [
+    "turn",
+    "payoff",
+    "explain"
+   ]
+  },
+  {
+   "id": "J13",
+   "score": 3,
+   "reason": "The paper turning to its next page in place keeps the eye on one spot through the join ('the next page of the proof'), a clean carrier E, but only for paper beats.",
+   "best_beats": [
+    "explain"
+   ]
+  },
+  {
+   "id": "J15",
+   "score": 4,
+   "reason": "The voice's next sentence, or the next place's sound, leading the cut carries attention across it (with the sound removed, match-action cuts were noticed far more: STUDY N6; M23); it smooths every join but cannot rescue a picture that drops the thread.",
+   "best_beats": [
+    "setup",
+    "explain",
+    "turn",
+    "reveal"
+   ]
+  },
+  {
+   "id": "X11",
+   "score": 1,
+   "reason": "A spin, glitch or flash is a full-frame onset with no place to look and no meaning (modern.md 7; DIRECTION 4 and 8): the opposite of carrying the eye.",
+   "best_beats": []
+  }
+ ],
+ "top10": [
+  "E2",
+  "N1",
+  "RJ4",
+  "J3",
+  "N7",
+  "RM8",
+  "I11",
+  "J2",
+  "N14",
+  "D1"
+ ],
+ "bottom10": [
+  "RJ1",
+  "X11",
+  "X4",
+  "X3",
+  "X10",
+  "X2",
+  "X9",
+  "RM9",
+  "X6",
+  "X5"
+ ],
+ "notes": "SCALE (this lens only): 5 = among our strongest tools for story clarity and flow: it puts the one focal where the eye already is, or carries the eye and the thread across a join, or explains by one change at a time, with STUDY/META evidence or our own measurement behind it, across several beats; 4 = a strong tool for particular beats, or a broad support with a clear story job; 3 = useful in one narrow beat, or a support that helps clarity only indirectly (geometry, depth, mood); 2 = marginal for the story (depth or mood with no story job, or structure that adds a second call or more pieces to manage); 1 = hurts clarity or flow (splits the eye, drops the thread, a jolt with no meaning) or cannot be used in our look. COUNTS: 19 fives (18 %, under the 25-entry cap), 29 fours, 30 threes, 13 twos, 12 ones; family means frame 3.25, move 3.35, join 3.37. No bonus or penalty for the source: the owner's 58 entries got 11 fives and 5 ones, our 45 got 8 fives and 7 ones. SAME TOOL IN TWO FAMILIES, scored alike on purpose: E9 = RM1 (5), T = RM8 (5), E3 = RM2 (3). A2 (4) sits under N1 (5) on purpose: the centre carries the evidence [S7, V5], the golden ratio itself does not (cinema.md 4.2). WHAT THE LENS FOUND. (1) A subject is made plain by making the subject, the story light, the hardest value step and the one accent coincide (E2, N7, D1, E8) and by keeping it near the centre (N1); lines only mark the place (in 12 of 20 reel examples a brighter patch beat the subject the lines pointed at), so the line devices B1-B13 score 2-4 and each needs the light at its end. (2) Flow is the eye's spot kept across a join (N1's focal home; the next focal within 150 px of the last, 190 px for a light match, 370 px at most, beyond that only on a plain cut: M19) by a carrier that carries the thread (RJ4, J2, J3, J10; then J4, J7, J6, J11, J15). The reels' own join grammar (RJ1's black card, X3's fade, a plain cut between every idea) is a list's grammar and scores lowest: it is the owner's 'a bunch of shots put together'. (3) Explaining is one change at a time (N14, I11, J11, RM6, D7's one break) and the line first with its pen tip (T, RM8: M27), at the explainer's working sizes (Z3, Z4, N9) and with cause and effect in one view (C3). (4) The 'But' needs only one turn tool, once: A7's break, N14, J11, N15, B6, the inverted B11, or RJ2 (at most 2 a film); M3 drops to 2 because its gaze leads the eye out of the frame. BEATS, the strongest on this lens: hook RM8/T + E2 + N1 + one push RM4 (one capture lever at a time, modern.md 1); setup Z2 + C1 + E10/E4 inside RJ4's continuous camera; explain I11 + C3 + Z3 + D7 + RM1, joined by J3 or J10; turn N14 or J11 or A7's break (RJ2 at most twice a film); reveal I4 or I5 with I12 as the pivot, D2, J2; payoff E2 + RM4/RM6 on the payoff word + Z4 + N14; loop RJ3 + N14 (the last frame matches frame 0's drawing state). NUMBERS that carry this lens (1080 x 1920): the focal in x 413-667, y 951-1187, its centre within 130 px of x 540; the drop from the caption block's foot (y 556) to the focal 300-450 px, 650 at most, nothing calling in it; <= 6 named objects, <= 3 regions at half the focal's pull, one rival at most; one onset at a time, >= 0.5 s from the next, none in the 0.4 s round a join; a push >= 3 % in <= 2 s on its word, the picture ~0.1 s ahead of the voice; plain cuts <= 2 a film, panels averaging >= 3.5 s; the thread on screen >= 80 %. LEFT OUT OF bottom10 though scored 1: X1 (blur would isolate a subject if our look allowed it) and X8 (a distortion that still keeps one subject): their harm to the story is indirect. Judged blind: catalogue.json and the grounding docs only (DIRECTION.md, modern.md, cinema.md, the playbook's story rules); catalogue_prior.json and the other judges' files were not read."
+}

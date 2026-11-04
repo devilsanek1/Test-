@@ -51,7 +51,8 @@ un-building into the FIRST panel's `t < 0` drawing state, so the film loops back
 **G5 entry and exit checks** (`G3_ANIMATIC.md` §2: G4+ may only ADD, never a mover, a place or a tier promotion —
 these checks are where that promise is enforced; owner-approved 2026-10-27):
 - **Entry, before lanes fan out:** (1) a scripted diff of scenes.json and each built scene against the locked board
-  JSON — every camera move, element move, transition device and carrier, and `life:`/promise item matches, and no
+  JSON — every camera move, element move, transition device and carrier, `life:`/promise item and sound cue (its type
+  and frame: `look/SOUND_SYNC.md`) matches, and no
   motion exists that G3 did not play; a mismatch is a FAIL or an explicit, owner-visible G3 reopen. (2) A sound-off
   cold read of the first fully dressed set (the home set, the density key, as built for the G4 look clip): map each
   board `promise` line to what a cold reader names (v3: streams read as birds). (3) CRAFT's measures (`CRAFT.md` §e:
@@ -82,8 +83,9 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'light'}];   // optional: ov
 ```
 
 - **Time**: `useTime()` = panel-local seconds; a voice word at VO time w lands at `t = w - start`. Lead the voice
-  (ENGINE §1 rule 5). Everything in seconds, deterministic (`rng`, never `Math.random`), flat (no blur, filters,
-  gradients), **no opacity fades** (pop, grow, wipe or slide; a draw-on at frame 0 and where the drawing is the beat:
+  (ENGINE §1 rule 5). Everything in seconds, deterministic (`rng`, never `Math.random`), flat (no blur, filters or
+  gradients drawn live, but the sky's gradient and a changing source's cropped bloom; the paint and the light maps come
+  baked: `docs/look/CRAFT.md` §c-§d, §g), **no opacity fades** (pop, grow, wipe or slide; a draw-on at frame 0 and where the drawing is the beat:
   `docs/look/DIRECTION.md` rule 8). From `ENGINE.md`: §1 rules 1-5, 7 and 10
   (rules 6, 8 and 9 are retired: `docs/look/DIRECTION.md`), §4-§6 (stage, transitions, captions) and §7 (primitives,
   with the clean pen); its §3 template and §10 kit show the API, never the look (v1's sketch pen, drifting sun,
@@ -112,8 +114,8 @@ exception from the G3 hand-off.
   first frames (the first word at ~0.12 s, the voice file's lead), one continuous shot (`docs/look/DIRECTION.md` rule 9; the owner approves this build with the G4 look clip). The
   last panel un-builds over its last `dur` s on top of it: build
   with `Ink` / `Fill` / kit (they read the exit value) or read `useExit()` for raw SVG (`<ExitShrink>` for characters).
-- **Caption tone**: `captionTone` keys are scene-local `{t, tone}`: `'dark'` (ink) on light walls and skies, `'light'`
-  (white) on dark skies; check the contrast (`contrast(a, b)` in `lib/Captions`: v3's dusk blue #5B6A94 takes white
+- **Caption tone**: `captionTone` keys are scene-local `{t, tone}`: `'dark'` (the deep plum ink, `docs/look/TYPE_GUIDE.md` §b)
+  on light walls and skies, `'light'` (warm white) on dark skies; check the contrast (`contrast(a, b)` in `lib/Captions`: v3's dusk blue #5B6A94 takes white
   5.3:1, ink only 3.1:1). Export it from the panel file (the engine merges it over scenes.json); a `wipe` key follows a
   sky wipe edge (ENGINE §6).
 - **Screen zones:** the one definition is `docs/look/LAYOUT.md` §1 (moved there 2026-10-29 with every other layout
@@ -133,9 +135,11 @@ exception from the G3 hand-off.
   STYLE.md (v3: LOOK.md) and palette roles (one hero colour, one dark anchor, at most one pop), inside
   `docs/look/DIRECTION.md` and `CRAFT.md`; then `docs/look/LAYOUT.md`, `docs/look/COZY_AND_SCALE.md`,
   `docs/look/CINEMATIC_GUIDE.md`. Every
-  set, person, prop and Pip is the film's own kit (playbook: no reusable assets; people have no faces); `lib/cine`'s
+  set, person, prop and Pip is the film's own kit (playbook: no reusable assets; people in direction C with the generic
+  LASH face, owner 2026-10-30: `docs/look/PEOPLE_DESIGN.md`); `lib/cine`'s
   drawing pieces are references, never film code, until the craft tooling lane ports them to the clean pen
-  (`CRAFT.md` §c; its camera and utilities are fine). The light and shadow layers come from `lib/light.tsx`, depth from
+  (`CRAFT.md` §c; its camera and utilities are fine). The light and shadow layers come from `lib/light.tsx`, and the
+  proper light's baked maps and live layers from `lib/light2` where the film takes them (`CRAFT.md` §d), depth from
   `lib/depth.ts` (the set's atmosphere, planes and ONE camera from W1, plus the far stage where W1 declares a designed
   view: `CRAFT.md` §f, §f.5; how-to `lib/DEPTH.md`), particles
   from `lib/particles.tsx`; a film never imports another film's folder (`src/vN/`).
@@ -173,7 +177,7 @@ not board panels (v3: `docs/v3/flow_v2.md` §2, SQA-SQF). §2 holds for it, plus
   a cut at a seam is a FAIL; the seam probe, `FilmSeamProbe` registered as `FilmNSeams`, renders each side ALONE at
   f - 1 and f, and over 1 % of the pixels differing by > 4 L* is a FAIL) and a 60 fps strip of c ± 0.4 s.
 - **Chunks** for the full-size render: `python3 -I scripts/film_chunks.py src/vN/film/scenes.json --max 360` (one per
-  sequence on Film's own ceil boundaries, the long ones split; §8b).
+  sequence on Film's own ceil boundaries, the long ones split; §8b); `render-media.mjs --parallel` cuts on them itself.
 
 ## 3. Lane rules
 
@@ -198,23 +202,24 @@ E=--entry=src/entry-v3-film.tsx
 node scripts/render-frames.mjs Film3-SQD /tmp/sqd 0.2,1.0,1.8 $E --scale=0.5
 # contact sheet + the caption legibility check (scripts/capcheck.py) on the same frames
 scripts/sheet.sh Film3-SQD 0 1.9 8 /tmp/sqd_sheet.png $E --scale=0.35
-# the props form (Film3Shot {id}); sheet.sh's caption check passes its own --props, so add --no-capcheck here
+# the props form (Film3Shot {id}); sheet.sh takes --props too (its caption mask = your props + {"capcheck":"mask"})
 node scripts/render-frames.mjs Film3Shot /tmp/sqd 0.5 $E --props='{"id":"SQD"}' --scale=0.25
 # every frame of a motion at 60 fps: a range t0:t1[:step] (scripts/strip.sh tiles it with frame numbers)
 node scripts/render-frames.mjs Film3-SQD /tmp/sqdf 0.5:1.0 $E --scale=0.33
 scripts/strip.sh Film3-SQD 0.5 1.0 /tmp/sqd_strip.png $E --scale=0.33
 # a join in context (the film around a scene start: VO seconds), and a seam's two builders alone (§2b)
 node scripts/render-frames.mjs Film3 /tmp/cut 19.383,19.4,19.417 $E --scale=0.5
-node scripts/render-frames.mjs Film3Seams /tmp/seams $(python3 -c "print(','.join(f'{k/60:.4f}' for k in range(16)))") $E --scale=0.25
-# a playable sequence with its voice
-npx remotion render src/entry-v3-film.tsx Film3-SQD /tmp/sqd.mp4 --scale=0.5
+node scripts/render-frames.mjs Film3Seams /tmp/seams 0:0.25 $E --scale=0.25
+# a playable sequence with its voice (one step: a single shot gains nothing from --parallel)
+node scripts/render-media.mjs Film3-SQD /tmp/sqd.mp4 $E --scale=0.5
 ```
 
 Tile stills with `montage` (scripts/sheet.sh does it for you). Never render the whole film at full size in a lane
 session; the owner's gate video is the orchestrator's render, at FULL size (1080 x 1920: at 0.5 scale the fine lines
 blur and the float camera's sub-pixel drift flickers, `LIFE_AND_DENSITY.md` §9, §8b below):
-`npx remotion render src/entry-vN-film.tsx FilmN deliverables/vN/vN_g5_blocking.mp4`, or chunked per panel for a long
-film (§8b's recipe).
+`node scripts/render-media.mjs FilmN deliverables/vN/vN_g5_blocking.mp4 --entry=src/entry-vN-film.tsx --master --parallel`
+(the master's encode, so no JPEG-banded sky; 3 chunks on the film's scene boundaries, joined and checked frame by frame,
+the audio muxed once; v2r: 5 min). Never the bare CLI for a gate video: its JPEG q80 frames and CRF 18 band skies.
 
 ## 5. Captions and frame 0
 
@@ -328,10 +333,10 @@ own G3 density key, `LIFE_AND_DENSITY.md`); its per-panel lanes are replaced by 
   checked against a direct still. v3: 14 chunks 63.5 min + 26 min audio; this fixer round re-rendered only the 9
   touched chunks (34.5 min) and reused the audio. Trap: Film cuts at ceil(start * 60), chunks cut at round() start one
   frame early, so a fix to a panel re-renders the next chunk too (fixed: `scripts/film_chunks.py` builds the list with
-  ceil, §2b). Faster since (the v3 rework): `scripts/render-media.mjs` (one bundle, renderMedia, `--frames=a-b` per
-  chunk, `--codec=wav` for the audio) with Chrome's default GL renders a full-size Film3 frame in ~0.12-0.27 s against
-  the CLI's ~2.9 s (remotion.config.ts: 'swangle'); the two differ only in anti-aliasing (4-9 % of the pixels by a few
-  levels, invisible at 1:1), so render every chunk and its seam stills with ONE GL (`GL=swangle` matches the CLI).
+  ceil, §2b). Since 2026-10-29 it is one command, `render-media.mjs ... --master --parallel` (chunks on film_chunks.py's
+  boundaries, a stream-copy join checked frame by frame, the audio once: the premixed file, or one audio-only pass when
+  the film has sound cues; v2r 5:03). The CLI no longer uses `swangle`: its frames equal the scripts', so the one-GL
+  rule is moot (leave GL unset).
 - **Meter floating holds at full res:** S7 / S8 / S12 read 5.3 / 7.8 / 15.5 ev/s in the lanes but 1.8 / 3.6 / 3.1 in
   the film. A `--scale=0.5` render rasterises the float camera's sub-pixel drift as 1-3 % of a static wall flipping
   every frame (0-0.8 % at full res), and the density pass counts it as motion (static 0 %; `--cozy` removes the shift,

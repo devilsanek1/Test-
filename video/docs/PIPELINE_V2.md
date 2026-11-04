@@ -31,14 +31,114 @@ which added each API call's usage once per transcript line, about 2.4x too much.
 tokens and the orchestrator made about 800 calls (est.; v1's transcripts are gone). The shares hold roughly. spend.py
 v2 counts each call once: `python3 video/docs/retro/spend.py` (`docs/retro/2026-10-28_streamline/phase1_meter.md`).
 
-## The loop: gates G0-G8 (with G0.5, the core line, and W1, the world bible)
+## THE LOOP NOW (owner, 2026-10-30: loose, imaginative, frames whole; it wins where the gates below differ)
+
+The owner's three rules lead (playbook, THE THREE RULES ABOVE ALL): every frame worth pausing on; readable imaginative
+ideas; frames planned and created whole from the get-go, never filled for density later. Pictures before documents.
+1. **Script and voice** (G0-G2, as below).
+2. **The story beats** (from the locked voice): one line per beat: what the viewer must understand and feel there, on
+   the take's clock, with the card's story-level choices (one thread, one home place, one "you"). No pictures, no
+   staging, no camera: nothing that restricts the ideas.
+3. **IDEAS:** for every beat, a few imaginative, readable picture ideas drawn as whole-frame thumbnails (the idea, the
+   world, the light, the people, the words in one picture); the best picked per beat (the owner sees the board). Any
+   earlier picture plan (a visual script written before the ideas) is one candidate among them, never a limit.
+4. **KEY FRAMES, made whole:** each beat's frame (its landing frame, and its start where a move changes the picture)
+   built complete in the film's look: the idea, the full world, the light, the people, the words. The owner approves the
+   board of key frames: this IS the film's look and content (it replaces W1's density keys, G3's grey placeholders and
+   G4's separate look clip). The world kit and the hero frame come first ("A RICH, BEAUTIFUL WORLD" below).
+5. **THE SHOT PLAN (the visual script, written now):** the camera moves and the joins that travel between the approved
+   key frames on the voice's clock (the composition library's moves and joins, the sync plan): the camera serves the
+   frames, never the other way round.
+6. **THE ANIMATIC FROM THE KEY FRAMES** (G3): the key frames on the voice with the shot plan's moves, joins and key
+   actions played; the owner locks it.
+7. **ANIMATION** (G5-G6): each shot animated from its own key frame (life, motion, the transitions), never re-filled.
+8. **Sound and final** (G7-G8, as below). Then the optional finishing tests on the final product (on video 4: the ink
+   line, B), the cut with and without, side by side for the owner; kept only if it makes the film better (owner,
+   2026-10-30: "lets build without ink first and then we will test the final product with ink if its makes it any better").
+**ONE FILM, NEVER A HODGE-PODGE (owner, 2026-10-30): coherence is held above the frame, at every step.**
+1. **One film concept above the beats:** before or with the ideas, ONE imaginative idea for the whole film (its world,
+   its central device, the thread's journey, the arc of feeling from the first frame to the payoff), invented for this
+   story (never a past film's). Every beat's idea is a chapter of it; an idea that belongs to another film is
+   out, however good.
+2. **Pick sequences, not single beats:** the ideas come as whole sequences (one imagination per sequence, every beat
+   flowing into the next); the pick is one sequence as the base, then individual beats improved inside it, never a
+   collage of the best single ideas from different sequences.
+3. **One art director holds the vision:** one agent per film (or the orchestrator) owns the film's vision note (the
+   concept, the world, the arc, the thread, the look) and approves every frame against the whole; builders work from that
+   note and the same world kit (one place, one light, one palette, one cast, one type), so every frame is a view of one
+   world, never a separately invented place.
+4. **Evaluate in sequence:** THE FRAME LOOP's evaluator sees each frame IN the board (all frames in order) and asks, beside
+   the frame's own questions: does it belong to this film's world and concept; does it continue the thread; does it move
+   the arc of feeling one step; does it hand on to the next frame? After every round, one BOARD READ: the whole board in
+   order, sound off, as a viewer: does the story read from the frames alone, as one world, one thread, one arc?
+5. **Lanes by sequence, never by isolated beat:** parallel builders take contiguous stretches of the film with the
+   joins between them, and the art director lands the seams; the shot plan and the animatic are the last coherence
+   checks (the whole film, played once, judged as one story).
+
+**A RICH, BEAUTIFUL WORLD (owner, 2026-10-30): designed before the frames, held by one finished frame, never added later.**
+1. **The world first, from the real place:** after the sequence pick, the art director designs the film's world whole
+   from real photos of its real places and things (on video 4: Helsinki's harbour streets in winter, their facades,
+   trams, snow and light; a real data hall, real pipes), its shape language, palette and light, and the story's own
+   marks on it (on video 4: the heat, as steam, melted snow, warm windows). Its pieces are built ONCE at finished
+   quality (the buildings, windows, props, trees, snow, vehicles, the people and their life: the world kit), so every
+   frame is composed from beautiful, specific parts: richness and beauty are inherited, never filled in.
+2. **The hero frame first:** before the other key frames, the art director paints ONE frame to full finish (the one
+   that shows the most of the world) through THE FRAME LOOP, and the owner approves it. It is the film's own bar: every
+   later frame must sit beside it at its richness and finish. It comes after the ideas are picked and shows this film's
+   own world, so it guides the craft, never the ideas.
+3. **Rich means specific, layered and alive, never "more stuff":** three scales of detail (big shapes that read in a
+   second, middle shapes that describe the place, small details that reward a pause), each detail saying something
+   about this place or this story, the world going on past the frame's edges, life in its calm tier.
+4. **Pleasing is judged as a painter judges, at finished quality and at phone size:** the values first (squint: big
+   quiet masses, one light, one focus), a few colours in harmony around the one accent, a rhythm of big, medium and
+   small shapes, edges varied (crisp at the focus, lost elsewhere), the finish (the paint, the texture, the clean pen). THE
+   FRAME LOOP's evaluator judges every frame on these beside the hero frame; an ALMOST comes back as a paint-over (the
+   frame itself marked up: circled, arrowed, a value or colour correction painted on), never as new rules.
+5. **The owner's eye twice before animation:** the hero frame, then the whole board of key frames.
+
+**THE FRAME LOOP (owner, 2026-10-30; every built idea, key frame, scene and shot, before the owner sees it):**
+1. **Build:** the builder makes the frame whole from its card (the beat's feeling and idea; `docs/look/FRAME_CARD.md`).
+2. **Evaluate:** a FRESH evaluator (never the builder; one, not a panel) looks at the frame at full and phone size
+   beside the hero frame (once it exists) and the owner's references, never a past film of ours. Its report OPENS with
+   one line, "The feeling it gives: ...", written from looking at the picture before reading the brief, then the
+   beat's intended feeling beside it, and answers: does it give the viewer the beat's FEELING and idea in a second, and
+   is it worth pausing on? Then the card's questions and the craft. Measurements only explain a gap the eye found
+   ("it feels gloomy: 43 % of it is under L* 40"); they never make a verdict on their own, and a reference lends its
+   craft, not its mood (owner, 2026-10-31: "we lost the feeling"). The verdict is one of:
+   - **THERE:** it achieves the feeling; small polish notes only -> move on.
+   - **ALMOST:** the feeling is there but specific things hold it back -> ADJUST: the builder fixes exactly those
+     (each note names what and why), re-render, re-evaluate. At most 2 adjust rounds.
+   - **NOT THERE:** the frame doesn't achieve the feeling -> REWORK from the idea: a new approach to the frame (a
+     different idea, staging or device), never a patch. At most 1 rework; if it still fails, the owner gets the frame
+     with two options and what each lacks.
+3. **The orchestrator's look**, beside the references, then the owner. Workflows encode the loop (build -> evaluate ->
+   adjust or rework, capped), so it never depends on someone remembering it. Look ITERATIONS keep one evaluator round.
+
+**Our recipes are the toolbox at every step, never a cage (owner, 2026-10-30: "are the composition recommendation
+included in here? Are the stylistic recipes included here? is it completley free flowing ..."):** the ideas are
+composed with `docs/look/COMPOSITION_SHOTS.md` (the frame's grammar in every frame, one lead device per frame named by
+its code), `LAYOUT.md`'s bands and the world's rules (DIRECTION, COZY_AND_SCALE, LIFE_AND_DENSITY: a full world designed
+in); the key frames apply the style recipes in full (painter v7, ORGANIC, PAINT_RECIPES, the film's palette and light,
+PEOPLE_DESIGN, TYPE_GUIDE, the picked ink line); the shot plan takes the library's moves and joins and `SOUND_SYNC.md`.
+Checks catch mistakes (captions, safe zones, timing, contrast); they never design a frame. Where a gate below asks for
+grey placeholders, density keys or a fill pass, this loop replaces it.
+
+## Two modes: production and iteration (owner, 2026-10-29)
+
+The gates below are PRODUCTION: a film on its way to posting. An ITERATION is a question the owner wants answered by
+looking (a look test, a rethought scene, a style probe): it skips the gates and their checks. One or two max-effort
+agents, no review panel, no critic, no QA suite, no fix pass; stills first (a clip only once the owner has approved the still), with its build stages; about an hour,
+then straight to the owner, whose verdict is the review. Only what the owner picks from an iteration enters production,
+and there it passes the gates in full. The playbook's Process section has the rule and the owner's words.
+
+## The loop: gates G0-G8 (with G0.5, the core line, W1, the world bible, and G2.5, the visual script)
 
 Start every video by reading `docs/OWNER_PLAYBOOK.md` (the owner's rules), and add any new feedback to it at every gate.
 A new video starts when the owner asks for it (`HANDOFF.md` §1, "Starting the next video"); films in flight share the
 weekly limit and finish first.
 
 Breadth-first: the whole film passes each gate together. At every gate from G3 on, the owner gets **one MP4 that plays
-on the phone, with voice and captions**; G0-G2 are text and audio only, with no MP4s (owner, 2026-10-25), plus at most 5
+on the phone, with voice and captions**; G0-G2.5 are text and audio only, with no MP4s (owner, 2026-10-25), plus at most 5
 lines of notes. One version: one deliverable per gate; a choice the owner makes (the topic, the core line, the hook
 line) comes as up to 3 options on one screen of text (playbook Process). Nothing is built for a later gate before this
 one is approved; the one exception is W1, internal text written beside G1-G2.
@@ -47,17 +147,18 @@ one is approved; the one exception is W1, internal text written beside G1-G2.
 |---|---|---|---|---|
 | G0 Topic | the top 3 topics on one screen of text, **each with its proposed core line** (lean scouting: Creative exploration below), or the owner's own topic | topic **and its core line** (a separate G0.5 only on request), audience, takeaway, length band | topic, core line, length band; then the **fact lock** (built ONCE, by one agent; every later check reads it) (`docs/vN/research/factlock.md`: every fact, number and quote the film may use, each checked against its primary source; v2 and v3 have one) before G0.5 | 2 scouts + 1 editor, skipped when the owner names the topic; then one fact-lock agent |
 | **G0.5 Core line** (owner, 2026-10-25; folded into G0 by default since 2026-10-28) | by default nothing extra: the core line comes with the topic on G0's screen; a separate round (the top 3 lines on one screen) only when the owner asks for more options | **the one sentence** the whole video exists to land, the one that gets the biggest emotional reaction (v3 example: "AI is making your PC more expensive") | the core line: it becomes the frame-0 text, the hook's seed, the cover and title text and the payoff's callback, and every script line must serve it; from the pick we draft its **THROUGH-LINE CARD** (thread object and home spot, home place, one "you": internal; G1 completes it and the owner approves it there) | by default none (G0's editor drafts the line); on request one writer + one critic |
-| G1 Script | **the ElevenLabs-ready script** (a short emotional cue per line, v1 format), with up to **3 hook-line alternatives** as text inside it (the owner picks one; G2 voices only the pick), plus the completed **THROUGH-LINE CARD** (one screen of text, `docs/look/CRAFT.md` §a; owner-approved 2026-10-27): the thread object and its home spot, the one home place (one home place and at most ONE comparison or scale shot: the playbook's ONE SUBJECT, GONE DEEP), the one "you", the mascot rule, and a carrier (A-F) for every join between the script's lines, taken from the script's own joins (the carriers follow the script, never the other way round); the voice comes at G2 | every word, the hook line, the card | meaning and order of lines; the hook line; the card | one writer + one critic + one fix pass; 1 h, then 15 min per round |
-| G2 Voice lock | **the take, generated with the owner's voice through the API** (owner, 2026-10-26; `docs/voice/API_QUICKSTART.md`: paste format v2, `check_paste.py` OK, `generate_take.py` `all_clean`, `check_take.py` MATCH), sent as take.wav with the full script text, locked into `public/vN/`, logged in `ELEVENLABS.md` section 5; word timings taken from it. Only without the key does the owner paste it (always the full `--handoff` text); we check that take the same way. No video (owner, 2026-10-25) | voice, pace | the clock (word timings) | 30 min |
-| **W1 World bible** (text, beside G1-G2; owner-approved 2026-10-27) | no owner step (internal text): the set list (the home place first); the PROPOSED palette (one sister palette from `look/PALETTE.md` by the story's use case; 2-3 candidates judged internally when the topic needs a new look) and, in its terms, one light rig per set (the key and its side, the shadow tint family, the pool colours: `CRAFT.md` §d.1), its depth (the planes, 0 = the subject's, the air behind them = the sky's lowest step, the camera's horizon and vanishing point(s): `CRAFT.md` §f.1) and one colour-script line per beat; tiers A/B/C per shot (`CRAFT.md` §b); the recurring living character (Pip by default, `LIFE_AND_DENSITY.md` §5); its choices reach the owner as G3's grey and the G4 look clip | — (judged at G3 and G4) | — (G3 freezes the tiers and the rig's shapes; G4 approves the palette and freezes the pen, the rigs and the tier palettes; a change at G4 is written back into W1) | in parallel with G1-G2 |
-| **G3 Sketch animatic** | ONE video at 60 fps: the whole film as an ANIMATED SKETCHBOOK (spec: `docs/G3_ANIMATIC.md`) — every cut, camera move, transition and key action PLAYED at sketch fidelity, every join with its carrier, the tiers at their final weights in grey, each set's light rig as shapes and its planes as grey steps (paler with distance, the horizon and the ground's lines to the VP drawn), density and life as grey placeholders (particle fields among the `life:` items), timed to the locked voice (visual concepts judged internally; owner rule: one version) — tool: `SketchReel` board mode + `board_lint` | **the film's rough pass**: story in pictures, cuts, transitions, camera moves, key actions, the density/life plan, and **where the eye goes and what carries each join** (2026-10-27; the hand-off states the fidelity ladder) | the signal contract (`G3_ANIMATIC.md` §2): scene list, cut points, shot content, framing, transition devices and carriers, camera moves, motion plan, density promises, thread coverage, tiers, the light rig, the mover budget | first cut ~3 h (was 2; the hour goes to tiers, carriers and the light marks; assumes `G3_ANIMATIC.md` §7 tier-1 tooling, built once beforehand: not built yet on 2026-10-27, tooling item 6); rounds 30 min |
+| G1 Script | **the ElevenLabs-ready script** (a short emotional cue per line, v1 format), with up to **3 hook-line alternatives** as text inside it (the owner picks one; G2 voices only the pick), plus the completed **THROUGH-LINE CARD** (one screen of text, `docs/look/CRAFT.md` §a; owner-approved 2026-10-27): the thread object and its home spot, the one home place (one home place and at most ONE comparison or scale shot: the playbook's ONE SUBJECT, GONE DEEP), the one "you", the mascot rule, and a carrier (A-F) for every join between the script's lines, taken from the script's own joins (the carriers follow the script, never the other way round); the voice comes at G2; and, in the card, the **sync plan** (<= 8 lines: the hook's count and trigger, the release with its written voice pause >= 0.8 s, the thread's sound, at most 2 middle moments: `docs/look/SOUND_SYNC.md` §4) | every word, the hook line, the card and its sync plan | meaning and order of lines; the hook line; the card | one writer + one critic (with the cold viewer panel) + one fix pass; 1 h, then 15 min per round |
+| G2 Voice lock | **the take, generated through the API with the voice the owner picks** (`docs/voice/VOICE.md`; owner, 2026-10-26; `docs/voice/API_QUICKSTART.md`: paste format v2, `check_paste.py` OK, `generate_take.py` `all_clean`, `check_take.py` MATCH), delivered on a private claude.ai player page (`scripts/voice/take_page.py`; attachments don't play in the owner's phone app) with the full script text, locked into `public/vN/`, logged in `ELEVENLABS.md` section 5; word timings taken from it; the release's pause measured (>= 0.8 s, else that one gap lengthened before the lock) and the sync plan timed on the take (`docs/look/SOUND_SYNC.md` §4). Only without the key does the owner paste it (always the full `--handoff` text); we check that take the same way. No video (owner, 2026-10-25) | voice, pace | the clock (word timings) | 30 min |
+| **W1 World bible** (text, beside G1-G2; owner-approved 2026-10-27) | no owner step (internal text): the set list (the home place first); the PROPOSED palette (one sister palette from `look/PALETTE.md` by the story's use case; 2-3 candidates judged internally when the topic needs a new look) and, in its terms, one light rig per set (the key and its side, the shadow tint family, the pool colours: `CRAFT.md` §d.1), its depth (the planes, 0 = the subject's, the air behind them = the sky's lowest step, the camera's horizon and vanishing point(s): `CRAFT.md` §f.1) and one colour-script line per beat; tiers A/B/C per shot (`CRAFT.md` §b; keyed to the visual script's shot ids once G2.5 locks); the recurring living character (Pip by default, `LIFE_AND_DENSITY.md` §5); its choices reach the owner as G3's grey and the G4 look clip | — (judged at G3 and G4) | — (G3 freezes the tiers and the rig's shapes; G4 approves the palette and freezes the pen, the rigs and the tier palettes; a change at G4 is written back into W1) | in parallel with G1-G2 |
+| **G2.5 Visual script** (owner, 2026-10-29: "brainstorm a story and like a visual script with what happens on the screen and camera movements and etc") | **the film's visual story in words** (`docs/vN/visual/VISUAL_SCRIPT.md`; the format, steps and checks: `docs/v4/visual/METHOD.md`, researched from how studios do this step): shot by shot on the locked take's word times (`public/vN/voice_words.json`), a one-line-per-shot overview, then one block per shot that reads on a phone: its time in and out, the words spoken, what is on screen, the camera (size, angle, ONE move with its start and end), the thread, the words in the picture, the sound cues, the join into the next shot with its carrier (`docs/look/CRAFT.md` §a); style-neutral (content, staging, camera, timing, joins, words and sound; never palette, rendering, texture or line), so it stands while the look is still being found; 3 visual concepts judged internally first, the owner reads one (one-version rule) with at most 3 open questions; text and audio only, no MP4 (a read-along page that plays the take beside the blocks, when cheap); before it locks, two passes fold in: the COMPOSITION-AND-MOTION PASS from the ranked shot library (`docs/look/COMPOSITION_SHOTS.md`, Part 0 tiers and 0b guidelines: per shot its frame device, the move within it and the join, by code, on the take's words; `docs/vN/visual/COMPOSITION_PASS.md`, v4's the first) and the SYNC PLAN timed on the take (`docs/look/SOUND_SYNC.md` §4) | the visual story: the shots, what each one shows, the camera, every join and its carrier, the words in the picture, the sound cues | the shot ids, their times, pictures, camera moves and joins: G3 plays them, one block = one panel (a change to a locked shot reopens the visual script, starred and dated) | 3 concept writers + 2 judges (story, craft), 1 writer, 1 cold reader (sound off, then on), 1 critic, 1 fix pass; ~2-3 h on the clock (an estimate, measured on v4) |
+| **G3 Sketch animatic** | ONE video at 60 fps: the whole film as an ANIMATED SKETCHBOOK (spec: `docs/G3_ANIMATIC.md`) — every cut, camera move, transition and key action PLAYED at sketch fidelity, every join with its carrier, the tiers at their final weights in grey, each set's light rig as shapes and its planes as grey steps (paler with distance, the horizon and the ground's lines to the VP drawn), density and life as grey placeholders (particle fields among the `life:` items), timed to the locked voice and played from the locked visual script (G2.5: one block = one panel, with its times, camera, join and carrier; the visual concepts are judged there; owner rule: one version) — tool: `SketchReel` board mode + `board_lint` | **the film's rough pass**: story in pictures, cuts, transitions, camera moves, key actions, the density/life plan, and **where the eye goes and what carries each join** (2026-10-27; the hand-off states the fidelity ladder) | the signal contract (`G3_ANIMATIC.md` §2): scene list, cut points, shot content, framing, transition devices and carriers, camera moves, motion plan, density promises, thread coverage, tiers, the light rig, the mover budget, the sync points (the count, the hold, the release: `docs/look/SOUND_SYNC.md`) | first cut ~3 h (was 2; the hour goes to tiers, carriers and the light marks; assumes `G3_ANIMATIC.md` §7 tier-1 tooling, built once beforehand: built 2026-10-30 as the shared kit `src/lib/g3/`, tooling item 6); rounds 30 min |
 | **G4 Look clip** (after the G3 lock: it builds G3's home set, one of its joins and its frame 0 in the final style; approved before the G5 lanes start) | a **6-8 s playable LOOK CLIP of the home set** in the final style (replaces "1-3 stills + a 3-5 s test", 2026-10-27): the clean pen, the set's light rig with contact, form and cast shadows, tiers at final weight, one real transition, tier-B life, and frame 0 being drawn in the clean pen (how the opening draws on: `docs/look/DIRECTION.md` rule 9); checked before the owner sees it by an independent art director (fresh eyes; the owner's notes verbatim; ref 1 and v1 side by side; a phone-size squint; verdict SHOW / FIX FIRST) and by the checks (`CRAFT.md` §b-d: salience peak/median >= 2.4, environment local contrast <= 7, strokes <= 80/Mpx, near-miss ends <= 40/Mpx, dark-line pixels <= 3 %, `scripts/qa/check_light.py`; `scripts/qa/check_depth.py`, no FAIL: `CRAFT.md` §f; a sky: `skyProblems` empty and `scripts/qa/check_banding.py` PASS on the clip, `CRAFT.md` §g; carry and movers on its transition, rule 6), with the set's few particles (`lib/particles.tsx`) | palette and tier colours, line, light and shadow, mascot, frame 0's build, edges (opt-in per film; 'paint-subtle' at most) | visual language: the pen, the light rigs and the tier palettes freeze | ~1 day before the G5 lanes (the retro's estimate) |
 | G5 Blocking cut | **the G3 tier masks filled in colour from the G4 kit** (2026-10-27; the owner's cut renders at full size, 1080 x 1920: `G5_BLOCKING.md` §4): real sets and props in the film's clean pen, light rigs, tiers and depth (`docs/look/CRAFT.md` §b-d, §f: `lib/light.tsx`, `lib/depth.ts`, the declared `lib/particles.tsx` fields; draft finish, never the sketch pen), every G3 placeholder made real, so the world is full and alive, calm and tiered (`LIFE_AND_DENSITY.md`; v3 G5 was "way too empty"), with **no new places, movers or tier promotions**; final camera, key poses, **no edges/paper/texture**; **one lane per SEQUENCE, and one agent owns every transition**; **entry and exit checks** (`G5_BLOCKING.md` §1): the scripted diff of scenes.json + built scenes against the locked board JSON (every camera move, element move, transition device and carrier, `life:`/promise item matches; no new motion), a sound-off cold read of the first fully dressed set (the home set, the density key), and CRAFT's measures rerun on the render and compared with the G3 render | staging, readability at phone size, transitions that play | compositions, camera, timing | 4 h of work; longer on the clock (one lane per sequence, one transition owner) |
 | G6 Polish cut | life checked by tiers (`CRAFT.md` §b: at most 3-4 noticeable supporting movers at once, B <= 30 % of the motion, the subject >= 60 % in its beat; supporting life small and steady, never a still frame; events/s is information, never a target), easing and secondary motion only on movers that already exist (the particle fields' sizes, speeds, turns and sun side too), edges only if the G4 look clip approved them ('paint-subtle' at most; never at the top or beside the caption band), full-res 60 fps; **AI critics start here**; last, an *optional* tactical texture pass on a few elements (playbook) | feel only (no restaging) | the picture | ~6 h (an estimate): review rounds as the quality needs while each one improves the scene (anti-waste rule 2), + bug fixes |
-| G7 Sound | SFX from the final beats, music, -14 LUFS mix | mix | audio | 1 h |
+| G7 Sound | the final sounds for G3's sync plan (sized like their gestures, every sync point heard; no new sync point, the picture never re-timed: `docs/look/SOUND_SYNC.md` §4), music, -14 LUFS mix | mix | audio | 1 h |
 | G8 Final | the master (`scripts/render-media.mjs --master`: "Master encode" below), QA (+ `scripts/qa/check_banding.py` on the master's sky shots: no FAIL), cover, posting kit | blockers only | everything | 1.5 h |
 
-Target: the first playable cut (the G3 reel) about 3 h after the voice lock, then the G4 look clip (~1 day after the G3
+Target: the visual script about 2-3 h after the voice lock (an estimate), the first playable cut (the G3 reel) about 3 h after its lock, then the G4 look clip (~1 day after the G3
 lock), then the G5 lanes and G6 (video 1: the first playable film at hour 18.7).
 
 ## Creative exploration is not waste (owner rule)
@@ -87,21 +188,69 @@ Quality and output value come first, spent where it reaches the film. Ideas are 
   four-persona gut panel and a truth check in one pass), the top 3 on one screen; bookkeeping
   `video/scripts/coreline.py`. The heavy version (22 agents: `v3-g05-core-line*.js`, `v4-g05-facts-and-core-line-*.js`)
   cost about $150 on v4 and its four judges barely separated the top lines: never by default.
-- **G1 script = story first (owner, 2026-10-26; lean since 2026-10-28):** one writer (1) drafts 2-3 competing story
-  spines (the throughline question, the viewer's situation, beats joined by but/so, the turn, the payoff that lands the
-  core line) and picks one, with its reason; (2) writes the script with cues; (3) runs `check_rhythm.py` and
-  `check_paste.py` until both pass. Then one critic: a cold retell (a list-like retelling fails), the first line heard cold: "ad or news?" (an ad-like or
-  baity opening fails: playbook, never baity), the flow (every line
-  follows from the previous) and the facts against the fact file, at most 6 findings; then one fix pass by the same
-  writer (resumed, not restarted). The through-line card's carriers come from the script's joins (G1 row). Never
-  structure a script as a list of facts to prove. **Rhythm (owner, 2026-10-27):** short sentences (<= 5 words) break up
-  the long ones, at least one after every 1-2 long sentences; the script must pass `scripts/voice/check_rhythm.py`
-  before it goes to the owner. The heavy version (~12 agents: `v3-g1-story-*.js`) runs only on request.
-- **G3 animatic:** 2-3 visual concepts for the whole film, judged internally; the owner sees one animatic (one-version rule).
+- **G1 script = story first, clear on one hearing (owner, 2026-10-26 and 2026-10-29; lean since 2026-10-28):** one
+  writer (1) drafts 2-3 competing story spines (the throughline question, the viewer's situation, beats joined by
+  but/so, the turn, the payoff that lands the core line) and picks one, with its reason, then gives every beat its job
+  in one line and runs **the side-quest test** (playbook ONE SUBJECT, GONE DEEP: "No side quests"; PRINCIPLES P10): cut
+  each beat in your head, and if the viewer still gets the story and the payoff, it stays cut, however true, weird or
+  fun (only the information the story needs; a sentence may still grow where its words make it more natural or
+  clearer); (2) writes the script with cues, in the beat order of
+  `docs/retro/2026-10-29_script_clarity/PRINCIPLES.md` ("How a 40-second script is structured"), with about two to
+  four **human connectors** at the joins that need a hand, each true to the sentence it opens and named with its job
+  in the script doc's notes (playbook "Human connectors, placed TACTICALLY"; PRINCIPLES P11, "Where the connectors
+  go"), never a RULE #1 stock reveal; (3) **the clarity pass:** fills the film's word list
+  `docs/vN/script/clarity.json` (the thread object's one everyday name and its rivals, the film's trade words with
+  their plain descriptions, any allowed word
+  with its reason; format: `docs/retro/2026-10-29_script_clarity/LINT_SPEC.md` section 3), writes "What I mean is:
+  ___" in the script doc's notes under every line that leans on what the writer knows, and runs `check_clarity.py`
+  (it reads `clarity.json` by itself), `check_rhythm.py` and `check_paste.py` until all three print OK
+  (`check_clarity.py` OK means no error, never that the script is clear), answering every clarity warning in the
+  script doc's "Checks" section (fixed, or why it stays). Then one critic, cold first (before the writer's brief and
+  notes, the script doc or the fact file: only the spoken words): (a) **the cold viewer panel:** the critic plays the
+  three viewers below in turn; each hears the narration once, one sentence at a time, never looking back or ahead,
+  and after each sentence reports what they understood (in their own words), the words they missed or took another
+  way, what each "it", "they", "this", "that" and new "the X" points at, and their thumb (stays, unsure, swipes) with
+  why; after the first sentence each also answers "ad or news?" (an ad-like or baity opening fails: playbook, never
+  baity); after the last, each also names the sentence they could lose without missing anything the story needs (or
+  "none") and where it sounded most like a real person talking to them and most like a script or an ad (or "none");
+  (b) the cold retell (a list-like retelling fails); then (c) the lint's targeted questions
+  (`check_clarity.py --questions`) put to the same three viewers; (d) the flow (every line follows from the previous;
+  every beat has its job, no side quest; the connectors, about two to four, each doing real work) and the facts
+  against the fact file. **A clarity finding** is any line a viewer retells wrong or can't retell, a
+  word one of them doesn't know or takes in another sense, a pointer one of them resolves wrongly or not at all, a
+  line one of them had to re-link to an earlier one, or an "unsure" or "swipe" thumb; each is listed by line, with
+  the viewer's own words and a plainer line, and never waved through as "paid off by the next line". A sentence a
+  viewer could lose gets the side-quest test (it goes unless the story or the payoff needs it; the critic says which),
+  and a line heard as a script or an ad is rewritten the way a person would say it (a connector where the join needs
+  a hand); both are on the panel's list. The panel's list is complete and all of it is fixed; the critic's other
+  findings stay at most 6. Then one fix pass by the same writer (resumed, not restarted): every panel line
+  rewritten, the three checks re-run, and the critic (resumed) re-hears each changed line as the three viewers, with
+  the line before and after it, until no changed line snags.
+  The through-line card's carriers come from the script's joins (G1 row). Never structure a script as a list of facts
+  to prove. **Rhythm (owner, 2026-10-27):** short sentences (<= 5 words) break up the long ones, at least one after
+  at most three long sentences (three only when they flow, joined by connectors: the El Niño reference,
+  `docs/voice/refs/2026-10-29_el_nino/`), each short line keeping its noun; the script must pass `scripts/voice/check_rhythm.py` and
+  `scripts/voice/check_clarity.py` (exit 0) before it goes to the owner. The heavy version (~12 agents:
+  `v3-g1-story-*.js`) runs only on request.
+  - **The three viewers** (each card says what that viewer doesn't know, because a played panel knows every word; each
+    hears one sentence at a time, once, and answers only from that sentence and the ones before it, then the two
+    questions at the end, (a) above: the sentence they could lose, and where it sounded like a person or a script;
+    they may run as three small cold agents instead, the narration inline, no file read, the card as the persona: v4
+    G1 did, and all three snagged on a line every check had passed, "Nothing is built yet."; never more than three):
+    1. **A non-native English speaker** (24, in São Paulo, Jakarta or Kraków; learned English at school; watches Reels
+       with the captions on): knows everyday words and takes each in its most common, literal sense; knows no idioms
+       beyond the most basic, no slang, no American cultural references; knows world-famous names only (Google,
+       Apple, Microsoft, Amazon, Tesla, Netflix, the FBI), not company or product names from the news; misses irony.
+    2. **A non-tech adult** (45, a nurse or a bus driver; uses a phone daily, never thinks about how computers work):
+       to them chips are food, a cabinet is a cupboard, a server is a waiter, the cloud is in the sky; knows "AI" and
+       "chatbot" from the news, not how they work; a number means something only next to an everyday thing.
+    3. **A fast-scrolling teen** (15; thumb on the screen, two seconds of patience): knows apps and memes, not news,
+       not trade words; swipes on the first line that doesn't make sense or sounds like an ad.
+- **G2.5 visual script (owner, 2026-10-29):** 3 visual concepts for the whole film (one page each, style-neutral), judged internally by a story judge and a craft judge; the pick is written as the one visual script the owner reads, after a sound-off and sound-on cold read, a critic and one fix pass (`docs/v4/visual/METHOD.md`). - **G3 animatic:** plays the locked visual script, one block = one panel (the thumbnail variants per beat stay G3's: `G3_ANIMATIC.md` §5); the owner sees one animatic (one-version rule).
 - **G4 look:** 2-4 style-frame directions when the topic needs a new look, judged internally; the pick becomes the one
   look clip the owner plays.
 
-G3 and G4 are divergent stages (a few concepts, judged together); G0-G1 run lean (above). The rules below target the convergent
+G2.5 and G4 are divergent stages (a few concepts, judged together; G3 plays G2.5's pick); G0-G1 run lean (above). The rules below target the convergent
 stages (building, fixing, polishing), where the measured waste happened.
 
 ## Anti-waste rules (each one fixes a measured waste)
@@ -109,7 +258,7 @@ stages (building, fixing, polishing), where the measured waste happened.
 1. **No AI critics on built scenes before G6** (reviews were 28 % of spend, mostly on scenes that changed afterwards).
    Before G6 the owner is the reviewer, plus what judges no taste: scripted checks (the gate check: duration, A/V sync,
    captions inside the safe area; from G3 on, CRAFT's lints, rule 6), cold reads that only retell what they see (G1's
-   retell panel, G3's sound-off and sound-on reads, G5's first-set read) and each lane's style quiz before it builds
+   cold viewer panel and retell, G2.5's and G3's sound-off and sound-on reads, G5's first-set read) and each lane's style quiz before it builds
    (playbook Process: one STYLE.md per film). The divergent stages above keep their judges. `G5_BLOCKING.md` §9's
    art-director reviews were v2r's (an owner-ordered restart with full creative freedom), not the default.
 2. **Scripts measure first (2026-10-29), then one combined reviewer per scene per round from G6 on, max 6 findings,
@@ -152,8 +301,7 @@ stages (building, fixing, polishing), where the measured waste happened.
 7. **The hook goes first at every gate:** its first 3-5 s are built and checked before the rest (a swappable hook
    segment, tooling item 4, was never built), with its sound cue from G1 on (a positive phone sound in the first second,
    per the playbook). Where it is decided: G0.5 picks the core line (the hook's seed and the cover title; the payoff in words by ~2 s); G1 picks the
-   spoken hook line (up to 3 alternatives as text); G2 voices only the pick; G3 decides its picture (the one opening
-   shot: concepts judged internally, the owner sees one). v3 picked its hook at G2 from three MP4s, one per hook ("why
+   spoken hook line (up to 3 alternatives as text); G2 voices only the pick; G2.5 writes its picture (the one opening shot, at sub-second detail: concepts judged internally, the owner reads one), and G3 plays it. v3 picked its hook at G2 from three MP4s, one per hook ("why
    are there multiple versions"): retired with the one-version rule. It is never polished last.
 8. **One deliverable per gate, no status reels.** Drop the 30-minute strips of every composition. The owner gets the gate video;
    between gates, a short text status on all active threads (playbook Process, "Progress"), never a rendered reel.
@@ -200,9 +348,11 @@ the film's real rate — v3's "smoothness is not there" had no 30 fps surface to
 
 Every master (the G8 file, a 1440 x 2560 YouTube master with `--scale=4/3`, any owner download meant to be posted)
 renders in ONE step with `node scripts/render-media.mjs <FilmN> out/<name>.mp4 --entry=<entry> --master` (+ the film's
-`--props`, `GL=` as its chunks): lossless PNG frames, Remotion's BT.709 conversion (limited range, tagged) in the same
+`--props`): lossless PNG frames, Remotion's BT.709 conversion (limited range, tagged) in the same
 encode, x264 CRF 14, preset slow, aq-mode 3, 8-bit yuv420p (High), mp4 faststart. The settings live there and nowhere
-else. Measured on the sky demo (`docs/look/research/2026-10-27_sky_gradients.md` §5): Remotion's default JPEG q80
+else. The owner's gate videos (the G4 clip, the G5-G7 cuts) use the same encode, chunked:
+`--master --parallel` (3 chunks on the film's scene boundaries, the audio muxed once and bit-identical to a one-step
+render's, the seams within 0.06 dB of one step; v2r 5:03 instead of 6:11). The posted master stays one step. Measured on the sky demo (`docs/look/research/2026-10-27_sky_gradients.md` §5): Remotion's default JPEG q80
 frames halve a sky's dither and band it, and the old second "TV-range" pass (`scale=in_range=full:out_range=tv` +
 `-colorspace bt709`) re-encoded a BT.601 file and only relabelled it BT.709 (the mint 1.7 L* darker, dE76 up to 2.5)
 and banded the sky again: retired.
@@ -225,14 +375,17 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
 |---|---|---|
 | G0 topic | lean by default (2 scouts + 1 editor: the G0 bullet); heavy on request: `v3-g0-topics-*.js`; `docs/IDEAS_BANK.md` | the top 3 topics, each with its proposed core line |
 | G0.5 core line | by default inside G0; on request one writer + one critic (`video/scripts/coreline.py` for the bookkeeping); heavy, never by default: `v3-g05-core-line-*.js` | the top 3 lines |
-| G1 script | lean by default (one writer + one critic + one fix pass: the G1 bullet); heavy on request: `v3-g1-story-*.js` | spines, the script with cues, rhythm and paste checks, critique, fix |
+| G1 script | lean by default (one writer + one critic + one fix pass: the G1 bullet); heavy on request: `v3-g1-story-*.js` | spines, the script with cues, the clarity pass (the film's `clarity.json`), the clarity, rhythm and paste checks, critique (the cold viewer panel first), fix |
 | any line | `v3-line2-fix-*.js` | replacement lines tested in context by viewer personas + a standards/flow judge |
-| G1/G2 voice | `docs/ELEVENLABS.md`; `video/scripts/voice/` | paste-file rules + `check_paste.py`; `check_rhythm.py` (long sentences broken by short ones); `check_take.py` (transcribe + diff), `clean_take.py`, `transcribe.py` |
+| G1/G2 voice | `docs/ELEVENLABS.md`; `video/scripts/voice/` | paste-file rules + `check_paste.py`; `check_rhythm.py` (long sentences broken by short ones); `check_clarity.py` (clear to a regular listener on one hearing: errors for trade words and false friends, pointers with rivals or no target, vague scope, idioms; 13 warnings, each a targeted question for the G1 panel via `--questions`; reads the film's word list `docs/vN/script/clarity.json`; `--selftest` keeps the owner's v4 notes as its regression; needs the pinned spaCy and wordfreq, and prints their install line (exit 2) when they are missing; run it without `python3 -I`; spec and build: `docs/retro/2026-10-29_script_clarity/LINT_SPEC.md`, `LINT_REPORT.md`); `check_take.py` (transcribe + diff), `clean_take.py`, `transcribe.py` |
 | G2 voice (API) | `video/scripts/voice/generate_take.py` | per-line generation with the owner's voice, ASR check (Parakeet + Whisper), auto-regenerate, stitch; needs `ELEVENLABS_API_KEY` |
+| G2 delivery | `video/scripts/voice/measure_take.py`, `shape_take.py`, `textnorm.py` | measure a take's delivery (words/min, pauses, pitch spread, stress) against a reference; shape its cadence after generation (pause lengths from each pause's own audio, beats before chosen lines, one static gain; no time-stretch, no compressor: on v4 they sounded robotic and "like in some chamber"); numbers spelled the script's way in every check |
 | G2 sound | `video/audio/tools/make_phone_sfx.py` | our own positive phone sounds (like pop, ding, swoosh, cart add) |
-| G3 animatic | `video/src/v3/SketchReel.tsx` + `v3-g3-animatic-*.js` | 3 visual concepts, judges, storyboard artist writes the animatic JSON; SketchReel draws it with voice and pop captions |
+| G2.5 visual script | `docs/v4/visual/METHOD.md` (format, steps, checks); v4's run in `docs/v4/visual/` (research, concepts, judges, the visual script, the reviews) as the template | 3 concepts, 2 judges, the visual script (an overview, then one block per shot), the mechanical checks, the sound-off and sound-on cold read, the critic, one fix pass |
+| G3 animatic | the shared kit `video/src/lib/g3/` (`G3ReelComposition`, `SketchReel`; lint `video/scripts/g3/board_lint.py`; v3's `src/v3/SketchReel.tsx` stays v3's own) + `v3-g3-animatic-*.js` (structure only) | the storyboard artist writes the animatic JSON from the locked visual script (the concepts are G2.5's); SketchReel draws it with voice and pop captions |
+| G3-G8 sync | `docs/look/SOUND_SYNC.md` §4 (the sync check list); `video/scripts/qa/av_lag.py` (the voice in the render); `video/scripts/qa/sync_check.py` (to build: each cue's type, its window against the event's first visible frame, heard or not, the spend) | sync points planned at G1, timed at G2, played at G3, carried at G5, finished at G7 |
 | G3 board style | `docs/G3_ANIMATIC.md` (stage) + `docs/look/STORYBOARD_STYLE.md` (drawing); SketchReel `style: "board"`; `scripts/v3/board_lint.py`; `v3-g3-board-*.js` | the animated sketchbook: monochrome boards at their tier weights, every final move/transition played with its carrier, the light rig as shapes, placeholder density; tier-1 lint (motion, emptiness, carrier, thread, tier and rig checks; eye jump and colour shift on the reel: anti-waste rule 6) before render (to build: today `board_lint.py` checks only the panel rules, `STORYBOARD_STYLE.md` §6); sound-off + sound-on cold reads, ONE batched fix round |
-| G3 motion + density | `G3_ANIMATIC.md` §3-4 + §7 tier 1 — **to build**, one checkpointed lane before the next video's G3 (not yet kit) | pose-test actions (2-4 stepped keys, smears), kit ambient loops, transition `device` + `carrier` fields and the carrier check (`CRAFT.md` §a), the `tier` and `rig` fields and the thread's coverage, density placeholders + `life:` lists, 60 fps reel |
+| G3 motion + density | `G3_ANIMATIC.md` §3-4 + §7 tier 1 — **built 2026-10-30**: the shared kit `src/lib/g3/` (how-to `src/lib/g3/README.md`) + `scripts/g3/board_lint.py` | pose-test actions (2-4 stepped keys, smears), kit ambient loops, transition `device` + `carrier` fields and the carrier check (`CRAFT.md` §a), the `tier` and `rig` fields and the thread's coverage, density placeholders + `life:` lists, 60 fps reel |
 | G3 clarity | SketchReel `icon` elements; sound-off cold read (`v3-g3-clarity-*.js`) | recognisable objects instead of boxes; viewer personas say what each shot shows with the sound off; confusing shots get redrawn literally before the owner sees the animatic |
 | G3-G5 camera | `docs/look/CINEMATIC_GUIDE.md` (+ `research/arcane_shots.json`, sketches in `docs/look/cine_sketches/`) | Arcane-measured shot vocabulary V1-V12, camera presets, 9:16 composition, light, transitions, sequence templates; storyboard and blocking pick from it. At G3, a per-film camera plan (`docs/vN/camera_plan_g3.md`, one row per panel, with its carrier, tier map and rig; checks in `STORYBOARD_STYLE.md` §7) comes before the re-board |
 | references | `arcane-cinematic-guide-*.js`, `scripts/look/shot_sheets.py` | dissect any reference video: measure, contact sheets, per-shot analysis agents, guidebook |
@@ -248,6 +401,13 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
   call, `effort: "max"` on every Agent tool call, `/effort max` as a helper session's first prompt, and every brief says
   that anything its agent starts runs at max too. The hook in `.claude/settings.json` enforces it;
   `python3 .claude/hooks/max_effort.py --lint|--fix <workflow.js>` checks or repairs a script.
+- **The standard brief header** (owner, 2026-10-31: "start from the feeling, never from a number"): every look or
+  frame brief opens with (1) the beat: its story moment and what the viewer should FEEL, in words, and where its life
+  and action are; (2) the tools to consult for that feeling, named by guide (never a guide's numbers copied in);
+  (3) only the hard constraints that apply (CLAUDE.md). A look number in a brief is a target the frame gets forced to:
+  the hook `.claude/hooks/feeling_brief.py` stops a brief that carries one (a share of the frame, an L* target, a
+  placement) unless the brief says "Numbers here are examples or checks, not targets." (for a hard constraint, a
+  mistake check or a labelled example); `python3 .claude/hooks/feeling_brief.py --lint <file>` checks a script.
 - Context: the gate's brief plus the scene's own data. **Point to sections, never "read all docs fully".**
 - An agent writes its result into a file and its chat report is at most 3 lines (rule 9). Cross-lane requests go in one
   block, in an exact format.
@@ -263,8 +423,9 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
 ## Tooling planned before video 2 (history, except item 6)
 
 Where each one stands (2026-10-27): 2, 3 and 5 exist (Film's `draftLabel` and `edges={false}`, `src/v3/SketchReel.tsx`,
-`scripts/qa/gate_check.py`); 1 and 4 were never built (gate videos are plain `npx remotion render`: the G3 reel at
-540p60, the G4 clip and the G5+ cuts at full size); 6 is part of the approved pipeline and still to build, before the
+`scripts/qa/gate_check.py`); 1 and 4 were never built (gate videos render through `scripts/render-media.mjs`, never
+the bare CLI: the G3 reel at 540p60 with `--scale=0.5`, the G4 clip and the G5+ cuts at full size with
+`--master --parallel`); 6 is part of the approved pipeline and BUILT 2026-10-30 (the shared kit `src/lib/g3/`, `scripts/g3/board_lint.py`; `g5_scaffold.py`'s carry-through and the eye-jump / colour-shift measures still to build) before the
 next video's G3.
 
 1. **`npm run preview`**: the whole film at 0.33 scale with audio, CRF 28, x264 veryfast, about 3-5 min. Also

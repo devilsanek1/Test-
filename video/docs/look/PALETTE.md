@@ -59,19 +59,26 @@ every palette against the DNA below.
 **The house DNA** keeps the palettes one family. The numbers are CIE L* (lightness) and C (colourfulness):
 - **Background:** soft and light (L* >= 75, C <= 20), never saturated or dark. It fills 50-80 % of the frame.
 - **Mids:** soft, from our clay family (cream, peach, terracotta, rose, leaf sage) or the palette's own tints; never
-  beige, muddy tan, olive or grey (playbook "Warm, never sickly", v3 G4). Props and figures are
-  flat shapes without lines, parted by their lit and shade faces (`CRAFT.md` §c).
+  beige, muddy tan, olive or grey (playbook "Warm, never sickly", v3 G4). Figures are crisp flat shapes and props are
+  painted at their plane's dose (ONE painted language since 2026-10-30), all without lines, parted by their lit and
+  shade faces (`CRAFT.md` §c). Each scene keeps ONE colour key inside its palette: one strong family (the sky's own),
+  one hot accent at the focal, every other colour tone-on-tone in its mass (playbook PROPER LIGHT; `ORGANIC.md` §4.3).
 - **Where the values and the colour live** (owner, 2026-10-29: "Go with your suggestions", the city-poster study's
-  decision 2; numbers `CRAFT.md` §f.8): calm lights (the page, the sky), the near world in mid-tones carrying the
-  colour, and real darks drawn in many small pieces (windows, doorways, eave undersides, the shade under trees), never
-  a narrow band of light pastels; a palette carries roles for those darks (unlit panes, doorways, an eave shade, as
-  10b does). The study's chroma numbers for it (light fills C* 4-8, mids C* 18-32) are 10b's proposal below.
+  decision 2; the darks settled anew on 2026-10-30 under his hand-over as the references' low key; numbers `CRAFT.md`
+  §f.8): calm lights (the page, the sky with the caption band), the mid-tones carrying the colour, and real darks:
+  small darks at the focal (an unlit pane, a doorway, a hull, the subject's silhouette) plus one or two big quiet dark
+  masses below the band in the key's shade colour at its value, chroma kept (never black, grey or muddy), never darks
+  scattered as confetti or a narrow band of light pastels; a palette carries roles for those darks (unlit panes,
+  doorways, an eave shade, as 10b does, and the shade mass's colour: v7's violet-plum quay). The study's chroma numbers
+  for it (light fills C* 4-8, mids C* 18-32) are 10b's proposal below.
 - **Ink:** dark and warm (L* <= 25), never pure black, for captions and the darkest thin lines; a thin line takes its
   object's own deep shade (`CRAFT.md` §c). At least 7:1 contrast on the background.
 - **The references' trick, used tactically:**
   - **one hero** (C >= 30): saturated, on the subject or the story's object, 5-15 % of the frame;
-  - **one dark anchor** (L* <= 40): tinted, instead of black; its hue carries the frame's darks, in many small pieces
-    on 6-10 % of the frame (owner, 2026-10-29: `CRAFT.md` §f.8), never one mass (about 5 % until then);
+  - **one dark anchor** (L* <= 40): tinted, instead of black; its hue carries the frame's darks: the small darks at the
+    focal and the one or two big quiet dark masses below the band, up to ~45 % of the frame under L* 40 (the
+    references' low key, decided 2026-10-30 under the owner's hand-over: `CRAFT.md` §f.8; 6-10 % in many small pieces
+    from 2026-10-29, about 5 % before);
   - **at most one hot pop** (C >= 50): 1-3 %, only on "look here" (the frame-0 hook detail, a notification, a reveal);
     the sun is never the pop unless it is the shot's "look here": one step off its sky, or behind a ridge (owner,
     2026-10-29: `CRAFT.md` §g.2).
@@ -123,8 +130,9 @@ the owner sees it in a look clip (a W1 proposes it, the G4 clip shows it: "How t
   sky is the one cool field, as Canal Mint's mint is. **Lantern Paper**'s page and ground sit just outside the beige band
   and under the olive band: lint their shaded copies on the frame. The same check flags house palettes #1-2's ground
   (yellow-green) and #5 Sage Study's page (olive, h 116) (`style.md`).
-- **What goes with 10b, decided by the owner** (2026-10-29: "Go with your suggestions"): its darks in many pieces
-  (`CRAFT.md` §f.8: 6-10 % under L* 40) and its tier-A shade at -24 (inside `CRAFT.md` §d.3's -20 to -25); its
+- **What goes with 10b, decided by the owner** (2026-10-29: "Go with your suggestions"): its real darks (`CRAFT.md`
+  §f.8: then 6-10 % under L* 40 in many pieces; since 2026-10-30 the references' low key, small darks at the focal
+  plus one or two big quiet dark masses) and its tier-A shade at -24 (inside `CRAFT.md` §d.3's -20 to -25); its
   sun-orange pop stays for a "look here", never a calm far sun, which sits one step off its sky (`CRAFT.md` §g.2).
   Every proposal here follows the same three rules. The palettes themselves and the study's chroma numbers (light
   fills calm, the colour in the mid-tones, saturation as confetti: `STUDY.md` §4) stay proposals until the owner sees
@@ -159,8 +167,9 @@ thing (hair, steam).
 **What our kit has:**
 - an optional paper-grain overlay (`public/textures/grain.png`, `Card` `grain`; off by default): retired as it was;
   since 2026-10-28 a VERY subtle paper-and-paint texture is being tested again (owner: "start playing with it, very
-  subtly especially if its adding to the premium look"; `CRAFT.md` §c, which holds the test's spec), measured from the
-  city posters (`docs/studies/2026-10-28_city_posters/`);
+  subtly especially if its adding to the premium look"), measured from the city posters
+  (`docs/studies/2026-10-28_city_posters/`), and since 2026-10-30 it is the one paper per film (owner, on an overall
+  texture: "that seems solvable too?"; its spec: `CRAFT.md` §c);
 - tapered brush lines (the mascot ink; the clean pen keeps taper off unless asked).
 
 **What it lacks:** a halftone fill. Add it as an SVG `<pattern>` (dots in the fill's darker tone), applied per shape

@@ -7,15 +7,19 @@
 //   PosterS1-v2       the same, every switch off (v2's S1 exactly, plus the hold)
 //   PosterS1-pass1    STUDY §10's pass 1
 //   PosterS1-pass2    every decided change
+//   PosterLookTest    THE clip for the owner's phone (15.5 s, 930 f): a card "Before: the Google video", v2's S1 (6.1 s),
+//                     a card "After: the poster lessons", pass 2 (7.0 s); v2's voice and captions in both parts
 // Stills (always GL=angle; 4 shared CPUs: one render at a time, --concurrency=2):
 //   GL=angle node scripts/render-frames.mjs PosterS1 <dir> 0,1.0,3.0,5.2 --entry=src/entry-look-poster.tsx --scale=0.5 --props='{"preset":"pass2"}'
 // Clip:
 //   npx remotion render src/entry-look-poster.tsx PosterS1-pass2 out/poster_s1_pass2.mp4 --gl=angle --concurrency=2
+//   the master: test/REPORT.md §1 (render-media.mjs --master)
 import './v2r/palette';
 import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import {PosterS1, POSTER_S1_FPS, POSTER_S1_FRAMES, type PosterS1Props} from './look/poster_s1/PosterS1';
 import type {PosterPreset} from './look/poster_s1/switches';
+import {PosterLookTest, LOOK_TEST_FPS, LOOK_TEST_FRAMES} from './look/poster_s1/PosterLookTest';
 
 const W = 1080;
 const H = 1920;
@@ -28,6 +32,7 @@ const LookPosterRoot: React.FC = () => (
     {PRESETS.map((p) => (
       <Composition key={p} id={`PosterS1-${p}`} component={PosterS1} defaultProps={{...defaults, preset: p}} durationInFrames={POSTER_S1_FRAMES} fps={POSTER_S1_FPS} width={W} height={H} />
     ))}
+    <Composition id="PosterLookTest" component={PosterLookTest} durationInFrames={LOOK_TEST_FRAMES} fps={LOOK_TEST_FPS} width={W} height={H} />
   </>
 );
 

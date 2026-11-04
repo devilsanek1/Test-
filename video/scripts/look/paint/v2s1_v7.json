@@ -1,0 +1,255 @@
+{
+ "film": "v2s1_v7",
+ "about": "v2's S1, painter v7a (iteration 2026-10-30, ORGANIC.md \u00a76 steps 1, 2, 4; notes paint_test/NOTES.md 'v7a'): v6's recipe-book pieces re-keyed at the SOURCE for T3, the references' low key (composition.md \u00a75): the sky deepens to L* 60 at its top (violet), flat at L* 77 through y 270-590 (the caption band; the recipe's field stops widened from 317-556 so its big soft strokes, sampled on the steep zenith ramp above, leave the words' block flat) (a warm rose-lilac, ink 9:1), the light band and the peach horizon as v6; the hero cumulus a dark violet mass (body L* 52, deep 44) lit on the sun's side (peach-gold L* 81, rim 88); the mid bank and the far deck calmed toward the sky (k 0.62 / 0.74: within +-4-6 L* of it); the streaks a step off the light band; the far city stays the scene's own hazed flat, keyed by the scene (as v6 shipped it: v6's painted far city was dropped from its manifest by paint.py's --only merge, and painting it is step 3c's); the canal (E7) painted on v7's OWN design frame (the prop cut, one boat, Pip on its cabin roof) with the keyed local colours. The tree is cut (R6). The scene side: src/look/v7_s1 (palette_v7.ts keys the vector world at the source; the light bake adds the darks).",
+ "out": "public/paint/v2s1_v7",
+ "out_design": "public/paint/v2s1_v7design",
+ "frame": [
+  1080,
+  1920
+ ],
+ "band": [
+  290,
+  600
+ ],
+ "key": [
+  -0.7,
+  -0.62,
+  0.36
+ ],
+ "light": {
+  "sky": {
+   "zenith": "#928CB1",
+   "field": "#CBB8CD",
+   "rose": "#E1C5D0",
+   "band": "#EEDAD4",
+   "horizon": "#F3D6C3",
+   "glow": "#FFDFBE",
+   "sun": "#FFF0DC",
+   "rim": "#FED5AF",
+   "lit": "#F4BE98",
+   "half": "#CC9193",
+   "shade_top": "#8C84AA",
+   "shade": "#83759E",
+   "deep": "#746089",
+   "streak": "#E8CDDA",
+   "bird": "#5A506F"
+  },
+  "local": {
+   "window": "#E3C9AE",
+   "door": "#FFE0B0",
+   "facade": "#CD9985",
+   "facade_cream": "#D5C5BB",
+   "dark_window": "#412F45",
+   "paving": "#E2D0C1",
+   "sand": "#D8B9A2",
+   "stone": "#6D6680",
+   "haze": "#CDB3BF"
+  },
+  "sun_colour": "#EE6A2E"
+ },
+ "pieces": [
+  {
+   "id": "v2s1/sky",
+   "style": "sky_recipe",
+   "seed": 61,
+   "size": [
+    1080,
+    1100
+   ],
+   "band": [
+    270,
+    590
+   ],
+   "sun": {
+    "xy": [
+     196,
+     752
+    ],
+    "r": 20,
+    "glow": 0.55
+   },
+   "streaks": 4
+  },
+  {
+   "id": "v2s1/clouds",
+   "style": "cloud_planes",
+   "seed": 62,
+   "planes": [
+    {
+     "name": "p1",
+     "depth": "far",
+     "plane": 3,
+     "zdepth": 0.7,
+     "box": [
+      0,
+      610,
+      780,
+      706
+     ],
+     "base_y": 686,
+     "design": "FAR",
+     "prm": {
+      "k": 0.74
+     }
+    },
+    {
+     "name": "p2",
+     "depth": "mid",
+     "plane": 2,
+     "zdepth": 0.4,
+     "box": [
+      0,
+      100,
+      580,
+      290
+     ],
+     "base_y": 240,
+     "design": "MID",
+     "prm": {
+      "k": 0.62
+     }
+    },
+    {
+     "name": "p3",
+     "depth": "near",
+     "plane": 0,
+     "zdepth": 0.0,
+     "box": [
+      560,
+      0,
+      1080,
+      345
+     ],
+     "base_y": 300,
+     "design": "NEAR",
+     "prm": {
+      "n_block": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "v2s1/water",
+   "style": "water_recipe",
+   "seed": 65,
+   "design": "out/paint/v2s1_v7/design_frame.png",
+   "rows": [
+    1030,
+    1310
+   ],
+   "waterline": [
+    [
+     0,
+     1068
+    ],
+    [
+     460,
+     1111
+    ]
+   ],
+   "near_edge": {
+    "y0": 1143,
+    "slope": 0.1311
+   },
+   "s_range": [
+    0.55,
+    0.95
+   ],
+   "dose": {
+    "mid": 0.6,
+    "near": 0.6
+   },
+   "accents": 4,
+   "objects": [
+    [
+     785,
+     1020,
+     1080,
+     1150
+    ]
+   ],
+   "gold_skip": {},
+   "lights": [
+    {
+     "box": [
+      545,
+      850,
+      712,
+      1062
+     ],
+     "length": 0.75
+    }
+   ],
+   "reflection": {
+    "solid": 0.6,
+    "face": 7,
+    "quay_top": 10,
+    "simplify": [
+     7,
+     21
+    ],
+    "k": 0.3,
+    "fresnel": [
+     -4,
+     -8
+    ],
+    "wobble": [
+     0.5,
+     2.7,
+     120
+    ],
+    "top_limit": 600
+   },
+   "glint": {
+    "x": 196,
+    "D": 96,
+    "strength": 0.5,
+    "slivers": [
+     2,
+     4
+    ]
+   },
+   "rings": {
+    "xy": [
+     400,
+     1137
+    ],
+    "r0": 46,
+    "grow": 1.5,
+    "ratio": 7
+   },
+   "contact": {
+    "px": 1.2,
+    "dL": -12,
+    "op": 0.5
+   },
+   "ladder_dL": {
+    "w_mid": -12,
+    "w_near": -18,
+    "w_deep": -24,
+    "w_deeper": -24
+   }
+  },
+  {
+   "id": "v2s1/flock",
+   "style": "flock_sprite",
+   "seed": 66,
+   "path": [
+    [
+     34,
+     704
+    ],
+    [
+     150,
+     664
+    ],
+    [
+     292,
+     684
+    ]
+   ],
+   "n": 28,
+   "far_k": 0.55
+  }
+ ]
+}

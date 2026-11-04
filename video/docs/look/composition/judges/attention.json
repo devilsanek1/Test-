@@ -1,0 +1,935 @@
+{
+ "lens": "ATTENTION: does it stop a thumb and hold the eye on a phone, at phone size, in a 30-45 s voice-led film (the first 3 s weigh most; a subtle effect counts as none)",
+ "scores": [
+  {
+   "id": "A1",
+   "score": 1,
+   "reason": "No gaze evidence for thirds (no preference in large photo sets [S3]; raised only experts' interest [AT31]); the first look lands on the centre whatever sits on a third [S7, V5]; on the feed the visible thirds x 393 / 687 are just the axis edges, so the grid adds nothing for the eye; its use is proportion (sky : ground 2:1), not attention.",
+   "best_beats": [
+    "home hold",
+    "breather"
+   ]
+  },
+  {
+   "id": "A2",
+   "score": 3,
+   "reason": "Works only because the phi box (x 413-667, y 951-1187; on the feed x 436-644, y 951-1168) lies within ~130 px of the centre where the first saccade goes [S7, AT15]; phi itself has no gaze evidence [S4]: the right home for every onset, not a pull of its own.",
+   "best_beats": [
+    "hook (0-3 s)",
+    "mechanism step",
+    "home hold"
+   ]
+  },
+  {
+   "id": "A3",
+   "score": 1,
+   "reason": "The nested cut has no attention evidence; the big form is the larger, earlier call and the small subject at its foot (570, 1086) is seen only if it carries the light and the onset (then E2 / RM6 do the work): a two-call risk at phone size.",
+   "best_beats": [
+    "scale / awe"
+   ]
+  },
+  {
+   "id": "A4",
+   "score": 1,
+   "reason": "The eye does not travel a curve, it jumps between key elements [AT31]; in reel 04a the walker at the spiral's eye was only the 4th value call (reels.md section 6); it pulls only when RM1's traveller or RM8's pen rides the arc into the pole, which is their score, not the spiral's.",
+   "best_beats": [
+    "arrival"
+   ]
+  },
+  {
+   "id": "A5",
+   "score": 1,
+   "reason": "No gaze evidence; its two feet (454, 987) and (626, 1133) are two related points ~226 px apart, inside the crowding ring (~150-220 px at the 4-6 degree drop [AT25]), and the slope itself outpulls either foot.",
+   "best_beats": [
+    "mechanism step"
+   ]
+  },
+  {
+   "id": "A6",
+   "score": 3,
+   "reason": "An orientation singleton (one strong vertical among level lines builds salience [AT8]) whose crossing is a junction gaze favours [AT13], at x 413-667 near the centre, with the tall frame's full height; but a mast or lamp post is not the subject unless the light or a figure sits at the crossing.",
+   "best_beats": [
+    "scale / awe",
+    "join: same object",
+    "breather"
+   ]
+  },
+  {
+   "id": "A7",
+   "score": 4,
+   "reason": "Fixations gather on a single symmetry axis [AT32] and ours is the screen centre x 540 [S7]; a mirrored frame reads as one fluent gist in 0.25 s [AT1, AT59]; its one break at the axis on the turn is a singleton change at the centre; once or twice a film, or it stops reading as an event.",
+   "best_beats": [
+    "But turn",
+    "ending / loop",
+    "callback / before-after"
+   ]
+  },
+  {
+   "id": "B1",
+   "score": 3,
+   "reason": "The lines' end gains attention only with a clear subject there (one study, 34 viewers [AT30]); the eye does not ride lines [AT31]; in the owner's reels a brighter patch beat the lines' subject in 12 of 20 frames: it pulls when the lines end within 40 px of the focal's box AND at the story light; drawn live by RM8 it becomes a path the eye can follow.",
+   "best_beats": [
+    "arrival",
+    "hook (0-3 s)",
+    "home hold"
+   ]
+  },
+  {
+   "id": "B2",
+   "score": 4,
+   "reason": "The vanishing point draws fixations beyond salience (AUC 0.85 vs 0.80) and search is faster there [AT29]; on the subject at x 540-700, y 950-1150 it coincides with the centre bias [S7]; the owner's model explainer centres its VP in 11 of 16 shots (vertical.md section 6); a 5 once the closing object holds the light (E7 + E2).",
+   "best_beats": [
+    "arrival",
+    "home hold",
+    "join: going inside"
+   ]
+  },
+  {
+   "id": "B3",
+   "score": 3,
+   "reason": "A convergence point like B2 [AT29] with 5-9 rays, but rays are extra edges (feature clutter cuts attention to the key element [AT26]) and ours must avoid the band (wires only above y 290 or below y 600); it pulls when a light event (RM6) fires at the source.",
+   "best_beats": [
+    "mechanism step",
+    "payoff word"
+   ]
+  },
+  {
+   "id": "B4",
+   "score": 4,
+   "reason": "Stacks a vanishing point [AT29], the brightest area [AT6] and the centre [S7] on the far opening at (540, 950-1100), 15-25 % of the frame; but the portal's sides in the gutters (x < 95, > 945) through the band are mostly cropped on the feed (visible x 98-982), so the enclosure reads only in the stage; the natural set-up for J2.",
+   "best_beats": [
+    "arrival",
+    "join: going inside"
+   ]
+  },
+  {
+   "id": "B5",
+   "score": 2,
+   "reason": "A texture with no point, no gaze evidence as a guide (attention.md: 1); its one use for the eye is the uniform field that a single mover or a break pops out of (similar distractors make the odd one easy [AT22]): 3-5 lines below y 600 at 30-60 degrees under RM3 or RM1.",
+   "best_beats": [
+    "mechanism step"
+   ]
+  },
+  {
+   "id": "B6",
+   "score": 2,
+   "reason": "Orientation contrast makes the diagonal itself salient [AT8], so the line, not the subject, takes the look unless the focal breaks it at its upper end with the light; no gaze study; its energy is a feeling for the turn, not a pull.",
+   "best_beats": [
+    "But turn"
+   ]
+  },
+  {
+   "id": "B7",
+   "score": 2,
+   "reason": "A crossing seen 35-55 degrees down puts a convergence at (540, 1000-1100), but the raised view shrinks everything into many small parts (arms, lamps) and the crossing is a place, not a subject; weak, once a film.",
+   "best_beats": [
+    "mechanism step"
+   ]
+  },
+  {
+   "id": "B8",
+   "score": 2,
+   "reason": "A slow route in; the eye does not ride curves [AT31], so the S works only if its end (480-640, 950-1150) is lit or a traveller (RM1) rides it; calm by design, no thumb-stop.",
+   "best_beats": [
+    "arrival",
+    "breather"
+   ]
+  },
+  {
+   "id": "B9",
+   "score": 2,
+   "reason": "An enclosure: a surrounded region reads as the figure and is processed fluently [AT59], but the curve is a big shape of its own beside the subject; no gaze study; a calm holding frame.",
+   "best_beats": [
+    "home hold"
+   ]
+  },
+  {
+   "id": "B10",
+   "score": 2,
+   "reason": "A frame on two sides: one side mass <= 216 px, partly in the strip the feed crops (x < 98), quieter than the focal; no attention effect of its own beyond keeping the eye inside the stage.",
+   "best_beats": [
+    "home hold",
+    "breather"
+   ]
+  },
+  {
+   "id": "B11",
+   "score": 3,
+   "reason": "A convergence at the V's point on the focal (within 60 px of (540, 950-1100)), like B2 [AT29], with the band in the open top; the canyon (sky <= 10 %) quiets the sides; inverted it adds unease for the turn.",
+   "best_beats": [
+    "But turn",
+    "arrival"
+   ]
+  },
+  {
+   "id": "B12",
+   "score": 3,
+   "reason": "Its centre (540, 1000-1100) is where the centre bias already puts the eye [S7] and reel 05 opened on it (frame 0), a bold geometric gist; but that reel frame was the busiest measured (11 value calls, 17 % quiet: reels.md section 6) and clutter cuts attention to the key element [AT26]: tone-on-tone ramps and a lit centre, once a film (attention.md: 2).",
+   "best_beats": [
+    "scale / awe",
+    "mechanism step"
+   ]
+  },
+  {
+   "id": "B13",
+   "score": 3,
+   "reason": "Its round-window form (300-500 px, centre in the golden box) is a frame within a frame and pulls like C1 when lit; its ring-of-things form puts many small calls round the subject (clutter [AT24]); a circle is also the best match-cut anchor (J3, J4) (attention.md: 2).",
+   "best_beats": [
+    "join: same object",
+    "home hold"
+   ]
+  },
+  {
+   "id": "C1",
+   "score": 4,
+   "reason": "One opening on the axis, 15-30 % of the frame, with a figure 150-300 px dark in its aperture, stacks the centre [S7], a person [AT18] and a silhouette step; as catalogued (aperture only >= 10 L* off its rim) it is a 4; lit to E2's >= 65 L* step it is our strongest frame (attention.md: 5 lit, 3 unlit).",
+   "best_beats": [
+    "hook (0-3 s)",
+    "home hold",
+    "join: going inside"
+   ]
+  },
+  {
+   "id": "C2",
+   "score": 1,
+   "reason": "A near layer is big and contrasty by nature and pulls off the subject [AT26]; our hint (<= 2 props within 8 L* of the near shade) is quiet, and its home y 1250-1920 lies mostly under the name block (y >= 1519) and the bottom scrim (-10-20 %): no attention value on the feed, only depth.",
+   "best_beats": [
+    "home hold"
+   ]
+  },
+  {
+   "id": "C3",
+   "score": 2,
+   "reason": "Two levels are two places: the first saccade splits unless one is tone-on-tone [AT22]; the tall frame fits it (y 700-950 over y 1150-1450) and an onset passing from cause to effect can lead the eye, but the device itself directs nothing.",
+   "best_beats": [
+    "mechanism step"
+   ]
+  },
+  {
+   "id": "D1",
+   "score": 3,
+   "reason": "The subject is the singleton of a uniform field, the least clutter [AT22, AT24], with the words in its sky: one place to look; but it is small (130-220 px, under AR3's 250 px) in a calm frame, and a calm, pretty opening lost ~80 % by 3 s (playbook): it holds a breather, not a thumb (attention.md: 4).",
+   "best_beats": [
+    "breather",
+    "time passing",
+    "ending / loop"
+   ]
+  },
+  {
+   "id": "D2",
+   "score": 4,
+   "reason": "A person, a magnet even when small [AT18, AT19], against a thing >= 0.7 H (>= 1344 px) cut by the top edge, the tall frame's own resource; awe is the high-arousal feeling that holds and is shared [AT48]; the 130-220 px figure needs a calm field round it.",
+   "best_beats": [
+    "scale / awe"
+   ]
+  },
+  {
+   "id": "D3",
+   "score": 1,
+   "reason": "Two equal masses are two equal calls and the first saccade splits [AT22, AT23]; as the frame of a centred subject its <= 216 px wings sit mostly in the strips the feed crops (x < 98, > 982): nothing for the eye.",
+   "best_beats": [
+    "ending / loop"
+   ]
+  },
+  {
+   "id": "D4",
+   "score": 2,
+   "reason": "A balance device, not a pull: the subject stays on the axis (0-130 px off x 540) and the soft counterweight goes high (the hero cloud in a top gutter, its pull < 50 %); it avoids a second call rather than adding attention; never lower right (x > 830 below y 790), where the rail and name block already weigh (attention.md: 3).",
+   "best_beats": [
+    "home hold",
+    "breather"
+   ]
+  },
+  {
+   "id": "D5",
+   "score": 2,
+   "reason": "A convergence at the apex under the band (y >= 620), but three spots at unequal distances are three calls unless two stay tone-on-tone; no gaze study; stable and calm.",
+   "best_beats": [
+    "mechanism step"
+   ]
+  },
+  {
+   "id": "D6",
+   "score": 2,
+   "reason": "Two fields >= 13 L* apart and their seam: the seam is a strong edge at the subject (good for early contrast [AT6]), but two fields read as two places and, stacked in a tall frame, near a split screen (segmented attention [V6]); it helps meaning more than the eye.",
+   "best_beats": [
+    "comparison",
+    "callback / before-after"
+   ]
+  },
+  {
+   "id": "D7",
+   "score": 5,
+   "reason": "The textbook pop-out: similar distractors make the one break effortless to find [AT22]; the reel's window row had the fewest calls of all (1 value call, 73 % quiet: reels.md section 6); the break lighting on its word in 0.1-0.3 s adds a luminance onset [AT6, AT10] at (413-667, 860-1100): 'this one' in a glance.",
+   "best_beats": [
+    "payoff word",
+    "mechanism step",
+    "proof / number"
+   ]
+  },
+  {
+   "id": "E1",
+   "score": 4,
+   "reason": "Stacks a person [AT18, AT19], a convergence [AT29] and usually the centre on one point (attention.md: 5); but at 130-220 px (~1.8-3 degrees on the feed, under AR3's 250 px) it needs a calm field and a longer hold (>= 4 s, est.): a strong hold, not the hook's subject.",
+   "best_beats": [
+    "scale / awe",
+    "arrival",
+    "home hold"
+   ]
+  },
+  {
+   "id": "E2",
+   "score": 5,
+   "reason": "The salience peak and the meaning on one point: the aperture the lightest area below the sky (L* >= 95) with the figure <= 28 inside (a >= 65 L* step) takes the first saccade [AT5, AT6], with the enclosure, a person and the centre; a value step survives the phone's 4:2:0 colour where hue edges blur [V15].",
+   "best_beats": [
+    "hook (0-3 s)",
+    "payoff word",
+    "home hold",
+    "join: going inside"
+   ]
+  },
+  {
+   "id": "E3",
+   "score": 3,
+   "reason": "Steady motion does not capture [AT10], so an even, low-contrast flow keeps a hold alive without stealing the still subject; but one mover passing behind takes the eye [AT13], ours is drawn sharp (no blur to melt the flow into texture), and a still thing among movers pops out less than a mover among still things (motion onset is the feature [AT10]) (attention.md: 4).",
+   "best_beats": [
+    "time passing",
+    "breather"
+   ]
+  },
+  {
+   "id": "E4",
+   "score": 3,
+   "reason": "Facing steers where viewers look [AT20, S9]: 1.5-2x room in front (a right-facing figure at x <= 410 below y 860, because the rail makes x 870 the right edge); our figures face away, so the cue is the head and shoulders only, weaker than a face.",
+   "best_beats": [
+    "arrival",
+    "join: place to place"
+   ]
+  },
+  {
+   "id": "E5",
+   "score": 2,
+   "reason": "A quieting rule: a near layer within 8 L* of its mass loses salience [AT33]; but on the feed its home (top at y 1450-1650) is mostly under the name block (y >= 1519) and the bottom scrim, which quiet it anyway: little left to gain (attention.md: 3).",
+   "best_beats": [
+    "home hold"
+   ]
+  },
+  {
+   "id": "E6",
+   "score": 3,
+   "reason": "Lowering the far planes' contrast (the farthest within ~10-15 L* of the sky) stops them competing with the focal's step [AT8], and near / far is part of the gist read in 19-67 ms [AT1]; a quieting tool with no pull of its own.",
+   "best_beats": [
+    "scale / awe",
+    "breather",
+    "home hold"
+   ]
+  },
+  {
+   "id": "E7",
+   "score": 4,
+   "reason": "The sight line's end is a convergence the eye favours [AT29]; closed by the subject at x 540-700, y 950-1150 it is also near the centre [S7] and never leaks the eye into open sky; a 5 when the closing object holds the story light (E2).",
+   "best_beats": [
+    "arrival",
+    "home hold",
+    "payoff word"
+   ]
+  },
+  {
+   "id": "E8",
+   "score": 4,
+   "reason": "A colour singleton captures even when irrelevant [AT23] and saturation drives arousal [AT49]: one hot accent (C* >= 50 against <= 25, ~3-5 % of the frame, est.) at the focal pops from a tone-on-tone world; as an area it survives 4:2:0 (a thin coloured line would not [V15]); it carries the eye across joins (J4).",
+   "best_beats": [
+    "hook (0-3 s)",
+    "payoff word",
+    "join: same object"
+   ]
+  },
+  {
+   "id": "E9",
+   "score": 5,
+   "reason": "One point of motion and every viewer looks at it [S9, AT13]: a locked frame whose only motion is the subject travelling the device's line into the golden box (x 413-667, y 951-1187), its onset on its word [AT10]; the reels' commonest shot (17 of 23 locked or nearly).",
+   "best_beats": [
+    "arrival",
+    "mechanism step",
+    "hook (0-3 s)"
+   ]
+  },
+  {
+   "id": "E10",
+   "score": 2,
+   "reason": "A body is a magnet that can outpull the subject [AT18], and ours stands off the axis (x 130-380 or 700-830, by the crop or the rail); its turned head routes the eye on [AT20], but the first saccade may land on it: one fixation of the ~3-5 a 1.7 s look gives the picture (attention.md: 3, risky).",
+   "best_beats": [
+    "home hold",
+    "arrival"
+   ]
+  },
+  {
+   "id": "E11",
+   "score": 4,
+   "reason": "Hands break through inattention [AT18] and the effect landing in the hand at (300-600, 1000-1250) is the beat's onset near the centre: first-person stakes, a native short-form form (P); caution: v3's opening put the effect in the hand and lost ~60 points by 2 s, which the owner read as a bait commercial.",
+   "best_beats": [
+    "hook (0-3 s)",
+    "payoff word"
+   ]
+  },
+  {
+   "id": "T",
+   "score": 5,
+   "reason": "Frame 0's thumb-stop: the subject's line drawing on is a motion onset at the centre [AT10] that the eye can ride (one pen <= ~37 px/f [AT61]) while the gist forms, then the flood is a luminance onset; all five owner reels use it; it works only bold: >= 1 s, peaking after the page settles at ~0.4 s (the 0.3 s pale draw-on was invisible: playbook).",
+   "best_beats": [
+    "hook (0-3 s)",
+    "mechanism step",
+    "ending / loop"
+   ]
+  },
+  {
+   "id": "X1",
+   "score": 2,
+   "reason": "Selective focus does steer the eye to the sharp part [AT33] and blur melts a passing flow into texture, but on the feed value softness (E5) and light (I11) give the same separation; motion blur would smear our movers' onset edges, and a soft near layer at y >= 1450 sits under the name block anyway.",
+   "best_beats": []
+  },
+  {
+   "id": "X2",
+   "score": 1,
+   "reason": "Words are the second magnet (11.1x fixations [AT16]) and we already spend them on the captions (~30 % of viewing time [AT21]); a title over the shot is text against text, pulls the eye off the subject and repeats the spoken line (the owner: 'why do we have the text repeat itself?'): it costs the hook.",
+   "best_beats": []
+  },
+  {
+   "id": "N1",
+   "score": 5,
+   "reason": "The first look after every picture or cut lands at the centre whatever it holds [S7, AT15], and in vertical video a centred subject got longer fixations and fewer saccades than a moving one [V5]; the focal within 130 px of (540, 960) is also the only area clear in every app view (x 130-870 to y 1519): zero search.",
+   "best_beats": [
+    "hook (0-3 s)",
+    "payoff word",
+    "mechanism step",
+    "join: place to place"
+   ]
+  },
+  {
+   "id": "N2",
+   "score": 3,
+   "reason": "Words above (the band y 290-600), story below (y 600-1520): the eye always knows where both are, as in the owner's model explainer (37-43 % flat sky over a centred stage: vertical.md section 6), so a new frame costs no search; structure, not a pull.",
+   "best_beats": [
+    "home hold",
+    "mechanism step"
+   ]
+  },
+  {
+   "id": "N3",
+   "score": 2,
+   "reason": "Keeping the horizon off y 900-1020 keeps a long level edge from crossing the focal's home and competing with its step, and setup A sets heads against the sky, a clean silhouette for people [AT18]; otherwise no attention effect.",
+   "best_beats": [
+    "home hold"
+   ]
+  },
+  {
+   "id": "N5",
+   "score": 4,
+   "reason": "The eye travels band-to-subject at every caption page (one every ~1.1-1.5 s, ~20-40 times a film): a 300-450 px drop (4-6 degrees) keeps the subject in the preview field while reading, and words near their picture help (d ~0.79-1.10 [AT34]; [V9]); 650 px is the far limit; nothing may call in the drop.",
+   "best_beats": [
+    "hook (0-3 s)",
+    "payoff word",
+    "mechanism step"
+   ]
+  },
+  {
+   "id": "N6",
+   "score": 2,
+   "reason": "Depth up the tall frame keeps the 884 visible px of width for the one subject and stops two people standing at one depth (two equal calls); near / far is gist [AT1]; the pull belongs to E6, I12 and I4, not to the stacking.",
+   "best_beats": [
+    "scale / awe",
+    "home hold"
+   ]
+  },
+  {
+   "id": "N7",
+   "score": 5,
+   "reason": "The gist comes from the big masses in 19-67 ms [AT1, AT3] and early saccades go to the strongest contrast [AT6]: one closed shape nameable at 0.25 scale (270 px), the focal's step >= 65 L*, three masses >= 85 % at a squint; value edges survive the phone's 4:2:0 encode where hue edges blur [V15]: it passes the 0.25 s flash test (AR1).",
+   "best_beats": [
+    "hook (0-3 s)",
+    "payoff word",
+    "home hold"
+   ]
+  },
+  {
+   "id": "N9",
+   "score": 5,
+   "reason": "Big, centred and alone: one object >= 650 px (>= 60 % W; AR3 asks >= 400 px of the hook) on one quiet backing with a calm ring and nothing named within ~150-220 px (the crowding distance [AT25]); the platforms' own advice ('tight framing', 'focus on your main subject' [V1]); size alone is a mixed lever for pictures [AT27], so the onset still lands on it.",
+   "best_beats": [
+    "hook (0-3 s)",
+    "payoff word",
+    "But turn"
+   ]
+  },
+  {
+   "id": "N11",
+   "score": 3,
+   "reason": "The colossus >= 0.7 H cut by the top fills the tall frame and reads as power, an awe that holds [AT48]; but the subject is a big mass, not a point, so the eye needs the light or the one tiny mover (0.01-0.02 H) to land.",
+   "best_beats": [
+    "scale / awe"
+   ]
+  },
+  {
+   "id": "N12",
+   "score": 2,
+   "reason": "An overview (35-55 degrees down from a 3rd-5th floor) shrinks everything into many small parts; it helps the eye only as the uniform field of a pattern or a crossing (D7, B7); once a film.",
+   "best_beats": [
+    "mechanism step",
+    "scale / awe"
+   ]
+  },
+  {
+   "id": "N13",
+   "score": 3,
+   "reason": "An opening of 15-30 %, >= 10 L* off its surround, pulls like a frame within a frame, and the figure facing it routes its own pull there [AT20]; but the person in the refuge and the opening are two calls, and the frame is calm by design.",
+   "best_beats": [
+    "home hold",
+    "breather"
+   ]
+  },
+  {
+   "id": "N14",
+   "score": 4,
+   "reason": "The eye re-finds a known frame at once (no search after the cut [AT15]; few sets re-framed: vertical.md section 6) and the one change sits at the focal, where it must be the hardest step or the cut hides it; the callback rewards the viewer's memory: before and after in one look.",
+   "best_beats": [
+    "callback / before-after",
+    "ending / loop",
+    "time passing"
+   ]
+  },
+  {
+   "id": "N15",
+   "score": 2,
+   "reason": "The focal at x 250-380 or 700-830 is 160-290 px off the centre, so the first saccade misses it unless an onset marks it [AT15]; at 700-830 it sits by the rail (x 870 below y 860); the unease is felt but costs the look.",
+   "best_beats": [
+    "But turn"
+   ]
+  },
+  {
+   "id": "M3",
+   "score": 2,
+   "reason": "The short-sided figure at x 130-300 faces out of the frame and gaze cues send attention where it looks [AT20]: out, toward the crop at x 98; the low-quadrant form is a singleton under a quiet field (D1-like); unease once, on the turn.",
+   "best_beats": [
+    "But turn"
+   ]
+  },
+  {
+   "id": "Z1",
+   "score": 3,
+   "reason": "Awe holds and spreads [AT48] and the simplest masses (three masses, one call) read in a glance [AT1]; but the 'you' at 60-150 px is 0.8-2 degrees on the feed and the frame is calm: a 1.5-4 s scale beat mid-film, not a thumb-stop.",
+   "best_beats": [
+    "scale / awe",
+    "breather"
+   ]
+  },
+  {
+   "id": "Z2",
+   "score": 2,
+   "reason": "The working wide (the subject 290-670 px tall in its place) has no attention lever of its own; its value for the eye is the familiar home place, re-found without search.",
+   "best_beats": [
+    "home hold"
+   ]
+  },
+  {
+   "id": "Z3",
+   "score": 3,
+   "reason": "The explainer's working size: a subject box 270-460 px wide (35-60 % of the stage) is big enough to read what it does at phone size ('tight framing' [V1]), on one backing with <= 2 props: size and quiet, both moderate levers.",
+   "best_beats": [
+    "mechanism step"
+   ]
+  },
+  {
+   "id": "Z4",
+   "score": 4,
+   "reason": "A number or chart filling the stage: text pulls 11.1x and gains with its size [AT16, AT27], and words with the picture at the same moment help most (d ~1.22-1.30 [AT34]); a 120-160 px number on what it measures is the proof the eye lands on; one per shot or it competes with the captions.",
+   "best_beats": [
+    "proof / number",
+    "payoff word"
+   ]
+  },
+  {
+   "id": "S2",
+   "score": 4,
+   "reason": "A ~650 px sun disc at (580, 1060), the brightest area [AT6], centred and huge, behind three values only: the clearest gist we can draw [AT1]; but it is calm (locked 2.5-3 s, clouds ~6 px/s) and the sun is the subject only on a time or ending line; once a film.",
+   "best_beats": [
+    "time passing",
+    "ending / loop",
+    "breather"
+   ]
+  },
+  {
+   "id": "K8",
+   "score": 3,
+   "reason": "One lit person in a dark vastness stacks a spotlight cue [AT36], a person [AT18] and a singleton on the axis, but the shaft as catalogued is +2-4 L*, near invisible at phone size and banded by the encode (a subtle effect counts as none): only a bright pool on the figure carries it.",
+   "best_beats": [
+    "scale / awe",
+    "breather"
+   ]
+  },
+  {
+   "id": "X4",
+   "score": 1,
+   "reason": "Two stages split attention into a 'segmented' switching mode [V6] and a subject moving round a vertical frame costs saccades [V5]; on 884 visible px each stage is half-size: it hurts both the stop and the hold.",
+   "best_beats": []
+  },
+  {
+   "id": "X5",
+   "score": 1,
+   "reason": "A rolled horizon is a whole-frame change with no place to look, and on a tall phone frame it reads as a mistake rather than a cue; the turn's unease comes from B6 or N15 with the subject still near the axis.",
+   "best_beats": []
+  },
+  {
+   "id": "X7",
+   "score": 1,
+   "reason": "A parallel projection has no vanishing point and no size falloff, so nothing converges on the subject [AT29] and every part is an equal call [AT22, AT26]; detached and person-less (no people magnet, no awe).",
+   "best_beats": []
+  },
+  {
+   "id": "X8",
+   "score": 2,
+   "reason": "Steep converging verticals are a dramatic pointer, but their third vanishing point sits up in the band or above the frame, so they lead the eye up through the words and out of the top; N11's parallel verticals keep the awe with the eye in the stage.",
+   "best_beats": []
+  },
+  {
+   "id": "RM1",
+   "score": 5,
+   "reason": "One point of motion takes every viewer's eye [S9, AT13], its start captures [AT10] and self-propelled, animate motion captures more [AT14]: a walker at ~150 px/s (2.5 px/f) crossing an opening in 1-2 s, its onset on its word, ending in the golden box, with the camera locked so it is the only motion.",
+   "best_beats": [
+    "arrival",
+    "mechanism step",
+    "hook (0-3 s)",
+    "join: place to place"
+   ]
+  },
+  {
+   "id": "RM2",
+   "score": 3,
+   "reason": "An even flow (far walkers 12-50 px/s, clouds 0-15 px/s) does not capture [AT10] and keeps a hold from going dead; but each edge entry (~0.6 a second) is a small onset, one mover right behind the subject steals it [AT13], and drawn sharp our flow pulls more than the reels' blurred one did.",
+   "best_beats": [
+    "time passing",
+    "breather"
+   ]
+  },
+  {
+   "id": "RM3",
+   "score": 3,
+   "reason": "The subject held within +-40 px while the world slides keeps the eye still (centred beats moving in vertical video [V5]); but the whole background moves (no onset, more load), sideways is costly in an 884 px wide view (detail <= ~6.4 px/f), and never two in a row.",
+   "best_beats": [
+    "mechanism step",
+    "join: place to place"
+   ]
+  },
+  {
+   "id": "RM4",
+   "score": 4,
+   "reason": "Looming captures [AT11]: the field expands round a target held within +-40 px, which becomes the still singleton, on its word with the picture ~0.1 s ahead; it must be big enough to see: >= 3 % in <= 2 s is the floor (1.4 %/s read frozen), the payoff push larger, up to 2x.",
+   "best_beats": [
+    "payoff word",
+    "But turn",
+    "hook (0-3 s)"
+   ]
+  },
+  {
+   "id": "RM5",
+   "score": 2,
+   "reason": "8-15 px/s, under the capture threshold on purpose: steady motion does not capture [AT10]; it keeps a hold from reading as a still image without spending the eye, but as an effect it counts as none.",
+   "best_beats": [
+    "home hold",
+    "breather"
+   ]
+  },
+  {
+   "id": "RM6",
+   "score": 5,
+   "reason": "A luminance onset at the focal: a lamp or window on in 0.1-0.3 s (6-18 f) with its bloom, making the frame's hardest step (>= 65 L*); early saccades go to contrast [AT6], onsets capture [AT10], a light that comes with the action is the cue that helps [AT36, AT37], and its sound on the same frame makes it pop out [AT39]; >= 0.5 s from any other onset [AT40].",
+   "best_beats": [
+    "payoff word",
+    "hook (0-3 s)",
+    "mechanism step",
+    "time passing"
+   ]
+  },
+  {
+   "id": "RM7",
+   "score": 3,
+   "reason": "It hands the motion to the subject, so its onset is the one singleton (one motion leads at a time: attention.md section 8), and a stable centred frame gets longer fixations [V5]; on its own a hold is calm and must carry slow life and a story change every ~1.5-3 s.",
+   "best_beats": [
+    "home hold",
+    "payoff word",
+    "proof / number"
+   ]
+  },
+  {
+   "id": "RM8",
+   "score": 5,
+   "reason": "The opening's engine: ONE pen tip at ~12-25 px/f the eye can pursue (smooth pursuit to ~37 px/f [AT61]), a draw-on >= 1 s peaking after 0.4 s, then pops (~7 % overshoot) and builds, each a motion or looming onset at the subject [AT10, AT11]; animating the process itself helps learning (d ~0.40 [AT38]); separate reads >= 0.5 s apart [AT40].",
+   "best_beats": [
+    "hook (0-3 s)",
+    "mechanism step",
+    "proof / number",
+    "ending / loop"
+   ]
+  },
+  {
+   "id": "RM9",
+   "score": 1,
+   "reason": "A wandering, zooming frame (16-83 px/s, +-0.3-6 %/s) is continuous global motion: it captures nothing [AT10], adds saccades and load (as a moving subject does in vertical video [V5]) and hides the subject's own onsets in the wobble.",
+   "best_beats": []
+  },
+  {
+   "id": "I4",
+   "score": 4,
+   "reason": "Receding motion does not capture by itself [AT11], but the reveal is the film's awe moment (awe holds and spreads [AT48]) with the subject held as the pivot (I12) and its own event (a light burst before the landing, the landmark rising on the payoff word); bold (the far plane slides 1.0 W); once a film.",
+   "best_beats": [
+    "scale / awe",
+    "payoff word",
+    "ending / loop"
+   ]
+  },
+  {
+   "id": "I5",
+   "score": 3,
+   "reason": "A vertical reveal suits the tall frame and holds by curiosity [AT60] (600-900 px in 3.5-4.5 s, front-loaded), but the whole frame moves with no local onset, the band must stay one flat field while it travels, and 3.5-4.5 s is long against a 1.7 s look.",
+   "best_beats": [
+    "scale / awe",
+    "arrival"
+   ]
+  },
+  {
+   "id": "I6",
+   "score": 3,
+   "reason": "The expected wall, then the world opening past it: a reveal that pays curiosity [AT60] with strong parallax (a 400-700 px crane, the ledge 1.3x); the near mass sliding out does not capture [AT11], so the landing needs its own event and the subject where the eye already is.",
+   "best_beats": [
+    "arrival",
+    "scale / awe"
+   ]
+  },
+  {
+   "id": "I11",
+   "score": 5,
+   "reason": "It moves the eye without a cut: the new focal reaches the hardest step (>= 65 L*) while the old drops >= 10-15 L*, a luminance onset where the eye should go [AT6, AT10] and the cue that improved comprehension even of what it did not light [AT36]; no join, so no reset and no search [AT15]; one at a time, >= 0.5 s apart.",
+   "best_beats": [
+    "But turn",
+    "mechanism step",
+    "payoff word",
+    "time passing"
+   ]
+  },
+  {
+   "id": "I12",
+   "score": 4,
+   "reason": "During any move the subject stays within +-40 px of its screen spot, so the eye never re-searches (centred beats moving in vertical video [V5]) and the subject is the still point among moving planes [S6]; it makes every camera move safe for the eye rather than pulling by itself.",
+   "best_beats": [
+    "scale / awe",
+    "mechanism step",
+    "join: place to place"
+   ]
+  },
+  {
+   "id": "X6",
+   "score": 2,
+   "reason": "Its one gain for the eye, the subject held still while the background moves, is I12's, which a plain push or pull gives; the stretch itself is global motion with no onset at the subject [AT10], and in our 2.5D planes it shows only as planes scaling, weak at 884 visible px unless large.",
+   "best_beats": []
+  },
+  {
+   "id": "X9",
+   "score": 1,
+   "reason": "A slow automatic zoom (1.00 -> 1.06 over 2 s) is ongoing motion that captures nothing [AT10]; on every shot it habituates and empties the story push (RM4) of its contrast: attention spent with no event.",
+   "best_beats": []
+  },
+  {
+   "id": "X10",
+   "score": 2,
+   "reason": "The capture is real (looming [AT11]; camera changes raise arousal [AT46]), but on every key word it lands on the caption page's own onset, wears out within a few uses, and a fast pace with arousing content overloads viewers [AT46]; its one earned form is RM4 on the payoff word.",
+   "best_beats": []
+  },
+  {
+   "id": "RJ1",
+   "score": 1,
+   "reason": "A black card for 0.6-1.3 s is a still frame with no subject (deadframes flags > 0.4 s); in a feed a black frame reads as the end and invites the swipe, and the next idea must be found from scratch [AT15]; its line-first rhythm survives in T and RM8.",
+   "best_beats": []
+  },
+  {
+   "id": "X3",
+   "score": 1,
+   "reason": "Two half-contrast pictures and no onset: two weak calls at once with no single place to look [AT22]; nothing captures the eye and the subject's step halves while it runs.",
+   "best_beats": []
+  },
+  {
+   "id": "RJ2",
+   "score": 3,
+   "reason": "A cut is an involuntary orienting response [AT46]; the eye resets to the centre and searches [AT15]; with the new focal near (540, 960), the incoming camera already moving and a 6-20x scale jolt it is the 'But' felt as surprise [AT47]; at most 2 a film or it becomes a search tax.",
+   "best_beats": [
+    "But turn",
+    "join: scale jump"
+   ]
+  },
+  {
+   "id": "RJ3",
+   "score": 3,
+   "reason": "The seam hides the end, so the minority who reach it (19-25 % in v1) restart before they swipe (P), and the 0.5 s un-build then the >= 1 s draw-on are bold onsets; but it does nothing for the first 3 s, where most viewers leave.",
+   "best_beats": [
+    "ending / loop"
+   ]
+  },
+  {
+   "id": "RJ4",
+   "score": 4,
+   "reason": "No cut means no reset and no search (the join is the eye's most expensive moment [AT15]); the subject stays the pivot within +-40 px and camSpeed >= ~1 px/f carries across the seams; the swipe window wants one continuous shot until the idea lands; the refresh must then come from the subject's events (every ~1.5-3 s).",
+   "best_beats": [
+    "hook (0-3 s)",
+    "mechanism step",
+    "join: place to place"
+   ]
+  },
+  {
+   "id": "J2",
+   "score": 5,
+   "reason": "A looming push (to 7x in 0.5 s) into the brightest area below the sky captures [AT6, AT11], and the next focal comes out where the aperture was (within 150 px), so the eye never re-searches [AT41]; bold at phone size (1.1 s, the opening 15-30 % of the frame), and 'going inside' pays curiosity [AT60].",
+   "best_beats": [
+    "join: going inside",
+    "payoff word",
+    "arrival"
+   ]
+  },
+  {
+   "id": "J3",
+   "score": 4,
+   "reason": "The anchor holds its spot (within 150 px and 1.5x) across a 0-frame cut, so the eye is already on the next subject (no search [AT15, AT41]) and the match is a small surprise; a shape alone is weaker early salience than a light, so it is best when the anchor is also the brightest thing (J4).",
+   "best_beats": [
+    "join: same object",
+    "join: place to place",
+    "callback / before-after"
+   ]
+  },
+  {
+   "id": "T2",
+   "score": 3,
+   "reason": "Each quick cut is an orienting event [AT46] while the pinned anchor (+-10 px) keeps the eye still; but cuts 20-30 f apart fall inside the attentional blink (~0.5 s [AT40]), so the changes round the anchor must be big to register; untested in our >= 3.5 s panels.",
+   "best_beats": [
+    "time passing"
+   ]
+  },
+  {
+   "id": "J4",
+   "score": 5,
+   "reason": "The brightest shape or the one hot accent holds its spot across the cut (centre within 190 px, size within 1.5x), so the frame's salience peak at ~0.3 s [AT5, AT6] is exactly where the eye already is: zero search, and the light or accent is the thread itself (E8); the strongest cut-type carrier for the eye.",
+   "best_beats": [
+    "join: place to place",
+    "join: time",
+    "join: same object"
+   ]
+  },
+  {
+   "id": "J5",
+   "score": 4,
+   "reason": "A continuity cut on a motion onset goes unseen a third of the time [AT42]: the motion (begun >= 4-6 f before, running >= 0.3 s after, in the same screen direction) carries the eye through the cut; rare for us, since our size changes come by pushes.",
+   "best_beats": [
+    "mechanism step",
+    "join: place to place"
+   ]
+  },
+  {
+   "id": "J6",
+   "score": 3,
+   "reason": "A held look (>= 0.5 s) cues where the next view is [AT20, S9] and builds curiosity for it; ours are figures from behind, so the cue is the head turn only, weaker than a face, and the next focal must land within 150 px of the gaze's end.",
+   "best_beats": [
+    "arrival",
+    "join: place to place"
+   ]
+  },
+  {
+   "id": "J7",
+   "score": 3,
+   "reason": "The one mover leads the eye through the cut [AT42], but it takes the eye to the frame's edges, where the feed crops (x 98 / 982) and the rail sits (x >= 870 below y 860), and the re-entry forces a jump across the whole width (~12 degrees, against AR13's ~220 px); vertical carries cross the band and the name block.",
+   "best_beats": [
+    "join: place to place",
+    "arrival"
+   ]
+  },
+  {
+   "id": "J8",
+   "score": 3,
+   "reason": "A big moving edge (>= 70 % of the stage at ~50 px/f) is a bold onset that leaves the eye where it stops (attention.md section 8, est.), so the next focal must be there; it carries no information itself, and the near mass is the call for its ~0.5 s.",
+   "best_beats": [
+    "join: scale jump",
+    "join: place to place"
+   ]
+  },
+  {
+   "id": "J9",
+   "score": 2,
+   "reason": "A full-frame onset with no place to look (attention.md section 8: never): energy, then the eye must re-find the subject; drawn without blur it is a 2-3 f smear, nearer a flash than a carry.",
+   "best_beats": []
+  },
+  {
+   "id": "J10",
+   "score": 5,
+   "reason": "One object the eye tracks through the whole join (position, then shape and colour, then the world, in 0.4-0.8 s), the brightest and hottest thing throughout: no reset, no search; the transformation itself is the onset [AT10] and 'this IS that' is the surprise [AT47]; animating a real change helps learning [AT38].",
+   "best_beats": [
+    "join: same object",
+    "payoff word",
+    "mechanism step"
+   ]
+  },
+  {
+   "id": "J11",
+   "score": 4,
+   "reason": "A luminance onset in a frame the eye already knows (no reset): a lamp in 0.1-0.3 s or the sky by a moving edge over ~0.8-1.5 s, the cue moving with the event [AT36, AT37]; a whole-sky change must end with the hardest step on the subject, or it is a full-frame change with no place to look.",
+   "best_beats": [
+    "time passing",
+    "But turn",
+    "callback / before-after"
+   ]
+  },
+  {
+   "id": "J13",
+   "score": 3,
+   "reason": "The paper keeps its spot, so the eye stays (no search), and the turn is a motion event at the focal, a familiar 'next page' gesture; limited to paper beats.",
+   "best_beats": [
+    "proof / number"
+   ]
+  },
+  {
+   "id": "J15",
+   "score": 3,
+   "reason": "A sound on a change makes that change pop out even in clutter [AT39] (the effect on its frame or 1-2 f after), and the next place's ambience arriving 0.2-0.5 s early primes the cut; ducked under the voice the bridge itself is quiet: it supports the eye's carriers rather than leading.",
+   "best_beats": [
+    "join: place to place",
+    "join: going inside",
+    "time passing"
+   ]
+  },
+  {
+   "id": "X11",
+   "score": 1,
+   "reason": "A spin, glitch, RGB split or flash is a full-frame onset with no place to look (attention.md sections 4 and 8: never in the swipe window); it spends the orienting response on nothing, and flashes > 3 a second risk viewers' safety.",
+   "best_beats": []
+  }
+ ],
+ "top10": [
+  "RM8",
+  "T",
+  "E2",
+  "RM6",
+  "I11",
+  "RM1",
+  "N7",
+  "N1",
+  "J2",
+  "D7"
+ ],
+ "bottom10": [
+  "X11",
+  "X3",
+  "X4",
+  "X2",
+  "RM9",
+  "RJ1",
+  "X9",
+  "X5",
+  "D3",
+  "X7"
+ ],
+ "notes": "SCALE (attention only). 5 = stacks >= 2 proven levers (a motion or light onset, the centre, the brightest area / hardest value step, a person, a singleton, words with their picture) on the subject and works at phone size in the first 3 s or at a key beat; 4 = one strong proven lever on the subject, or a stack held back by size or frequency; 3 = helps indirectly (where it puts the subject, what it quiets) or one study, or strong with a real split / clutter risk; 2 = little attention power of its own, or a real pull spent at a cost; 1 = hurts in our frame (splits the eye, competes with the captions, a full-frame onset with no place to look, a dead or wobbling frame) or does nothing for the eye. DISTRIBUTION: 14 x 5 (13.6 %: 7 the owner's, 7 ours), 20 x 4, 30 x 3, 24 x 2, 15 x 1; means: the owner's 58 at 2.84, ours 45 at 3.07 (ours include 9 of the 14 rejected tools; the owner's include the five pure placement grids). GROUNDS: attention.md (levers L1-L15, rules AR1-AR18, section 7's 41 scores, section 8's moves) and vertical.md (the feed shows x 98-982 only; the rails cover x >= 870 below y 860 and x >= 945 from y 790; the name block from y 1519 with a 10-20 % scrim under it; the swipe settles at ~0.4 s; 1 degree = 74 px; the drop 300-450 px = 4-6 degrees). WHERE I DIFFER FROM attention.md section 7 (reason in each row): C1 5 -> 4 as catalogued (its aperture only >= 10 L* off the rim; with E2's >= 65 L* step it is the 5); E1 5 -> 4 and D1 4 -> 3 (130-220 px subjects are under AR3's 250 px: they hold a calm beat, they do not stop a thumb, and a calm, pretty opening lost ~80 % by 3 s); E3 4 -> 3 (our passing world is drawn sharp and slow, so it pulls more and isolates less than the reels' blur); D4 3 -> 2, E5 3 -> 2, E10 3 -> 2 (balance only; the near layer lies under the name block anyway; a body off the axis takes the first saccade); B5 1 -> 2, B12 2 -> 3, B13 2 -> 3 (the uniform field a mover pops out of; a spiral's centre is the screen centre and reel 05's frame 0; the round window is a frame within a frame). WHAT THE RANKING SAYS: (1) the strongest family is LIGHT: E2, RM6, I11 and J4 (5), J11 and S2 (4) put the salience peak at ~0.3 s and the meaning at ~1 s on one point; (2) the ONSET tools are the opening's draw-on (T, RM8) and the one mover in a locked frame (E9, RM1), and they count only when bold: >= 1 s, peaking after the 0.4 s swipe, one pen at <= ~25 px/f; (3) PLACEMENT N1, N7 and N9 (the centre, the 2-value gist, the big lone subject) make every other tool land; (4) JOINS rank by whether the eye stays where it already is: J2, J4, J10 (5) and RJ4, J3, J5 (4) beat carriers that send the eye to the edges (J7: the crop and the rail) or hide behind a full-frame onset (J9, X11); (5) the owner's armatures and grids (A1, A3-A5, B5-B10, D3-D5) have no attention power of their own: they reach 4-5 only stacked with the light, the subject's onset and the centre, which is how to use them; leading lines and the vanishing point (B1 3, B2 4, E7 4, B4 4) are the best of them because a convergence point does draw fixations [AT29]; (6) the feed's own furniture (the crop, the rail, the name block and its scrim) cancels most edge and near devices (C2, E5, E10, M3, J7, B10, D3); (7) the REJECTED tools are scored on attention alone: some keep a real capture (X10's punch-ins, X1's focus, X6, J9, X8) but spend it badly in our frame (2); the ones that hurt (X11, X3, X4, X2, RM9, RJ1) lead the bottom 10. One device in two entries (T / RM8, E9 / RM1, E3 / RM2) is scored alike. The 5s outside the top 10: E9 (RM1's frame), J4, J10, N9. The 1s outside the bottom 10 (A1, A3, A4, A5, C2) do nothing for the eye rather than harm it. RULE OF USE (attention): a beat's key moment uses a 4-5 tool or stacks a 2-3 device with the light (RM6 / I11), the subject's onset and the centre; calm beats, breathers and joins may use a 2-3 device alone."
+}

@@ -34,17 +34,23 @@ import {S1Pip} from './V2S1_pip';
 import type {ToneKey} from '../../lib/Film';
 import {S1Particles} from './V2S1_particles';
 import {useSwitches} from './switches';
-import {shadeRig} from './engine';
+import {shadeRig, TextureSlot} from './engine';
+import {useTime} from '../../lib/time';
+import {PARALLAX_SKY} from '../../lib/depth';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
 const V2S1: React.FC = () => {
   // (the look test) the rig: v2's, or with the form step per tier (the subject's shade face deeper: lane E)
   const sw = useSwitches();
+  const t = useTime();
   return (
   <World sky={CM.white} horizon={1000}>
     <Lit rig={shadeRig(sw, RIG_CANAL, CM.shadeWarm)}>
-      <SkyFlood />
+      {/* (the look test's texture: the sky's mottle, the sky plane's seed, no float) */}
+      <TextureSlot sw={sw} t={t} plane={PARALLAX_SKY} sky>
+        <SkyFlood />
+      </TextureSlot>
       <Look cascade={{at: FLOOD.t0, origin: FLOOD_ORIGIN, speed: FLOOD.speed, pale: S1_PALE, paper: CM.white}}>
         <S1World behindDoor={<S1HerBehindDoor />} towpath={<S1Row />} seated={<S1Steps />} pip={<S1Pip />} />
       </Look>

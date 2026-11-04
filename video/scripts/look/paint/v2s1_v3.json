@@ -1,0 +1,705 @@
+{
+ "film": "v2s1_v3",
+ "about": "v2's S1, paint v3: the broad brush (the owner's style models 03_beach_dusk, 02_bus_stop_night: big simple masses of a few broad flat-brush strokes, calm insides, dry-brush scumbled edges, one colour family lit by one light) and a LAYERED cloudscape (4 cloud planes by depth). Flats from PaintFlatS1 at 1.0 s.",
+ "out": "public/paint/v2s1_v3",
+ "frame": [
+  1080,
+  1920
+ ],
+ "band": [
+  290,
+  600
+ ],
+ "light": {
+  "dir": [
+   -0.9,
+   -0.35
+  ]
+ },
+ "pieces": [
+  {
+   "id": "v2s1/sky",
+   "style": "sky",
+   "brush": "broad",
+   "seed": 13,
+   "flat": "out/paint/v2s1/flat/sky.png",
+   "crop": [
+    0,
+    0,
+    1080,
+    1100
+   ],
+   "sun_warm": {
+    "xy": [
+     196,
+     772
+    ],
+    "r": 820,
+    "d": [
+     0.018,
+     0.012,
+     0.035
+    ]
+   },
+   "top_cool": {
+    "y1": 300,
+    "d": [
+     -0.018,
+     -0.006,
+     -0.014
+    ]
+   },
+   "broad": {
+    "vary": 0.007,
+    "vary_cell": 260,
+    "hatch": 0.008,
+    "hatch_angle": -24,
+    "hatch_along": 170,
+    "hatch_across": 1.6,
+    "grain": 0.004
+   }
+  },
+  {
+   "id": "v2s1/clouds",
+   "style": "cloudscape",
+   "brush": "broad",
+   "seed": 83,
+   "sky_flat": "out/paint/v2s1/flat/sky.png",
+   "light": [
+    -1.0,
+    0.12
+   ],
+   "calm_box": [
+    150,
+    300,
+    880,
+    540
+   ],
+   "air_px": 14,
+   "air_dL": 0.03,
+   "palette": {
+    "shade": "#C2D5CD",
+    "mid": "#E3ECE2",
+    "lit": "#FCEEDB",
+    "rim": "#FFE6C4"
+   },
+   "broad": {
+    "angle": -8,
+    "width": [
+     34,
+     72
+    ],
+    "len": [
+     1.8,
+     3.2
+    ],
+    "strokes": 0.5,
+    "op": [
+     0.25,
+     0.45
+    ],
+    "jitter_L": 0.008,
+    "edge_px": 12,
+    "edge_soft": 3.0,
+    "edge_cell": 70,
+    "edge_wobble": 8,
+    "drag_along": 80,
+    "drag_across": 2.2,
+    "edge_strokes": 0.22,
+    "edge_width": [
+     16,
+     34
+    ],
+    "specks": 160,
+    "speck_px": 40,
+    "speck_density": 0.03,
+    "grain": 0.005,
+    "side": [
+     0.14,
+     0.26
+    ],
+    "chisel": 0.04,
+    "mass_tau": 0.05
+   },
+   "planes": [
+    {
+     "depth": 0.92,
+     "kind": "streaks",
+     "box": [
+      0,
+      670,
+      460,
+      100
+     ],
+     "conv": 0.35,
+     "color": "#FFEEDB",
+     "streaks": [
+      [
+       70,
+       700,
+       190,
+       5
+      ],
+      [
+       200,
+       712,
+       250,
+       4
+      ],
+      [
+       40,
+       727,
+       150,
+       4
+      ],
+      [
+       262,
+       690,
+       130,
+       3
+      ],
+      [
+       130,
+       739,
+       220,
+       3
+      ],
+      [
+       330,
+       722,
+       120,
+       3
+      ]
+     ]
+    },
+    {
+     "depth": 0.7,
+     "box": [
+      -40,
+      590,
+      480,
+      110
+     ],
+     "flat": 0.42,
+     "conv": 0.55,
+     "lobes": [
+      [
+       10,
+       648,
+       34
+      ],
+      [
+       70,
+       640,
+       42
+      ],
+      [
+       140,
+       634,
+       48
+      ],
+      [
+       210,
+       636,
+       44
+      ],
+      [
+       280,
+       642,
+       36
+      ],
+      [
+       338,
+       648,
+       28
+      ],
+      [
+       110,
+       626,
+       30
+      ]
+     ]
+    },
+    {
+     "depth": 0.45,
+     "box": [
+      80,
+      100,
+      640,
+      190
+     ],
+     "flat": 0.6,
+     "conv": 0.38,
+     "lobes": [
+      [
+       140,
+       236,
+       40
+      ],
+      [
+       200,
+       222,
+       52
+      ],
+      [
+       270,
+       210,
+       60
+      ],
+      [
+       350,
+       204,
+       64
+      ],
+      [
+       430,
+       200,
+       66
+      ],
+      [
+       510,
+       202,
+       62
+      ],
+      [
+       590,
+       208,
+       56
+      ],
+      [
+       660,
+       216,
+       46
+      ],
+      [
+       250,
+       182,
+       40
+      ],
+      [
+       380,
+       170,
+       50
+      ],
+      [
+       480,
+       174,
+       46
+      ]
+     ]
+    },
+    {
+     "depth": 0.0,
+     "box": [
+      300,
+      0,
+      780,
+      660
+     ],
+     "lobes": [
+      [
+       420,
+       250,
+       50
+      ],
+      [
+       500,
+       236,
+       66
+      ],
+      [
+       590,
+       222,
+       80
+      ],
+      [
+       690,
+       205,
+       92
+      ],
+      [
+       790,
+       190,
+       100
+      ],
+      [
+       900,
+       175,
+       110
+      ],
+      [
+       1010,
+       160,
+       120
+      ],
+      [
+       560,
+       150,
+       70
+      ],
+      [
+       660,
+       120,
+       95
+      ],
+      [
+       780,
+       90,
+       115
+      ],
+      [
+       900,
+       70,
+       130
+      ],
+      [
+       1030,
+       60,
+       140
+      ],
+      [
+       720,
+       10,
+       90
+      ],
+      [
+       850,
+       -20,
+       120
+      ],
+      [
+       990,
+       -40,
+       150
+      ],
+      [
+       985,
+       310,
+       96
+      ],
+      [
+       1030,
+       390,
+       104
+      ],
+      [
+       960,
+       430,
+       70
+      ],
+      [
+       1000,
+       480,
+       104
+      ],
+      [
+       935,
+       545,
+       72
+      ],
+      [
+       1040,
+       560,
+       120
+      ],
+      [
+       930,
+       630,
+       90
+      ],
+      [
+       1010,
+       640,
+       140
+      ],
+      [
+       905,
+       395,
+       46
+      ],
+      [
+       895,
+       500,
+       48
+      ]
+     ],
+     "cuts": [
+      0.34,
+      0.62
+     ],
+     "form_blur": 22,
+     "rim_px": 24
+    }
+   ]
+  },
+  {
+   "id": "v2s1/tree",
+   "style": "foliage",
+   "brush": "broad",
+   "seed": 43,
+   "flat": "out/paint/v2s1/flat/tree.png",
+   "light": [
+    -0.9,
+    -0.35
+   ],
+   "clusters": {
+    "n": 9,
+    "r": [
+     36,
+     62
+    ],
+    "global": 0.55,
+    "local": 0.8
+   },
+   "cuts": [
+    0.42,
+    0.66
+   ],
+   "warm": [
+    0.055,
+    -0.012,
+    0.05
+   ],
+   "cool": [
+    -0.11,
+    -0.02,
+    -0.004
+   ],
+   "chroma_k": 1.2,
+   "value_bias": -0.012,
+   "broad": {
+    "angle": -28,
+    "width": [
+     16,
+     30
+    ],
+    "len": [
+     1.4,
+     2.4
+    ],
+    "strokes": 0.55,
+    "op": [
+     0.45,
+     0.75
+    ],
+    "jitter_L": 0.014,
+    "tau": 0.22,
+    "edge_px": 3.5,
+    "edge_soft": 2.0,
+    "edge_cell": 22,
+    "edge_wobble": 5,
+    "drag_along": 10,
+    "drag_across": 3.0,
+    "edge_strokes": 0.9,
+    "edge_width": [
+     10,
+     20
+    ],
+    "edge_angj": 0.6,
+    "specks": 0,
+    "grain": 0.008,
+    "side": [
+     0.12,
+     0.22
+    ],
+    "chisel": 0.03,
+    "crisp_colors": [
+     "#AF7263"
+    ]
+   }
+  },
+  {
+   "id": "v2s1/pier",
+   "style": "surface",
+   "brush": "broad",
+   "seed": 55,
+   "flat": "out/paint/v2s1/flat/pier.png",
+   "light": [
+    -0.9,
+    -0.35
+   ],
+   "cuts": [
+    0.4,
+    0.7
+   ],
+   "warm": [
+    0.03,
+    0.006,
+    0.02
+   ],
+   "cool": [
+    -0.04,
+    -0.002,
+    -0.016
+   ],
+   "broad": {
+    "angle": 62,
+    "width": [
+     26,
+     50
+    ],
+    "len": [
+     1.4,
+     2.4
+    ],
+    "strokes": 0.5,
+    "op": [
+     0.3,
+     0.5
+    ],
+    "jitter_L": 0.012,
+    "tau": 0.09,
+    "edge_px": 2.5,
+    "edge_soft": 1.4,
+    "edge_cell": 40,
+    "edge_wobble": 1.2,
+    "drag_along": 30,
+    "drag_across": 1.8,
+    "edge_strokes": 0.15,
+    "edge_width": [
+     12,
+     22
+    ],
+    "specks": 0,
+    "grain": 0.008,
+    "side": [
+     0.12,
+     0.22
+    ],
+    "chisel": 0.03
+   }
+  },
+  {
+   "id": "v2s1/farroofs",
+   "style": "surface",
+   "brush": "broad",
+   "seed": 62,
+   "flat": "out/paint/v2s1/flat/farroofs.png",
+   "light": [
+    -0.95,
+    -0.2
+   ],
+   "cuts": [
+    0.45,
+    0.7
+   ],
+   "warm": [
+    0.025,
+    0.008,
+    0.02
+   ],
+   "cool": [
+    -0.03,
+    0.006,
+    -0.016
+   ],
+   "haze": {
+    "color": "#FBD9BB",
+    "k": 0.3,
+    "top": 0.5
+   },
+   "broad": {
+    "angle": 0,
+    "width": [
+     14,
+     28
+    ],
+    "len": [
+     1.6,
+     3.0
+    ],
+    "strokes": 0.4,
+    "op": [
+     0.3,
+     0.5
+    ],
+    "jitter_L": 0.01,
+    "tau": 0.14,
+    "edge_px": 2.2,
+    "edge_soft": 2.6,
+    "edge_cell": 24,
+    "edge_wobble": 1.2,
+    "drag_along": 26,
+    "drag_across": 1.6,
+    "edge_strokes": 0.1,
+    "edge_width": [
+     8,
+     16
+    ],
+    "specks": 0,
+    "grain": 0.006,
+    "side": [
+     0.12,
+     0.22
+    ],
+    "chisel": 0.03
+   }
+  },
+  {
+   "id": "v2s1/fartower",
+   "style": "surface",
+   "brush": "broad",
+   "seed": 68,
+   "flat": "out/paint/v2s1/flat/fartower.png",
+   "light": [
+    -0.95,
+    -0.2
+   ],
+   "cuts": [
+    0.45,
+    0.7
+   ],
+   "warm": [
+    0.025,
+    0.008,
+    0.02
+   ],
+   "cool": [
+    -0.03,
+    0.006,
+    -0.016
+   ],
+   "haze": {
+    "color": "#F6E0D0",
+    "k": 0.25,
+    "top": 0.4
+   },
+   "broad": {
+    "angle": 90,
+    "width": [
+     14,
+     26
+    ],
+    "len": [
+     1.6,
+     3.0
+    ],
+    "strokes": 0.4,
+    "op": [
+     0.3,
+     0.5
+    ],
+    "jitter_L": 0.01,
+    "tau": 0.12,
+    "edge_px": 1.4,
+    "edge_soft": 1.6,
+    "edge_cell": 30,
+    "edge_wobble": 0.6,
+    "drag_along": 40,
+    "drag_across": 1.6,
+    "edge_strokes": 0.05,
+    "edge_width": [
+     8,
+     16
+    ],
+    "specks": 0,
+    "grain": 0.006,
+    "side": [
+     0.12,
+     0.22
+    ],
+    "chisel": 0.03
+   }
+  }
+ ]
+}

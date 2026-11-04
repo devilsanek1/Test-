@@ -1,0 +1,48 @@
+{
+  "about": "v8_s1: scene 1 of the Google film, feeling first (paint_test/v8_card.md). One camera on the canal-side street at a seated person's eye height, looking along the canal to the low October sun; the Google building's glass wall cut by the left edge; her a few steps out of its lit door. Metres: X right, Y up, Z forward; the street at Y 0, the canal's water at Y -1. Shared by the engine (src/look/v8_s1/*.tsx) and the bake (src/look/v8_s1/bake/*.py).",
+  "frame": [
+    1080,
+    1920
+  ],
+  "camera": {
+    "f": 1300,
+    "cx": 560,
+    "cy": 1150,
+    "h": 1.15
+  },
+  "sun": {
+    "az_deg": 10.0,
+    "el_deg": 6.2,
+    "r": 21,
+    "color": "#FFD7A0"
+  },
+  "street": {
+    "x0": -2.3,
+    "x1": 2.0
+  },
+  "water": {
+    "x0": 2.0,
+    "x1": 26.0,
+    "y": -1.0
+  },
+  "her": {
+    "X": 0.15,
+    "Z": 3.6,
+    "height_m": 1.68
+  },
+  "lobby": {
+    "z0": 4.6,
+    "z1": 7.95,
+    "top": 4.3,
+    "door": [
+      5.9,
+      7.3
+    ],
+    "door_h": 2.85,
+    "corner": 8.25
+  },
+  "band": [
+    290,
+    600
+  ]
+}

@@ -3,6 +3,8 @@
 Owner: timing stream. Data: `assets/timing.json` for **`assets/vo_v3_final.wav`** (ElevenLabs, 48 kHz mono PCM, LOCKED).
 The script is `docs/script/final_script_elevenlabs.txt`, using the spoken lines and ignoring the [cue] lines. Earlier takes are archived as `assets/timing_v1.json` (`vo.mp3`) and `assets/timing_v2.json` (`vo_v2_eleven.wav`). Those were a different, longer script, so there is no time-warp to v3: storyboards anchor to word indices, and `scripts/anchor/resolve.py` turns the anchors into times.
 All times are in **seconds from the first audio sample**, with 3 decimals. Frame = `Math.round(t * fps)`; the `@30` columns assume 30 fps.
+At 60 fps a picture event keyed at t first shows on frame ceil(t x 60), and Film plays a sound cue's file start on
+round(t x 60) (`docs/look/SOUND_SYNC.md` §1c).
 
 ## v2 to v3 delta
 
@@ -28,6 +30,8 @@ Pacing: v3 is a brisker read, at 194 vs 178 words per minute. Sentence breaks ar
 - `pauses` lists every gap of 120 ms or more. `kind` is `sentence`, `comma`, `ellipsis` or `phrase` (unpunctuated).
 - `captions` is a **default fallback** only, because the storyboard owns caption chunking. It has at most 2 lines of 26 characters or fewer, one highlight per page timed at its word's start, line 2 appearing at its first word, and every page on screen for at least 0.8 s. `e` is the next page's `s`, and the last page runs to `duration`.
 - `stress` (0 to 1) is a percentile rank of acoustic prominence (loudness, pitch, duration per syllable), with function words damped and numbers boosted. `hits` holds every word with stress of 0.9 or more, plus every number word.
+  (Video 1 only: today's takes, `public/vN/voice_words.json`, carry `{w, s, e}` and no stress; the sync plan marks its
+  stressed words by ear at G2: `docs/look/SOUND_SYNC.md` §4.)
 
 ## Global
 

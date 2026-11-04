@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_NIGHT}}') center/cover no-repeat}
+.lab{position:absolute;font-family:'Jost';font-weight:400;font-size:30px;letter-spacing:0.04em;color:rgba(255,240,222,0.78)}</style></head>
+<body><div id="stage"></div>
+<script>
+// "on giant / computers," pops 5.283 s (2 frames before "on"), on to 6.467 s
+window.__ready = TYPE.run(() => {
+  const S = TYPE.stage(), tone = 'night';
+  // seat L (x 440): the group's ink box centred there, line 2 stepped 100 px right (line 1 from x 131, line 2 from x 231)
+  TYPE.group(S, {seat: 'L', baselines: [395, 515], step: 100, lines: ['on giant', 'computers,'], tone});
+});
+</script></body></html>

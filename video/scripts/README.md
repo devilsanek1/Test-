@@ -7,7 +7,7 @@ re-run it after adding, moving or re-describing a tool (`--check` exits 1 when t
 toolkit"), `docs/G5_BLOCKING.md` §4 (previews) and §7 (the gate check). v1-only tools are archived in
 `archive/v1/scripts/` (the `v1-final` tag has them in place).
 
-106 tools in 18 folders; 9 without a header (add a docstring or a first comment line).
+157 tools in 30 folders; 9 without a header (add a docstring or a first comment line).
 
 ## `scripts/`
 
@@ -23,11 +23,34 @@ toolkit"), `docs/G5_BLOCKING.md` §4 (previews) and §7 (the gate check). v1-onl
 | `scripts/g5_scaffold.py` | Start a video's G5 film from its locked G3 board (docs/G5_BLOCKING.md). |
 | `scripts/index.py` | Write scripts/README.md, the index of every tool in video/scripts, from each tool's own header. |
 | `scripts/render-frames.mjs` | Render arbitrary frames of a composition in ONE bundle + ONE browser session. |
-| `scripts/render-media.mjs` | Render a composition (or a frame range of it) to a video / audio file with @remotion/renderer's renderMedia, in ONE bundle (cached while src/ and public/ are unchanged) and ONE browser (scripts/render/lib.mjs). |
+| `scripts/render-media.mjs` | Render a composition (or a frame range of it) to a video / audio file with @remotion/renderer's renderMedia, in ONE bundle (cached while src/ and public/ are unchanged: scripts/render/lib.mjs); selectComposition and the render launch their own browsers as … |
 | `scripts/sheet.sh` | Renders <count> frames evenly spaced over [t0, t1] seconds (one bundle, one browser) and tiles them into a labeled contact sheet (label = seconds). |
 | `scripts/still.sh` | Renders one frame at <seconds> (composition time) to <out.png>; other flags go to render-frames.mjs (its cached bundle and one browser make a repeated still ~1 s). |
 | `scripts/strip.sh` | Renders EVERY frame (or every Nth with --step) between t0 and t1 seconds at the composition's own fps (60 for the films; it sampled 30 fps until 2026-10-29, every 2nd frame of a 60 fps film) and tiles them with frame numbers: the tool for checking motion … |
 | `scripts/topic_chart.py` | The topic shortlist as a phone-portrait column chart (owner, 2026-10-28: "show me the visual next time we do research - like the story and some bar chart ... showing the score on each category"; then "make the visual into column chart"). |
+
+## `scripts/captions2/`
+
+| tool | what it does |
+|---|---|
+| `scripts/captions2/build_captions.py` | The film's words on screen per docs/look/TYPE_GUIDE.md (PICKED 2026-10-30), for src/lib/captions2. |
+| `scripts/captions2/measure.mjs` | The caption hand's ink metrics, measured in Chromium (the engine that draws the captions), for scripts/captions2/build_captions.py: every line-break, seat and type-frame decision uses these numbers. |
+| `scripts/captions2/render_test.mjs` | The captions2 test stills: src/lib/captions2 playing a caption file over a still background, rendered by Remotion (the real component, 60 fps), at chosen times; with --capcheck also the caption mask and the bare frame, for `python3 scripts/capcheck.py <list> … |
+
+## `scripts/docs/`
+
+| tool | what it does |
+|---|---|
+| `scripts/docs/visual_script_page.py` | Build the phone page the owner reads a visual script on (G2.5): the summary, one card per shot (the words, what we see, the camera, the join, and the rest folded away), the loop and the owner's questions, with the locked voice built in: each card's play … |
+
+## `scripts/g3/`
+
+| tool | what it does |
+|---|---|
+| `scripts/g3/board_lint.py` | The shared G3 board lint (docs/G3_ANIMATIC.md §5 step 6, §6, §7 tier 1; STORYBOARD_STYLE.md §6; CRAFT.md §a). |
+| `scripts/g3/build_selftest.py` | The shared G3 kit's self-test board (public/g3kit/selftest.json, 8 s, two panels of one set joined by a continuous camera): every tier-1 delta on screen at once, so a render shows the kit works. |
+| `scripts/g3/g3kit.py` | Python helpers for writing a G3 board JSON for the shared kit (src/lib/g3/, schema src/lib/g3/types.ts; spec docs/G3_ANIMATIC.md). |
+| `scripts/g3/merge_panels.py` | Land drawn panels into a film's board JSON without lanes overwriting each other (G3_ANIMATIC §5 step 4: one agent per 3-5 panels, ~4 lanes in parallel). |
 
 ## `scripts/g3demo/`
 
@@ -47,6 +70,48 @@ toolkit"), `docs/G5_BLOCKING.md` §4 (previews) and §7 (the gate check). v1-onl
 | `scripts/look/sketch_debug.py` | Side-by-side check sheets for the cinematic guidebook: each shot type's 9:16 sketch (our drawing) next to the reference frames it was translated from, so the owner can see what we index on. |
 | `scripts/look/texture_shoot.cjs` | Screenshots review/look/texture/*.html to PNG (1080x1920) and motion.html to frames/ (150 frames, 30 fps). |
 | `scripts/look/texture_test.py` | Texture + line test (owner, 2026-10-25): a very subtle tone-on-tone halftone on the fills, and thin tapered ink lines only in key places, vs flat and vs full outlines. |
+
+## `scripts/look/aipaint/`
+
+| tool | what it does |
+|---|---|
+| `scripts/look/aipaint/cut_plates.py` | Cut the AI-painted plates into the ENGINE's pieces (docs/studies/2026-10-28_city_posters/ai_paint/NOTES.md), so they go into the scene through lib/paint like any bake: one RGBA PNG per piece, in the SAME box as our v4 design piece and under that piece's own … |
+| `scripts/look/aipaint/fetch_model.py` | Fetch SDXL base 1.0 (stabilityai/stable-diffusion-xl-base-1.0, licence CreativeML Open RAIL++-M: commercial use allowed) for the AI-paint test (docs/studies/2026-10-28_city_posters/ai_paint/NOTES.md). |
+| `scripts/look/aipaint/make_inits.py` | The AI-paint test's img2img INIT images (docs/studies/2026-10-28_city_posters/ai_paint/NOTES.md): OUR design, which the model only paints. |
+| `scripts/look/aipaint/run_ai1.sh` | The AI-paint test, end to end (docs/studies/2026-10-28_city_posters/ai_paint/NOTES.md): an open model (SDXL base 1.0, img2img + canny ControlNet) paints OUR v4 design's background plates LOCALLY on the CPU (no key, no service); the engine (lib/paint) places … |
+| `scripts/look/aipaint/sdxl_paint.py` | Paint one of OUR designed plates with an open image model, LOCALLY on the CPU (no key, no service): SDXL base 1.0 img2img (stabilityai/stable-diffusion-xl-base-1.0, CreativeML Open RAIL++-M, commercial use allowed). |
+| `scripts/look/aipaint/sheets.py` | The AI-paint test's sheets (docs/studies/2026-10-28_city_posters/ai_paint/): small labelled jpgs, no new data. |
+
+## `scripts/look/organic/`
+
+| tool | what it does |
+|---|---|
+| `scripts/look/organic/bench_render.py` | The organic proof's render cost per frame (docs/look/organic/organic_proof.md "Cost"). |
+| `scripts/look/organic/mypaint_bake.mjs` | The organic proof's brush (docs/look/organic/organic_proof.md; libraries.md rank 1): MyPaint's brush engine through peinten (MIT, a TypeScript port of libmypaint, ISC; pinned peinten@1.3.0) with the CC0 mypaint-brushes 2.0.2 presets, on the CPU in Node. |
+| `scripts/look/organic/oc_lib.py` | The organic proof's shared tools (docs/look/organic/organic_proof.md). |
+| `scripts/look/organic/organic_proof.py` | The ORGANIC PROOF's driver (docs/look/organic/organic_proof.md). |
+| `scripts/look/organic/organic_sheet.py` | The organic proof's numbers and sheet (docs/look/organic/organic_proof.png, organic_proof.md). - the three numbers of techniques.md section 1 (crisp edges, straight, dead-flat), the same method (JPEG q85 at the phone's width), on the whole still and on each … |
+| `scripts/look/organic/piece_cloud.py` | The organic near cumulus (docs/look/organic/organic_proof.md section 2.1). |
+| `scripts/look/organic/piece_facade.py` | The organic facade of the wing, by the doorway (docs/look/organic/organic_proof.md section 2.3). |
+| `scripts/look/organic/piece_paving.py` | The organic paving of our bank (docs/look/organic/organic_proof.md section 2.4). |
+| `scripts/look/organic/piece_tree.py` | The organic near tree (docs/look/organic/organic_proof.md section 2.2). |
+| `scripts/look/organic/render_inputs.sh` | The organic proof's engine renders (docs/look/organic/organic_proof.md "Rerun"): v6's frame at 1.0 s and the decomposition renders the bake reads (src/look/organic_s1: OrganicS1 variants and OrganicFlat solos), then, with --after, the frame with the four … |
+
+## `scripts/look/paint/`
+
+| tool | what it does |
+|---|---|
+| `scripts/look/paint/bake_v2s1.sh` | The paint bake for v2's S1 (paint_test/NOTES.md "the bake"): 1. each piece's flat shapes alone on a transparent frame (the PaintFlatS1 composition of src/entry-look-paint.tsx, 1.0 s, after the flood) into out/paint/v2s1/flat/; 2. the painter (paint.py … |
+| `scripts/look/paint/paint.py` | The engine's paint pass, the BAKE half (src/lib/paint is the placing half; the API, the method and the cost: docs/studies/2026-10-28_city_posters/paint_test/NOTES.md). |
+
+## `scripts/look/paint/recipes/`
+
+| tool | what it does |
+|---|---|
+| `scripts/look/paint/recipes/built_ground.py` | Painted-piece recipe proof: buildings, ground and far city. |
+| `scripts/look/paint/recipes/foliage.py` | Painting recipe proof: trees and greenery (docs/look/paint_recipes/foliage.md). |
+| `scripts/look/paint/recipes/sky_clouds.py` | Sky and clouds: the painting recipe as code (video/docs/look/paint_recipes/sky_clouds.md). |
+| `scripts/look/paint/recipes/water.py` | Water and reflections: the painting recipe as code (video/docs/look/paint_recipes/water.md). |
 
 ## `scripts/look/posters/`
 
@@ -73,6 +138,17 @@ toolkit"), `docs/G5_BLOCKING.md` §4 (previews) and §7 (the gate check). v1-onl
 | `scripts/look/posters/ab_outlines/build.py` | Build the owner's A vs B picture: docs/studies/2026-10-28_city_posters/img/AB_outlines.jpg. |
 | `scripts/look/posters/ab_outlines/render.cjs` | Render an SVG or HTML file to PNG with the pre-installed Chromium (Playwright). |
 | `scripts/look/posters/ab_outlines/scene.py` | The A vs B scene: v2's terrace across the canal at sunset (S3, "her window"), drawn ONE way in three modes. |
+
+## `scripts/look/scene1/`
+
+| tool | what it does |
+|---|---|
+| `scripts/look/scene1/render.cjs` | Render SVG files to PNG with Playwright's Chromium: node render.cjs in.svg out.png [in2.svg out2.png ...] The PNG takes the SVG's width/height attributes as its size (deviceScaleFactor 1). |
+| `scripts/look/scene1/scene.py` | Scene 1 ("She quit Google."), rebuilt the city-poster way: ONE still, 1080 x 1920, in stages. |
+| `scripts/look/scene1/scene_v2.py` | Scene 1 ("She quit Google."), still v2: DEPTH IS AIR AND DISTANCE (owner, 2026-10-29, on still v1). |
+| `scripts/look/scene1/sheet.py` | Side-by-side sheets at 400 px wide, labelled (posters cropped to their content rows). |
+| `scripts/look/scene1/svgkit.py` | Tiny SVG writer + Chromium render for the scene-1 poster-rethink still (2026-10-29 iteration). |
+| `scripts/look/scene1/thumbs.py` | Three constructions of scene 1 ("She quit Google.") as grey value thumbnails, 540 x 960, 7 flat values. |
 
 ## `scripts/ops/`
 
@@ -172,6 +248,32 @@ Folder notes: [`qa/retro_tools/README.md`](qa/retro_tools/README.md).
 | `scripts/render/lib.mjs` | The plumbing render-frames.mjs and render-media.mjs share (streamlining Phase 1, 2026-10-29; docs/retro/2026-10-28_streamline/phase1_render.md). |
 | `scripts/render/parallel.mjs` | render-media.mjs --parallel=K, the review-cut and lane-clip path (see render-media.mjs's header). |
 
+## `scripts/type/`
+
+Folder notes: [`type/README.md`](type/README.md).
+
+| tool | what it does |
+|---|---|
+| `scripts/type/backgrounds.py` | The type iteration's two backgrounds (1080 x 1920), made from the latest look still (scene-1 painter v6). |
+| `scripts/type/check_stills.py` | Check the type stills against TYPE_GUIDE.md §f (the numbers, not the taste): per word, its ink box (from the renderer's layout log, canvas-measured), the type frame (y 290-1250; x 96-944 above y 840, x 96-860 below), the gap to the row above where they … |
+| `scripts/type/contact_sheet.py` | The type stills' contact sheet: every still in docs/look/type/stills/ at the guide's glance scale (0.25: 270 x 480), 7 per row, labelled, -> docs/look/type/stills/contact_sheet.jpg. |
+| `scripts/type/fetch_fonts.py` | Download the type iteration's candidate fonts (Google Fonts, OFL/Apache) from jsdelivr's @fontsource packages. |
+| `scripts/type/render.mjs` | The type iteration's still renderer: HTML (or a JSON spec) -> a 1080 x 1920 PNG, with optional phone-size preview and a platform-UI overlay. |
+
+## `scripts/type/lib/`
+
+| tool | what it does |
+|---|---|
+| `scripts/type/lib/type.js` | The type guide's system as an SVG layout helper for the stills (docs/look/TYPE_GUIDE.md, DRAFT). |
+
+## `scripts/type/stills/`
+
+| tool | what it does |
+|---|---|
+| `scripts/type/stills/emphasis_options.js` | The pleasantness pass's options for the stressed word and the big number (docs/look/type/PLEASANT.md §3; the owner, 2026-10-30: "shouldn't look like a blood message on the wall"). |
+| `scripts/type/stills/grid.js` | Lays out a list of options (stills/emphasis_options.js) as a column of labelled crops on one 1080 x 1920 still: each option is drawn on its own full frame (the background and the words at full size), then cropped to the band (cropY .. cropY + cropH) and … |
+| `scripts/type/stills/render_all.sh` | Render the type stills (TYPE_GUIDE.md §h): every page here -> scripts/type/out/<name>.png (+ _phone, _ui, _mask, _bare, _layout.json for check_stills.py), then the deliverables -> docs/look/type/stills/<name>.png and <name>_ui.jpg. |
+
 ## `scripts/v2/`
 
 | tool | what it does |
@@ -192,13 +294,24 @@ Folder notes: [`qa/retro_tools/README.md`](qa/retro_tools/README.md).
 | `scripts/v3/build_radio.py` | G1 radio cut builder: docs/v3/script/radio_input.json -> public/v3/radio_h<N>.wav + .json (one per hook variant). |
 | `scripts/v3/build_take.py` | G2 radio cut on the owner's ElevenLabs take: assets/v3/<take>_h<N>.wav + its Parakeet word timings (<take>_h<N>_words.json, from scripts/voice/transcribe.py) -> public/v3/take_h<N>.wav + .json for RadioCut (compositions TakeH1..3). |
 
+## `scripts/v4/`
+
+| tool | what it does |
+|---|---|
+| `scripts/v4/g3_skeleton.py` | Video 4's G3 board SKELETON (public/v4/animatic.json): the 12 shots of the locked visual script on the take's clock, each a placeholder panel with its name, so the reel plays end to end with the voice before the panels are drawn (phase B replaces each … |
+
 ## `scripts/voice/`
 
 | tool | what it does |
 |---|---|
+| `scripts/voice/check_clarity.py` | Check a script for what makes a regular listener stumble on ONE hearing: trade words, pointers with no single target, vague scope, idioms, numbers by ear. |
 | `scripts/voice/check_paste.py` | Lint an ElevenLabs paste file before the owner generates a take (rules: docs/ELEVENLABS.md, paste format v2; evidence and spec: docs/voice/PROPOSAL.md section 6). |
 | `scripts/voice/check_rhythm.py` | Check a script's sentence rhythm: long sentences must be broken up by short ones. |
 | `scripts/voice/check_take.py` | Check an ElevenLabs take against its paste file: transcribe it (Parakeet), align the words, and list everything the take says that the script doesn't (repeats, read-aloud notes or tags) and anything it skips, with timestamps, plus a ready clean_take.py … |
 | `scripts/voice/clean_take.py` | Cut unwanted bits out of an ElevenLabs take: keep the given [start, end] ranges (seconds, from the word timings), snap each cut to the quietest 20 ms window near it, and join with 15 ms crossfades. |
 | `scripts/voice/generate_take.py` | Generate a clean voice-over take with the owner's ElevenLabs voice, line by line, and verify every line. |
+| `scripts/voice/measure_take.py` | Measure how a take is DELIVERED (not what it says: check_take.py does that): pace, pauses, liveliness, loudness, and how much the key words stand out, so a few generated variants can be compared with each other and with a reference read the owner likes (v4 … |
+| `scripts/voice/shape_take.py` | Shape a voice take's cadence after generation: pause lengths, beats before chosen lines, tempo per sentence, polish. |
+| `scripts/voice/take_page.py` | Build the page a voice take reaches the owner on: a player, the take's cadence strip (its waveform with the long pauses marked) and the script to tap through (each line jumps the audio there). |
+| `scripts/voice/textnorm.py` | Shared word normalisation for comparing what a voice take says (heard by Parakeet or Whisper) with the script. |
 | `scripts/voice/transcribe.py` | Transcribe a voice-over with Parakeet (sherpa-onnx) and emit word-level timestamps. |

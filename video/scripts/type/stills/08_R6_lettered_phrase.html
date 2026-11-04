@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_NIGHT}}') center/cover no-repeat}
+.lab{position:absolute;font-family:'Jost';font-weight:400;font-size:30px;letter-spacing:0.04em;color:rgba(255,240,222,0.78)}</style></head>
+<body><div id="stage"></div>
+<script>
+// "That's a lot" pops 17.717 s, "of" 18.417 s, "tea." 18.583 s (with the mug), on to 19.217 s
+window.__ready = TYPE.run(() => {
+  const S = TYPE.stage(), tone = 'night';
+  TYPE.text(S, {t: "That's a lot", x: 110, y: 400, role: 'hand', size: 150, tone});
+  const tea = TYPE.text(S, {t: 'tea.', x: 890, y: 570, anchor: 'end', role: 'hand', size: 190, tone});
+  TYPE.text(S, {t: 'of', x: tea.x0 - 0.48 * 150, y: 570, anchor: 'end', role: 'hand', size: 150, tone});
+});
+</script></body></html>

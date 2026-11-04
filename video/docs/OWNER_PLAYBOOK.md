@@ -1,544 +1,506 @@
 # Owner playbook: everything the owner has told us, as rules
 
-This is the memory of the owner's feedback across videos: **approach-level rules only** (how we design and produce any
-video). Read it before starting any video, and before every gate of `docs/PIPELINE_V2.md`. **Before any visual work,
-also read `docs/look/DIRECTION.md`:** the one page of the current look and storytelling direction, distilled from the
-rules below (its numbers: `docs/look/CRAFT.md`). Only the owner's words outrank it: this file, and for one film
-what the owner said in `docs/vN/OWNER_NOTES.md` (the quoted words; the "-> what we did" half of a line is our log, with
-no owner rank). The chain: Process, "New feedback is INTEGRATED"; in full, `docs/look/DIRECTION.md`'s intro.
+The owner's feedback across videos as approach-level rules: each is its intent (the feeling or the goal), his words and
+the date; the tools, recipes and their example numbers live in the guides a rule points to. Read it before starting a
+video and before every gate (`docs/PIPELINE_V2.md`); before any visual work, also `docs/look/DIRECTION.md`. The owner's
+words outrank every doc: this file, and for one film the quoted words in `docs/vN/OWNER_NOTES.md` (never the "-> what
+we did" half of a line); the order of the rest: DIRECTION's intro. Every rationale, measurement and retired rule as it
+stood on 2026-10-31: `docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md`.
 
 **Capturing feedback (owner, 2026-10-26): split every note in the same turn and commit it.** A note about THIS video
-(pick, line, take, shot) goes to `docs/vN/OWNER_NOTES.md`; a lesson about our approach goes HERE as a general rule with a
-short evidence tag (vN, date); a concrete note that teaches something general goes to both. A reversed rule moves to
-"Retired". The owner's master creative brief is `docs/CREATIVE_BRIEF.md`: the source for the channel, story selection
-and writing, which this file does not replace; where a later rule here differs (the length, the sound effects, the voice
-paste), the later rule wins, as the brief's banner lists.
+(pick, line, take, shot) goes to `docs/vN/OWNER_NOTES.md`; a lesson about our approach comes HERE as a rule (its
+intent, his words, the date); a concrete note that teaches something general goes to both; a reversed rule moves to
+"Retired rules". `docs/CREATIVE_BRIEF.md` stays the source for the channel, story selection and writing; a later rule
+here wins where they differ.
 
-Format: **rule** — why / evidence (video, date).
+**Last reviewed for coherence: 2026-10-31 (made small: `docs/process/PLAN.md` step 6; what moved to the archive:
+`docs/process/playbook_dropped_quotes.md`) · coherent, clear and SMALL** (owner, 2026-10-31: "170k words of guides is
+absolutely bananas"; Maintenance, at the end).
 
-**Last reviewed for coherence: 2026-10-27 (sixth pass: a cold read as if starting video 4, every conflict it found fixed
-at its source: the card's timing, one version, people without faces, Pip in every shot, the line's colour, parallel
-work and the budget, the brief) · no size budget: coherent and clear wins over short** (owner, 2026-10-27; see
-Maintenance at the end).
+## THE THREE RULES ABOVE ALL (owner, 2026-10-30)
+Every brief and every frame review uses `docs/look/FRAME_CARD.md` (the questions, feeling first) and
+`docs/look/DESIGN_LANGUAGE.md` (the tools for each feeling).
+1. **Every frame is worth pausing on.** Judged at a glance, as a picture, before any numeric check: would a viewer stop
+   scrolling to look at it longer?
+2. **Readable imaginative ideas.** Each beat gets an imaginative picture a viewer reads in a second, invented for this
+   story: never a dry diagram, never an abstraction that needs explaining, never an idea taken from a past film.
+3. **Frames planned and created WHOLE, from the get-go.** Each frame is designed as one complete picture (its idea, its
+   world, its light, its people, its words) before it is built or animated; density comes from the imagination and
+   the world, never from a filling pass.
+
+— ("i like the main important rule is every frame is worth pausing on yes + readable imaginative ideas + frames planned
+and created whole. We shouldn't be in a situation where we have our video and then we just fill up space for the sake
+of density this is wrong", 2026-10-30.)
+
+**Settled for every video:** this section and CLAUDE.md are how every film is made from now on: apply them, never
+re-ask them. — ("we need to make sure this playbook follows into the next videos ... so that we don't talk about it
+again for future videos", 2026-10-30.)
+
+**No past film as the bar or the example:** no brief, card, review or guide points an agent at video 1 or any other
+film of ours as the bar, a reference or an example: it boxes the imagination in. The bar is the three rules and the
+beat's feeling; where an older guide still names a past film, that is a measured number, never a picture to look at,
+copy or upgrade. — ("don't reference video 1 - i think this would put agents in a box again", 2026-10-30.)
+
+**A RICH, BEAUTIFUL WORLD is designed before the frames and held by one finished frame, never added later:** the art
+director designs the film's world whole, from real photos of its real places and things with the story's marks on it,
+and builds its pieces once at finished quality (the world kit); the HERO FRAME, painted to full finish once the ideas
+are picked and approved by the owner, is the film's own bar for richness and finish, guiding the craft, never the
+ideas. Rich means specific, layered and alive (big shapes that read at once, middle shapes that describe the place,
+small details that reward a pause, the world going on past the frame's edges), never more stuff; pleasing is judged as
+a painter judges, at phone size (the values first, a few colours around one accent, a rhythm of shapes); an ALMOST
+comes back as a paint-over, never as new rules (PIPELINE_V2, "A RICH, BEAUTIFUL WORLD"). — ("what would ultimately
+ensure that the world is build rich, visaully and aestethically pleasing?", 2026-10-30.)
+
+**ONE FILM, NEVER A HODGE-PODGE:** one imaginative concept for the whole film (its world, its central device, the
+thread's journey, the arc of feeling); ideas picked as whole sequences, never a collage of the best single ideas; one
+art director approves every frame against the whole; every frame is judged IN the board, and the board is read in
+order after every round. — ("if every agent bulid a scene in isolation, the whole thing comes up like a complete mess
+of hudge pudge ideas", 2026-10-30.)
+
+**THE FRAME LOOP (every built frame, before the owner sees it):** build it whole -> a fresh evaluator names the feeling
+it gives and judges it against the beat's (the feeling and idea in a second; worth pausing on) -> THERE (move on),
+ALMOST (adjust what holds it back, at most 2 rounds) or NOT THERE (rework from the idea once, then options to the
+owner); every workflow encodes it (PIPELINE_V2, "THE FRAME LOOP"). — ("we evaluate and perhaps adjust it if its almost
+there or rework completely if it doesn't achieve the feeling we need", 2026-10-30.)
+
+**The process is loose and imaginative around these three:** pictures before documents, ideas before rules; every
+other rule here is guidance from the owner's past notes, never a checklist that designs the frame, and checks catch
+mistakes, never stand in for the picture. — ("i want to make it more loose, more imaginative", 2026-10-30.)
+- **Imagination first, inside the toolbox we built:** the composition library composes the ideas, the style recipes
+  make the key frames, the moves, joins and sound sync make the shot plan (PIPELINE_V2, "THE LOOP NOW"). — ("Are the
+  stylistic recipes included here?", 2026-10-30.)
+- **The toolbox is written as FEELINGS and the visual TOOLS that create them, never as placements:** "a feel of
+  distance" is the intent; layers, overlap and atmosphere are the tools; the artist invents the frame, planned on one
+  card that asks about every aspect (FRAME_CARD), so no piece is left for the owner to point at. — ("like not the
+  concrete steps "PUT A BUILDING HERE", but more abstarct like "layers and feel of distance" and the feel of distance
+  is achieved with a "visual" tool of layers", 2026-10-30.)
+- **A library is INSPIRATION, never a template:** a composition device is an abstract RELATIONSHIP (how things sit
+  next to each other and lead the eye), so it is shown as a plain diagram plus several examples from very different
+  worlds, never one street drawn every time; agents imagine the frame first and browse the libraries for "oh yeah, we
+  could do it like this", never pick a device and fill it. — ("composition library to me would normally be an
+  inspiration like oh yeah we could do it like this"; "previously composition shot was taken too literally by agents
+  like they used the same building and a street while the intention for the composition library is to be abstract and
+  there are million way to create visuals but how they are positioned next to each is what composition provides as a
+  tool", 2026-10-31.)
+- **A number is never a target the frame is built to:** "contrastful, to give feeling X" is the brief; how much
+  contrast, how much dark, how many props, how big the quiet areas are follows each scene's own content, mood and
+  setup, so every scene lands somewhere different. Measurements explain what we see and catch real mistakes (captions
+  readable, safe zones, timing), never the goal: an agent filling a percentage forces the design and loses the
+  feeling. Keep every tool and recipe; judge the frame by its feeling first, with the story's life and action where
+  the eye goes. — ("Saying 65% contrast makes the agent force a design actually sacrificing the feeling"; "each scene
+  would have a different contrast level depending on what is shown and what the mood and setup is"; on painter v7: "we
+  lost the feeling", "the life and action is rather on the background"; "focus on achieving feelings with our tools
+  rather than filling checkboxes", 2026-10-31.)
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section THE THREE RULES ABOVE ALL
 
 ## Audience and goal
-- **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
-- **Growth matters: maximise engagement with subtle, defensible hooks**, e.g. "the language everyone loves".
-  **Exaggerating, generalizing and making it bigger are fine; no law-firm precision** (2026-10-29); the core event is
-  real. **Comments are a massive plus:** a line people will argue with, or correct, in the comments counts FOR a
-  script, so G1 writes one or two on purpose (2026-10-29: "And people commenting is actually great so if comments are increasing the engagement that's a massive plus to the script"). And **never baity: the opening must never
-  sound like a commercial.** A sales question to
-  the viewer ("Buying a laptop soon?"), a pitch-like claim about their purchase, a shopping screen with a price and "Add
-  to cart" as the first image: together they read as an ad, and people skip ads (v3: 60 % gone by ~2 s, skip rate
-  64.5 % against v1's 32 %, no shares or saves). Open like a person telling surprising news they just found out (what
-  happened, then why it matters to you), in a curious, credible voice, with the world's own picture first; before G2,
-  a cold viewer panel hears the first line and sees the first frame and answers "does this sound like an ad or bait?":
-  it must be no. — (v1, 2026-10-24; owner, v3 insights, 2026-10-28: "the engagement is much worse on this video now. My
-  personal read is it sounds more like a bait commercial or rather way too baity".)
+- **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24.)
+- **Our niche: TECH IN CITIES**: how cities find creative, cool ways to adopt technology (a city heating homes with
+  computers' heat, a city bringing its history to life with AI), told through the place itself, its streets, homes
+  and people. It fits our painted city look and the city-poster study's answer on content ("videos where we have more
+  of cities / architectures / buildings"). Topics are scouted for it first. — ("I am thinking about a niche content
+  start something "tech in cities" like how cities find creative and cool ways to adopt tech / So our Helsinki story
+  is great actually", 2026-10-31.)
+- **Growth matters: maximise engagement with subtle, defensible hooks.** **Exaggerating, generalizing and making it
+  bigger are fine; no law-firm precision** (the core event is real). **Comments are a massive plus:** a line people
+  will argue with or correct counts FOR a script, so G1 writes one or two on purpose. — ("if comments are increasing
+  the engagement that's a massive plus to the script", 2026-10-29.)
+- **Never baity: the opening must never sound like a commercial.** People skip ads. Open like a person telling
+  surprising news they just found out (what happened, then why it matters to you), with the world's own picture first;
+  never a sales question, a pitch or a shopping screen; a cold viewer panel checks the first line and frame before G2.
+  — ("it sounds more like a bait commercial or rather way too baity", v3 insights, 2026-10-28.)
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Audience and goal
 
 ## Script and voice
-- **A script is a coherent STORY, not a collection of true sentences about the topic.**
-  - One throughline question, a situation the viewer is in, and every line following from the one before (joinable by
-    "but", "so" or "because", never "and also"), building to a turn and a payoff.
-  - Spine first, then lines. A list of facts to prove is input, never the structure.
-  - Test: someone who hears it once can retell it as a story.
-  — ("just a collection of sentences", v3 G1, 2026-10-26).
-- **ONE SUBJECT, GONE DEEP (the Big Bend rule).** One thing in one place carries the whole film, and every line digs
-  deeper into that same thing (what it is, how it works, why, the twist, what it means for you). Other places or
-  examples appear only as ONE comparison or scale shot that serves the subject, never as stops on a tour. The Big Bend
-  reel: one tower, one city, one question (why does it curve back down?); every line deepens it (its height, its name,
-  its year, the twist that it is the longest building, its curved lifts); the scale comes from one lineup beside other
-  towers, not from visiting them. Our v5 draft 1 broke it: orbit, a mountain in Italy, the sea off Shanghai, Stockholm,
-  then Helsinki in 43 s, one line each and nothing deepened (a list wearing a story's clothes). **Test, at G0 and G1:**
-  name the film's one thing in 3 words; count the places (one home place, at most one comparison shot); every line
-  must be about the one thing. This tightens CRAFT §a's "at most 3 places". — ("I what I don't like about the current story is we are too wide and unfocused again like we talked about a bunch of topics all within 30 seconds - we started with space then mountain then  Stockholm then Helsinki / Compare it with big bend story and create a new rule for storytelling", v5 G1, 2026-10-29).
+- **A script is a coherent STORY, not a collection of true sentences about the topic.** One throughline question, a
+  situation the viewer is in, every line following from the one before ("but", "so", "because", never "and also"),
+  building to a turn and a payoff; spine first, then lines. Test: someone who hears it once can retell it. — ("just a
+  collection of sentences", v3 G1, 2026-10-26.)
+- **ONE SUBJECT, GONE DEEP (the Big Bend rule).** One thing in one place carries the film and every line digs deeper
+  into it; another place appears only as ONE comparison or scale shot, never as a stop on a tour. Test, at G0 and G1:
+  name the one thing in three words; every line is about it. **No side quests, and only the information the story
+  needs:** a beat that doesn't carry the story to its payoff goes, however true or fun. — ("we are too wide and
+  unfocused again like we talked about a bunch of topics all within 30 seconds", v5 G1; "you are having again too much
+  of a sidequest", v4 G1, 2026-10-29.)
 - **The first line sounds like a friend starting a story, and still pulls: curious, never pushy. "Did you know that
-  ..." is the owner's model opener.** The Big Bend reel: "Did you know that New York once got a proposal to build this
-  giant 2,000-foot tall bending skyscraper? It's called the Big Bend." A friend's question with a surprising fact in it
-  (a place, a thing, a number), no sell (unlike v3's "Buying a laptop soon?"); the curiosity comes from the picture and
-  the one odd detail. The core line itself can open as "Did you know that ..." ("instantly more interesting").
-  — ("BTW I really like the script too in the video / See how it's using natural language it's
-  first hook sentence is extremely natural like a conversation yet captures the attention and curiosity without being
-  too pushy and the script has a rhythm we discussed before"; then "Oh I also meant that a video has an opening as "did you know that .." like that what I meant by great opening"; "Even with did you know the core line is instantly more interesting", 2026-10-29; saved: the study's
-  `refs/bigbend_reel/`).
-- **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24). **Rhythm: never a run of
-  long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a problem.") after every 1-2
-  long ones, at the turns,** gated by `scripts/voice/check_rhythm.py` OK at G1. — (owner's reference reel, 2026-10-27).
+  ..." is the owner's model opener.** A friend's question with a surprising fact in it, no sell; the core line itself
+  can open this way. — ("first hook sentence is extremely natural like a conversation yet captures the attention and
+  curiosity without being too pushy", 2026-10-29.)
+- **CLEAR TO A REGULAR PERSON ON ONE HEARING: every sentence is understood the first time, at feed speed, by regular
+  people worldwide (many learned English at school; they read the captions as it plays and can't rewind), never only
+  by us.** Write each sentence as news you'd pass to a friend (the principles:
+  `docs/retro/2026-10-29_script_clarity/PRINCIPLES.md`):
+  - **Everyday names, one per thing:** no trade words, no common word in its trade sense; a needed term is described
+    once, plainly.
+  - **Introduce, then point:** every "it" or "that" points at ONE obvious thing in the line before, or the noun is said
+    again.
+  - **The plain thought, as the typical case:** who does what, where; never a clever hint, never a vague scope.
+  - **One new idea per sentence, hooked onto the last,** with true joins; the plain base right after the hook, so the
+    viewer wonders about the story, never about a word.
+  - **Literal words for a worldwide ear:** no idioms, slang or wordplay.
+  - **The one joke is the plain situation, said kindly:** never weird, cheeky or scandalous.
+  - **Numbers and comparisons by ear:** one round number per sentence, tied to an everyday thing.
+  - **A comment line is clear first:** people argue with what they understood.
+  - **Checked, never assumed:** `scripts/voice/check_clarity.py` at G1, then the G1 critic's cold viewer panel; our own
+    ear proves nothing.
+
+  — ("is that sentence good and will be received well by regular people? Chips is a word not a lot of people would
+  understand"; "When you say IT - what exactly is it - heat or air or sea?", v4 G1, 2026-10-29.)
+- **Sound like a real person talking, never like AI (the creative brief's RULE #1): check every sentence for
+  AI-sounding wording.** — (v1, 2026-10-24.)
+- **Human connectors, placed TACTICALLY: a few spoken words a person telling a friend would use, at the moments that
+  need a hand:** "To put that into perspective," "Actually," "So," "Now," the viewer's own question said aloud ("So how
+  does it work?"), "Or in other words,"; a few in a film, each true to its sentence. RULE #1's stock reveal phrases
+  ("Here's the thing", "Turns out") stay banned. — ("i would add more human / conversation like sentences
+  TACTICALLY", v4 G1, 2026-10-29.)
+- **Rhythm: never a monotone run of long sentences:** a short line at the turns, a long run only as flowing spoken
+  thoughts joined by connectors, and the short line keeps its noun; `scripts/voice/check_rhythm.py` at G1 (never
+  evidence of clarity). — (the owner's reference reel, 2026-10-27; the El Niño read: "it sounds directionally good to
+  me", 2026-10-29.)
 - **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.**
-  — (v1; "give me the full text to paste, not one line", v3, 2026-10-26).
-- **We generate the narration with the owner's ElevenLabs voice through the API, for every video** (voice id and model
-  in `docs/voice/VOICE.md`, procedure `docs/voice/API_QUICKSTART.md`, details `docs/ELEVENLABS.md`): paste format v2
-  (few short tags, only at a paragraph start) with `check_paste.py` OK (it blocks every pattern that ever broke a take;
-  only its `--handoff` text reaches the owner); `generate_take.py` (whole script first, auto-checked, auto-regenerated)
-  with `report.json` `all_clean`; `check_take.py` MATCH on every take; send take.wav as an attachment; lock it into
-  `public/vN/`; log it in `ELEVENLABS.md` section 5; commit and push after each step (pull first). **One full paste
-  must narrate cleanly: a voice failure is our process bug, never the owner's problem** — fix it in the process. The
-  key is the secret `ELEVENLABS_API_KEY`: never print, file, prompt or commit it. Only without the key does the owner
-  paste it (then always the full paste text). Never a voice other than the owner's. — (owner's standing instruction +
-  v2 take 1, 2026-10-26).
+  — ("give me the full text to paste, not one line", v3, 2026-10-26.)
+- **We generate the narration with the owner's ElevenLabs voice through the API, for every video** (the voice:
+  `docs/voice/VOICE.md`; the procedure and its checks: `docs/voice/API_QUICKSTART.md`; the log: `docs/ELEVENLABS.md`).
+  A take reaches the owner on a private claude.ai player page (attachments don't play in the app on his phone). **One
+  full paste must narrate cleanly: a voice failure is our process bug, never the owner's problem.** Never a voice he
+  didn't pick (his cloned narrator by default); never print, file or commit the key; only without the key does he
+  paste the script himself (then always the full paste text). — (the owner's standing instruction, 2026-10-26; "lets
+  try another voice", v4, 2026-10-29.)
+- **The delivery is explored and shaped for attention, one take sent:** a few whole-script reads against the owner's
+  reference read, the best one shaped by its pauses (`scripts/voice/shape_take.py`), checked word for word again. —
+  ("play with the cadence and emotions to get to the best possible outcome capturing people attention and keep them
+  engaged", v4 G2, 2026-10-29.)
+- **Never process the voice itself: no time-stretch, no compressor, no dynamic loudness;** only its pauses are cut and
+  one gain sets its level; pace comes from the read and the pauses; a take the owner makes on the website can be the
+  base. — (a speed-up: "extremely robotic like there is some weird background", 2026-10-29.)
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Script and voice
 
 ## Music and sound
-- **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — (v1).
-- **Mix to -14 LUFS / -1 dBTP, voice always on top**; SFX land on visual hits. — (v1).
-- **More sound effects, especially ones people link with something good on their phone** (like pop, notification ding,
-  message-sent swoosh), **with one in the first second.** Our own sounds that evoke them, never Apple's or Instagram's. — (2026-10-25).
+- **Sync picture to sound ON PURPOSE.** Moves and key actions land on the sound where that adds energy or meaning, NOT
+  everywhere: spend it in the hook and at the payoff, rest while the voice explains; a hit lands on the first frame of
+  one change of the subject, never before it, and is heard; never on background life (`docs/look/SOUND_SYNC.md`). —
+  ("we just need to be more intentional and educated about this effect and where it make sense to use", 2026-10-30.)
+- **Music: cinematic but subtle, especially at the start:** the voice and the hook carry the opening on near silence;
+  the bed enters after the hook and rises once, at the payoff. — (v1; 2026-10-30.)
+- **Mix to -14 LUFS / -1 dBTP, voice always on top;** an effect lands on its visual hit, never before it. — (v1;
+  2026-10-30.)
+- **More sound effects, especially ones people link with something good on their phone** (a pop, a ding, a swoosh),
+  **with one in the first second:** our own sounds, never Apple's or Instagram's, each on a story event. —
+  (2026-10-25.)
 
-## Visual style (one page: `docs/look/DIRECTION.md`; numbers and checks: `docs/look/CRAFT.md`)
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Music and sound
+
+## Visual style (one page: `docs/look/DIRECTION.md`; the tools for each feeling: `docs/look/DESIGN_LANGUAGE.md`)
 - **ONE LOOK, ONE BRAND, still evolving: every video shares one coherent style, and we are still finding it.** The
-  style is what carries over (the rendering, light, texture, composition grammar, palette family, type and the cover's
-  layout); each film's world (its places, people, props, life and music) is drawn new inside it. The look keeps
-  evolving: each film may carry its next step (like the city-poster experiments), what works becomes the shared look,
-  and we never over-fixate on matching the last film. Our covers on the profile grid should read as one series, as the
-  city posters' 19 do. — ("i agree that a coherent style across all videos sharing one look, one brand would be
-  absolutely the key here"; "the importnat part about one look is our look is evolving - we are finding out style i
-  don't think we can overfixate on this", 2026-10-28).
-- **Hand-drawn flat colour like reference video 1, drawn CLEAN, REFINED, GENTLE, PREMIUM: never rough or messy.**
-  Reference 1 gives the composition, the flat colour and the small people; the line is the clean pen: clean, confident
-  lines (smooth, consistent weights, few of them, no jitter, no sketchy overshoot or double strokes), refined shapes,
-  no outlines (edges from light and shade, thin lines only on small things: Texture and lines below); hand-drawn
-  warmth comes from shape and colour, not from scratchy lines.
-  Spec: `docs/look/CRAFT.md` §c. — ("hand-drawn ink, flat colour, like reference video 1", v1, 2026-10-24; "too rough
-  and messy, a lot of rough lines, not clean at all; cleaner, more refined, gentle, premium", v3 G5b, 2026-10-27; the clean pen with tiers and gentle light
-  APPROVED at v2's G4 look clip: "okay good continue", 2026-10-27).
-- **Learn from the city posters and experiment with that style in our films, starting from v2's look.** The owner's
-  reference is seven illustrated city posters (`docs/look/poster_refs/`); v2 ("One Small Window") is the visual
-  baseline the owner likes. What we learn from them (perspective, visual style, details, composition, and the one
-  focus) is studied in `docs/studies/2026-10-28_city_posters/`; a lesson becomes a rule only once the owner approves
-  it, and `docs/look/DIRECTION.md` stands until then. What the owner feels in them, in their words: depth, with
-  "something WAY further out that gives me a sense of scale"; the main objects crisper and more detailed, the rest
-  simpler ("a bit more low poly") yet coherent; nature that looks real but, up close, mixes "the real effects with the
-  lower poly kind of effects"; colours "very vibrant" that "coherently fit together". Next to them v2 "still feels cheap
-  and lazy", though the owner likes its colours. The study researches how professional studios get each feeling and
-  turns it into concrete techniques, and adds what we observed that the owner didn't name. The owner's answers to our
-  observations (2026-10-28): texture yes, very subtly; the lit and shaded faces and the full value range yes (their
-  own bullets); outline-free edges liked, to be judged on an A vs B picture; layout "is a big aspect": consolidate
-  our earlier layout rules with the posters' findings into one guide; the posters' "unique camera angle and composition
-  of objects is fascinating" (a designed view of the place that no camera could take); the specific local objects
-  (a protea, a cyclo) belong to the content, not the style ("hard to imagine if its going to trasnalte and generalize
-  well"); one look, one brand (its own bullet). The owner's answer to the study's open calls (2026-10-29): "Go with
-  your suggestions", so these are decided, first judged in the 7 s look test of v2's canal opening: no outlines (edges
-  from light and shade, the subject's shade face -20 to -25 L*); real darks 6-10 % of the frame in many small pieces;
-  the "low poly" patchwork world for the ground and the far city (never on the subject, never in the sky); the designed
-  view (a second horizon for the far city) for the establishing view and the scale landing only; a quiet "find Pip" in
-  most exterior shots, none in closes and charts, hidden on the cover too; the sun toned one step off its sky or
-  behind a ridge unless it is the shot's "look here"; thin lines 2 px on the layers that float. — ("i really like the style
-  and i want us to experiment more with the style and the focus on our videos"; "i want to see how we can learn from
-  these pictures in terms of perspective, visual style, details and composition"; "i think visually in the video about
-  Google we have made good improvemnets in terms of overall style"; "research each further how professional studios
-  approach this and how my feelings translate to a concrete approach and techniques"; "I like the color scheme overall
-  - they feel very vibrant and coherently fit together. I like the colors of our last video about Google, but our
-  video still feels cheap and lazy as if these pictures give a very premium feel to it"; "let me know if i am missing
-  anything you observed too", 2026-10-28).
-- **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
-  gentle light pools that make sense; never absent and never "weirdly put". Every volume reads in 2-3 flat tones, a lit
-  face and a shade face, as the city posters' buildings do; with no outlines these faces make the edges, so the
-  subject's shade face goes clearly deeper (-20 to -25 L*) while supporting life and the world stay gentle (-7 to
-  -12). System: `docs/look/CRAFT.md` §d. — (v3 G5b, 2026-10-27;
-  "the shadows added are better", v2 G4, 2026-10-27; on the posters' lit and shaded faces: "4 is a good point and goes
-  along the shadows we discussed in the google video", 2026-10-28; the subject's deeper shade: "Go with your
-  suggestions", 2026-10-29).
+  style carries over (rendering, light, texture, composition grammar, palette family, type, the cover); each film's
+  world is drawn new inside it; what works becomes the shared look; never over-fixate on matching the last film. —
+  ("our look is evolving - we are finding out style i don't think we can overfixate on this", 2026-10-28.)
+- **Hand-drawn flat colour like the owner's reference 1 (France), drawn CLEAN, REFINED, GENTLE, PREMIUM: never rough
+  or messy.** The warmth comes from shape and colour, never from scratchy lines. — ("cleaner, more refined, gentle,
+  premium", v3 G5b, 2026-10-27.)
+- **Learn from the city posters and experiment with that style in our films** (`docs/look/poster_refs/`; the study:
+  `docs/studies/2026-10-28_city_posters/`): depth out to something far away that gives scale, crisp main objects and a
+  simpler supporting world, vibrant colours that fit together; a lesson becomes a rule only once the owner approves it,
+  and the decided ones live in their own rules here (their designed, impossible view is on hold: he prefers a person's
+  eye-level view, below). — ("these pictures give a very premium feel to it", 2026-10-28.)
+- **PROPER LIGHT: one story light per scene, done properly:** one source the eye goes to, real falloff, lit edges on
+  what it touches, a glow at the source itself (a glow is right where a source is), shadows and light pools that
+  follow it, local lights as story lights; ONE COLOUR KEY per scene, one hot accent. — ("can we do the proper
+  lights?", 2026-10-30.)
+- **Light and shadow: gentle, but always there.** One light direction per scene, soft form and cast shadows, never
+  absent or "weirdly put"; every volume a lit face and a shade face (they make the edges), the subject's shade the
+  deepest (CRAFT §d). — ("the shadows added are better", v2 G4, 2026-10-27.)
 - **DEPTH AND SEPARATION: every shot reads in distance, never a flat elevation.** The subject separates from what is
-  behind it (its own value and contrast against a calmer field: a building in front never melts into the buildings
-  behind it); distance shows in the colour (far planes converge on the air behind them: lighter, softer, simpler; cooler
-  under a blue sky, warmer under a sunset: atmospheric perspective, in flat colour) and in perspective (a ground plane that recedes: converging edges, foreshortened steps,
-  things smaller and paving finer with distance, overlaps), never stacked flat bands. A few particles make it natural, and
-  they must be SEEN at phone size without searching (leaves you watch fall, glints that sparkle, motes in the light):
-  calm, never invisible; leaves blown across the open mid ground are the proven one. Water gets the same clean, premium, refined
-  drawing as everything else, never a lazy fill: a flat band with box-shaped reflection patches, scattered dashes and
-  star sparkles read "way too cheap"; a film with water designs it (researched, the pro way) in its G4 look clip,
-  as one shared component, before the lanes build it. Proven libraries are welcome where they help (researched,
-  deterministic per frame for rendering). — ("the foreground and the main focus still blur with the background
-  supporting entities ... the Google office vs the building in the background: all blurred together, not clear to
-  separate one from the other, no distance effect, no perspective; the bottom part: little to no perspective or depth
-  ... research some libraries on GitHub ... add a bit of particles here and there to make things more natural"; on v4: "I don't see any changes in the particles
-  anywhere"; on v5: "I don't like the water too much, leafs are great"; "it's just looking way too cheap, not clean or premium
-  quality or refined, just lazy and cheap"; on v6, the researched shared water (true reflections, a gold light
-  column, still glitter, calm ripple lines): "Yeah this is better", v2 G4,
-  2026-10-27/28; the city posters: "some buildings are obviously closer to me, some further out and there is
-  something WAY further out that gives me a sense of scale", 2026-10-28).
-- **A gentle PARALLAX float, never a flat card.** When a held shot floats, its planes move by depth (Disney's multiplane
-  idea): the near ground most, far planes little, the sky and the caption band not at all; slow, small, back at rest
-  by every join; it adds depth in motion without adding movers. — ("switch it on if you think it will make the videos
-  better and improve engagement", v2 G4, 2026-10-28).
-- **ONE CONTINUOUS SKY, a gentle gradient, no abrupt colour seams.** The sky is one sky from the top of the frame to
-  the horizon: ONE gentle, smooth gradient (the sky is the one place a gradient is welcome), warmest around the sun and
-  toward the horizon, dithered so it never bands on a phone, nearly flat inside the caption band so captions keep their
-  contrast; the caption field is part of that sky, never a separate slab of another colour; the sun sits in sky that
-  agrees with it, and the far city takes the sky's lowest colour as its haze. Generally: two big fields of unrelated colour never
-  meet in a hard seam unless an object edge explains it. The sun stays calm: one step off its sky, or behind a ridge,
-  unless it is the shot's "look here", so the far is the calmest part of the frame. — ("what bothered me is different color of the space and sun,
-  like why is it blue sky and then suddenly abruptly orange, weird"; "maybe when it comes to sky we can find a beautiful
-  way to do a gentle gradient", v2 G4, 2026-10-27; the calm sun: "Go with your suggestions", 2026-10-29).
-- **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, the deepest
-  light-and-shade step, saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle
-  (smaller, lower contrast, gentler shade, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
-  a softer, simpler style than the subject; not every moving piece gets the same treatment. Too many equal moving parts
-  = "I don't know what to keep my attention on". The main objects are the crispest and most detailed; the supporting
-  world is simpler (fewer details, a more faceted, "low poly" build) yet made with the same shapes, colours and light,
-  so nothing looks off at a glance. Tiers: `docs/look/CRAFT.md` §b. — (v3 G5b, 2026-10-27; the city posters: "some
-  objects that are obviously the main parts and so they stand out and they have more details and cleaner lines and
-  just all around crispier and there are rest of the objects that compose the scene and give it fullness and live and
-  the right amount of density, but they are obviously less detailed, a bit more low poly but nonetheless coherently fit
-  into the style and the picture. Like you can't immidetaly spot that something is off", 2026-10-28).
-- **Every scene must FEEL ALIVE, calm and tiered: that is the key, not an object count.** A dense, detailed world (a
-  city full of buildings and windows, a room full of real things), people near and far, layered depth, a recurring
-  living character (Pip, hidden on purpose: the Pip bullet below), ambient life that never stops (clouds, birds, steam,
-  lights switching). A dense world makes a frame
-  full even when little moves (Arcane's rooftop; the owner's riverside reference "doesn't feel empty at all"). The
-  density sits mostly in the calm environment tier at low contrast, so full never means busy (`docs/look/CRAFT.md` §b).
-  The bar: reference 1 (France) and v1 (PHP), then each film's own G3 density key; `scripts/qa/density.py` is a warning
-  signal, never a quota; how-to `docs/look/LIFE_AND_DENSITY.md`. Big empty fields (nothing in them; flat colour itself
-  is right) and an object alone on a blank wall are failures even in a draft. — ("way too empty", "feeling alive is
-  absolutely the key", "less prescriptive on the amount of objects", v3 G5, 2026-10-26; "too busy ... too many moving
-  parts", v3 G5b, 2026-10-27).
-- **Scale moments, occasionally: make the viewer feel small**, using Arcane's camera work and staging, never its footage.
-  Keep it nuanced (it's still TikTok). The owner liked v1's scale scenes. — (v1, 2026-10-24/25).
-  **When a scale shot comes, the scale must feel GREAT**, like Arcane's rooftop end frame: a world that keeps going
-  (hundreds of buildings shrinking into haze), a landmark that is huge yet far, tiny anchors (figures, birds, airships),
-  the drop below the camera, a big sky with huge clouds, many depth layers. Recipe: `docs/look/CINEMATIC_GUIDE.md`
-  ("Scale cues"). — ("another point in the Arcane shot is how great the scale feels", v3, 2026-10-26).
-- **Arcane references: ENVIRONMENT ONLY** (cities, interiors as spaces, wides; no people), few and high-confidence; build on our own videos. — (2026-10-26).
-- **The owner's favourite Arcane shot: the pull-back crane reveal** (S1E1 rooftop: the camera pulls back and rises until
-  the sisters are tiny figures overlooking a vast city; "it has pretty much everything"): the model for a film's big reveal
-  (`docs/look/CINEMATIC_GUIDE.md` S5). — (v3, 2026-10-26).
-- **Second visual twist: coziness through a sense of enclosure**: framed, street-like spaces that hold the subject (ref
-  `docs/look/ref_sense_of_enclosure.jpg`). Rules: `docs/look/COZY_AND_SCALE.md`. — (2026-10-25).
-  **Coziness is a recurring topic we keep evolving, one reference at a time** (enclosure H:W ratios first; then the
-  owner's 2026-10-26 reference: a painterly street seen from above, everyday traffic flowing calmly under flowering trees):
-  each new reference is measured (composition, movement, texture, camera, details) and folded into `COZY_AND_SCALE.md`.
-  — ("really figure out what about the scene brings out this feeling; this is a recurring topic we need to evolve", 2026-10-26).
+  behind it; far planes go lighter, softer and simpler, the ground recedes; a few particles, SEEN at phone size, make
+  it natural; water drawn as cleanly as everything else, never a lazy fill. — ("the foreground and the main focus
+  still blur with the background supporting entities", v2 G4, 2026-10-27.)
+- **DEPTH AND SCALE FROM A HUMAN VIEWPOINT: the camera stands where a person would stand, near a person at a real
+  size, with the vast world beyond; never a wall in your face, never a far panorama.** The near frame a small, subtle
+  hint at the edges; the street across full of everyday life, never an empty strip; landmarks and odd angles matter
+  far less than depth, density and light (`docs/look/refs_human_scale/`). — ("I’m really suffocating with the view";
+  "where a person would be about this size", 2026-10-29.)
+- **A gentle PARALLAX float, never a flat card:** a held shot's planes move by depth, slow and small, at rest by every
+  join. — ("switch it on if you think it will make the videos better and improve engagement", v2 G4, 2026-10-28.)
+- **ONE CONTINUOUS SKY, a gentle gradient, no abrupt colour seams, and never an empty field:** one sky to the horizon
+  with calm life in it, the caption band clear; the sun sits in sky that agrees with it; no hard seam between unrelated
+  colours. — ("why is it blue sky and then suddenly abruptly orange, weird", v2 G4, 2026-10-27; "the sky is not
+  entirely single color there are more things happening", 2026-10-29.)
+- **ORGANIC, NOT GEOMETRIC: shapes blend naturally, never square and proper:** irregular, varied silhouettes, edges
+  lost and found, nothing repeating a template (`docs/look/ORGANIC.md`). — ("It feels like a lot of our design is too
+  square and proper", 2026-10-30.)
+- **Every film's visual script gets a composition-and-motion pass from the shot library:** for each shot of the shot
+  plan, its composition, how the camera and action move within it, and how it joins the next
+  (`docs/look/COMPOSITION_SHOTS.md`). — ("how we animate and move within a scene and from scene to scene",
+  2026-10-30.)
+- **SCENE COMPOSITION: big quiet areas and one place to look:** values in a few big masses, one focal point with the
+  most contrast and the story light; a busy frame of many props is the failure. — ("our scene is very busy",
+  2026-10-30.)
+- **ATTENTION HIERARCHY: one main arc, one focus at a time.** The subject gets the contrast, the saturation and the
+  clear motion; supporting life stays subtle, alive but never competing; the supporting world may be simpler yet made
+  with the same shapes, colours and light (CRAFT §b). — ("I don't know what to keep my attention on", v3 G5b,
+  2026-10-27.)
+- **Every scene must FEEL ALIVE, calm and tiered: that is the key, not an object count.** A dense, detailed world,
+  people near and far, ambient life that never stops, mostly in the calm tier so full never means busy; designed into
+  the frame whole; `scripts/qa/density.py` warns, never sets a quota (`docs/look/LIFE_AND_DENSITY.md`). **A place, never
+  buildings standing alone:** blocks shoulder to shoulder, rooftops layered back to the horizon, the street's own life
+  between them. — ("feeling alive is absolutely the key", v3 G5, 2026-10-26; "each house is so alone like the scene is
+  empty", 2026-10-30.)
+- **Scale moments, occasionally: make the viewer feel small**, nuanced (it's still TikTok). **When a scale shot comes,
+  the scale must feel GREAT:** a world going on into haze, a far landmark, tiny anchors, a big sky
+  (`docs/look/CINEMATIC_GUIDE.md`, "Scale cues"). **Arcane references: ENVIRONMENT ONLY**: its camera work and staging,
+  never its footage. **The owner's favourite Arcane shot: the pull-back crane reveal**, the model for a big reveal. —
+  ("how great the scale feels", v3, 2026-10-26.)
+- **Second visual twist: coziness through a sense of enclosure:** framed, street-like spaces that hold the subject
+  (`docs/look/COZY_AND_SCALE.md`). **Coziness is a recurring topic we keep evolving, one reference at a time.** —
+  ("really figure out what about the scene brings out this feeling", 2026-10-26.)
 - **Don't rely on reusable assets: every film's sets, characters, props, background life and music are made new for
-  it,** inside the one shared look (ONE LOOK, ONE BRAND above; a new Pip drawing too). Engine primitives (light and shadow layers included), timing,
-  captions and QA tools are tools, not assets; the kit pieces in `src/lib` (cine, kit, mascot) are references to learn
-  from, never a film's sets, and a film never imports another film's folder (`src/vN/`). — ("Don't rely on reusable
-  assets", v2 restart, 2026-10-27).
-- **People small and simple like reference 1** (crowds, small full figures seen from behind or in rear 3/4, round
-  heads; near heads <= ~140 px), never big character models or faces: they act with their pose (reach, shrug, slump,
-  look up), as reference 1's do; only the mascot has a face. **In the foreground only the film's one "you" or the
-  mascot;** strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). —
-  ("don't use big models of people; the people in the first example video are the right direction", v2 restart,
-  2026-10-27; v3 retro, 2026-10-27).
-- **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
-  platform auto-captions stay off. — (v1 reel, 2026-10-25).
-- **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
-  as a screen recording under the status bar). Each film decides them with its G4 look clip, 'paint-subtle' at most
-  (`docs/EDGES.md`). — (v1 posted reel, 2026-10-25).
-- **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
-  palette per video; within it one hero, one dark anchor, at most one pop; the family stays tight enough that every video
-  reads as one brand (ONE LOOK, ONE BRAND above). Rules: `docs/look/PALETTE.md`. — (2026-10-25; one brand, 2026-10-28).
-- **Warm, never sickly:** no beige, muddy tan, olive or grey; peach creams, terracotta, red-brown lines, golden light,
-  warm shadows. — ("we need to have a warm feeling, not sick", v3 G4, 2026-10-26).
-- **A full value range: a calm light sky, a mid-tone world and real darks where the eye should go, drawn in many
-  small pieces** (windows, doorways, eave undersides, a hull, the shade under trees: 6-10 % of the frame under L* 40),
-  never one dark mass or a narrow band of light pastels (one reason v2 reads cheap next to the city posters). Numbers:
-  `docs/look/CRAFT.md` §f.8, from the city-poster study. — (our observation on the posters; "5 - good point too!",
-  2026-10-28; the darks in many small pieces: "Go with your suggestions", 2026-10-29).
-- **Texture and lines: VERY subtle.** No outlines: as on the city posters, shapes are separated by light and shade (a
-  lit and a shade face on every volume, the subject's the deepest) and by value, never by a line drawn round them
-  (the A vs B picture's B). Thin lines only on small things that are lines (window bars, railings, rigging): dark,
-  warm lines in the object's own deep shade, never one near-black ink on everything (v3 G5b's was "too rough"), 2 px
-  on the layers that float so they never twinkle; the owner's "black outlines" now live only in these; captions keep
-  the dark ink. Spec: `docs/look/CRAFT.md` §c. Texture: start playing with a VERY subtle paper-and-paint
-  texture (a fine grain and gentle mottling in the big flats, like the city posters) where it adds to the premium look,
-  tried in a look clip and kept only if it does; the halftone stays an option on a few elements; the film must work
-  flat. — ("very subtle texture
-  pieces and the black outlines, VERY subtle but in key places", texture test, 2026-10-25; "cleaner, more refined,
-  gentle, premium", v3 G5b, 2026-10-27; "i like texture point yes we can perhaps start playing with it, very subtly
-  especially if its adding to the premium look sure"; "i like 3 - but can you draw me a picture of difference like A vs
-  B what you are talking about", 2026-10-28; on the A vs B picture and the thin lines in the float: "Go with your
-  suggestions", 2026-10-29, first judged in the 7 s look test of v2's canal opening).
-- **Pip stays, hidden on purpose.** The mascot Pip (the purple PHP elephant; the profile avatar
-  `deliverables/profile/pip_power_button.png`) is kept in every film, but far more subtle than before: hidden
-  deliberately in the world (in a window, on a boat, on a balcony, among a crowd), small and drawn in the film's look,
-  found on a second look, never the first thing the eye meets and never competing with the subject: a quiet "find
-  Pip" in most exterior shots, none in closes and charts, and hidden on the cover too (never the one place it shows);
-  drawn like everything else, with no outline. Its hiding spots are
-  planned with the shots (W1 and G3); it no longer rides the joins. — (profile identity, 2026-10-25; "the pip i mean would
-  be good to keep it, but we can perhaps make it way more subtle perhaps hide it deliberately in the video, like keep it,
-  but not as obvious", 2026-10-28; "find Pip" and the cover: "Go with your suggestions", 2026-10-29).
+  it,** inside the one look; engine, timing, captions and QA are tools, not assets; a film never imports another
+  film's folder. — ("Don't rely on reusable assets", v2 restart, 2026-10-27.)
+- **Hair is never static or one firm shape: always a little messy, unstructured and wavy, INSIDE A PROPER, STYLISH,
+  CLEAN HAIRCUT:** the cut first, the life a touch, never bed-head; slim, elegant people with a relaxed posture and an
+  upright neck. **Hair is BUILT TO ANIMATE and drawn CLEAN:** a few smooth shapes on a spring rig, proven in motion
+  before the owner sees it (`docs/look/PEOPLE_DESIGN.md`); **simpler and flowier, like the people references: a few
+  long tapering ribbons that stream with the wind, never many strands.** — ("more like a person woke up and that's what
+  we see like not stylish and not clean"; "looks like this person was sitting at computer the whole day", 2026-10-30;
+  "similarly with hair", 2026-10-31.)
+- **Faces, above all the profile, are cute and super appealing by modern standards; women read feminine and men
+  manly;** tasteful, never caricature. **Hair, face, light and values are designed together, as one character,**
+  judged overall beside the references. — ("just compare it overall and evaluate what makes the left to be modern and
+  natural and appealing", 2026-10-30.)
+- **People: small and simple in the frame, contemporary and refined in design:** small full figures acting with their
+  pose, never big character models; open eyes looking away, never at us (closed eyes only for a downcast, serene
+  moment). **In the foreground only the film's one "you" or the mascot;** strangers stay small in the mid and far
+  ground. **Simple, flowy and a touch cartoonish, like the people references (`docs/look/refs_people_flow/`): the
+  figure reads as a few flowing shapes, the clothes fluid with little detail, the garment and the hair swept the same
+  way while the body stays calm; never a tailored, jointed mannequin.** Beautiful, styled like today's 20-30-year-olds
+  in New York and Los Angeles. The people in use: `docs/look/PEOPLE_DESIGN.md` (its status block). — ("don't use big
+  models of people", v2 restart, 2026-10-27; "we need to draw people that are beautiful and pleasant and the clothing is
+  appealing"; "Let's do open eyes", 2026-10-30; "the models are simpler, more flowy, slightly more cartoonish, the
+  clothing is more fluid, less details and more flow ... I also generally like the visual style", 2026-10-31.)
+- **The words on screen are DESIGNED, never one static block: the fonts, the size, where the words sit and how they
+  move are chosen beat by beat to look premium, interesting, dynamic and engaging** (`docs/look/TYPE_GUIDE.md`).
+  **Captions are burned in and pop in place (or rise without clipping),** read at a glance, in the voice's order. —
+  ("there is so much more we can do to make it look premium, more interesting, dynamic and more engaging",
+  2026-10-30.)
+- **The words are PLEASANT to look at: soft, warm and calm, never menacing:** no blood-red, no rough or dripping
+  letters, no shouting capitals. — ("it shouldn't look like a blood message on the wall", 2026-10-30.)
+- **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band**
+  (`docs/EDGES.md`). — (v1 posted reel, 2026-10-25.)
+- **Palette: a family of house palettes as tools, not a cage:** a soft, warm, "no screaming colours" base; one sister
+  palette per video (`docs/look/PALETTE.md`). — (2026-10-25.)
+- **Warm, never sickly:** no beige, muddy tan, olive or grey. — ("we need to have a warm feeling, not sick", v3 G4,
+  2026-10-26.)
+- **A full value range: a calm light sky, a mid-tone world and real darks where the eye should go,** never confetti
+  darks or a narrow pastel band; a dark is a quiet shape with a reason, alive inside, and the caption band stays light.
+  How dark, and how much, follows each scene's mood and setup. — ("5 - good point too!", 2026-10-28; on painter v7's
+  low key: "we lost the feeling", 2026-10-31.)
+- **PAINTED PIECES: the sky and its clouds and the whole environment (buildings, trees and greenery, ground, water) are
+  uniquely painted in ONE painted language, as in the owner's references:** subtle and beautiful (big masses of a few
+  deliberate strokes, soft edges, one colour family under one light), clouds in planes, never an even streaky texture
+  over everything; the subject and the people stay crisp and clean, the far more painterly; designed first, then
+  brushed in layers, each plane painted softer and blurrier the farther it is (`docs/look/PAINT_RECIPES.md`); our own
+  engine's paint pass (`src/lib/paint/`); the film still works with the paint off; a painted piece paints on in the
+  opening, never pops up; AI only TACTICALLY, for chosen layers, never per frame. — ("I really like the “painted”
+  pieces like the sky and the clouds"; "it needs to be a bit more subtle and more beautiful", 2026-10-29; "I like the
+  idea of using AI tactically", 2026-10-30.)
+- **INK LINES, A BIT ROUGH BUT CLEAN: tested on the FINISHED film, never built in first:** the film is built without
+  ink; the ink line (`docs/look/ink_test/`) is laid over the final cut and kept only if it makes it better; the same
+  for any finishing treatment. — ("lets build without ink first and then we will test the final product with ink if
+  its makes it any better", 2026-10-30.)
+- **Texture and lines: VERY subtle.** No outlines: shapes separate by light, shade and value; thin lines only on things
+  that are lines; a very subtle paper-and-paint texture where it adds to the premium look; the film works flat (CRAFT
+  §c). — ("very subtly especially if its adding to the premium look", 2026-10-28.)
+- **Pip stays, hidden on purpose:** the mascot hidden deliberately in the world, small, drawn with no outline, found
+  on a second look, never competing with the subject: a quiet "find Pip" in most exterior shots, none in closes and
+  charts, hidden on the cover too; its spots planned with the shots. — ("hide it deliberately in the video, like keep
+  it, but not as obvious", 2026-10-28.)
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Visual style
 
 ## Hook and pacing
-- **Every video has ONE core line, picked before the script (by default on the topic screen: each topic comes with its proposed core line, so the owner picks both at once; a separate core-line round only on request):** the single sentence at the core
-  of the message with the biggest emotional reaction. It drives frame 0, the hook, the cover and the payoff; every line
-  serves it. From the pick we draft its THROUGH-LINE CARD (one thread object, one home place, one "you":
-  `docs/look/CRAFT.md` §a); the script (G1) completes it with a carrier for every join, taken from the script's own
-  joins, and the owner approves the card with the script. The thread may also leave for a FAIRNESS beat the owner approves
-  (the other side's equal-weight reply, a place the subject must never be): declare it on the card. — (v3, 2026-10-25; card:
-  v3 retro, owner yes, 2026-10-27; fairness exception: v2, owner yes, 2026-10-27; picked with the topic by default: lean early stages, v4, 2026-10-28).
+- **Every video has ONE core line, picked before the script** (by default on the topic screen, with the topic): the
+  sentence with the biggest emotional reaction; it drives frame 0, the hook, the cover and the payoff. Its THROUGH-LINE
+  CARD (one thread object, one home place, one "you") gets a carrier for every join at G1 and is approved with the
+  script; the thread leaves only for a FAIRNESS beat the owner approves. — (v3, 2026-10-25; 2026-10-27; 2026-10-28.)
 - **The first 3 s / first scene must be a banger ("something is about to happen"), and every opening effect must be
-  BIG enough to stop a thumb:** judged as a viewer scrolling a feed on a phone, each effect (the draw-on, the hook's
-  mechanism, the ticks) is unmistakable on first watch: bold, large on screen, long enough to register, with its own
-  sound; a subtle effect counts as none. — (owner, v3, 2026-10-28: "initial animation effects like visual aspect should
-  be better and more effective at capturing people attention ... the initial drawing effect is barely visible or
-  noticeable and really don't impact or amazes me", of a 0.3 s pale draw-on and 30 px memory sticks.)
-  - frame 0 is the scene being made, drawn on in the clean pen: the subject's outline (with the supporting lines)
-    first, then colour floods in over it (no outline stays: Texture and lines, 2026-10-29), as a visible event (bold
-    line at full contrast, a moving pen tip, long enough to
-    read: ~0.3 s was invisible), never a pale wash (the lined films drew every line first);
-  - voice from the first frames (the first word at ~0.12 s, the locked voice file's lead; never a silent lead);
-  - the hook's claim made physical and escalating: the expected thing shown, then reality overtaking it at ~2 s,
-    through the real mechanism;
-  - something new every few frames from the story's own build (the subject and its mechanism), never from extra
-    supporting life; never still, in one continuous opening shot;
-  - the film loops back to frame 0.
-  Details: `docs/look/CINEMATIC_GUIDE.md`, "The opening"; `docs/look/DIRECTION.md` rule 9. — (owner's reference, v3,
-  2026-10-26; the clean pen and one focus, v3 G5b, 2026-10-27).
-- **State the payoff in words within the first ~2 s, in the voice's order; polish the first 2 s and 5 s most, then the
-  first 10 s.** A calm, pretty opening lost ~80 % of viewers by 3 s; late quirks are acceptable. The captions ARE the
-  words on screen: frame 0 shows the first spoken line, and when the voice opens with a question the payoff is the next
-  caption (by ~2 s). Never a title over the captions (no `frame0` block): it answers before the question is asked and
-  repeats the spoken line; the core line as a title belongs on the cover. — (v1 IG insights, 2026-10-25; v3,
-  2026-10-28: "why do we have the text repeat itself?", then "Why are we having this out of order weirdly? Should we
-  just show buying ..?").
-- **The hook is a concrete, surprising, TRUE claim with stakes**, verified against the primary source before it's
-  locked; for a small news item, research the bigger story and lead with its strongest true framing. — (v2, 2026-10-25).
-- **Personal framings must feel natural, not over the top.** Never cast the viewer as a loser in a contest they don't
-  feel; test "you" claims with a viewer panel. — (v3 G2, 2026-10-25).
-- **Target 30-45 s and end close to the payoff** (viewers left once the story felt resolved, ~40 s). — (v1 insights).
-- **Every frame at least 8/10, no dead frames, joins on the beat** (every join carries something: `docs/look/CRAFT.md`
-  §a). — (v1; joins, v3 G5b, 2026-10-27).
+  BIG enough to stop a thumb:** bold, large, long enough to register, with its own sound; a subtle effect counts as
+  none. Frame 0 is the scene being made as a visible event (drawn on, then colour floods in); the voice from the first
+  frames, never a silent lead; the hook's claim made physical (the expected thing, then reality overtaking it);
+  something new every few frames from the story's own build, never from extra supporting life, never still; the film
+  loops back to frame 0 (`docs/look/CINEMATIC_GUIDE.md`, "The opening"). — ("the initial drawing effect is barely
+  visible or noticeable and really don't impact or amazes me", v3, 2026-10-28.)
+- **State the payoff in words within the first ~2 s, in the voice's order; polish the opening most.** The captions ARE
+  the words on screen: frame 0 shows the first spoken line, and when the voice opens with a question the payoff is the
+  next caption; **no title over the captions** (the core line as a title belongs on the cover). — ("why do we have the
+  text repeat itself?", v3, 2026-10-28.)
+- **The hook is a concrete, surprising, TRUE claim with stakes,** verified against the primary source; a small news
+  item leads with the bigger story's strongest true framing. — (v2, 2026-10-25.)
+- **Personal framings must feel natural, not over the top:** never cast the viewer as a loser in a contest they don't
+  feel; test "you" claims with a viewer panel. — (v3 G2, 2026-10-25.)
+- **Target 30-45 s and end close to the payoff.** — (v1 insights.)
+- **No dead frames, joins on the beat:** each join on the voice's beat, carrying something into the next shot (CRAFT
+  §a); the music bends to a join only where it is heard. — (v1; v3 G5b, 2026-10-27.)
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Hook and pacing
 
 ## Storyboard (G3) and flow
-- **The pipeline after v3 (owner APPROVED, 2026-10-27: "Yes"):** a DESIGNED sketch. From the core line comes a
-  through-line card (one thread object, one home place, one "you"), completed with the script (a carrier for every
-  join); a text world bible (sets, one light rig per set, the proposed palette and a colour-script line per beat,
-  tiers per shot) runs alongside the script; the G3 animated sketchbook decides flow, focus and light, not just the
-  story; after the G3 lock, a short playable LOOK CLIP in the final style is approved before the full build; G5 fills
-  what G3 decided, one lane per sequence, with no new places or movers. The owner may skip gates by name. Details:
-  `docs/retro/2026-10-27_v3_retro.md`, `docs/PIPELINE_V2.md`. — (v3 retro, 2026-10-27).
-- **One flowing story, never a bunch of shots stitched together.** Every join carries the eye and the story into the
-  next shot (a shared object, a match, a continuous camera, the subject's motion leading out and in); the main arc is
-  visible across the whole film. Life and detail are DESIGNED into the shot together with its hierarchy from the start,
-  never bolted onto a finished sketch afterwards ("we did the sketch first and then added a whole bunch of details to
-  make it feel alive, which is wrong"). Through-line and transition grammar: `docs/look/CRAFT.md` §a. Sketch-first
-  stays, as the designed sketch above (owner yes, 2026-10-27). — ("too busy, too incoherent; no story, no clean
-  transitions, just a bunch of shots put together", v3 G5b, 2026-10-27).
-- **G3 is the most important gate: an ANIMATED SKETCHBOOK of the final film, optimised for SIGNAL, not quality.** With
-  script and voice locked, the animatic gives the director the closest signal to the final story in the least drawing
-  and review time: story, transitions, animations and camera moves already very close to final — PLAYED, not only
-  marked (their shape and timing real, never their polish); detail deliberately loose scribble-mass placeholders (the
-  hand-scribbled texture: owner yes, 2026-10-27; the board's pen only, never the film's), nothing perfectly sharp but
-  the backbone of the future film clearly visible, like an urban sketcher's page (ref
-  `docs/look/ref_animated_sketchbook.png`); thumbnail drawings, the intent explicit (framing, the one action, shot
-  type, cozy/scale) in a big readable note, lean review loops. Spec: `docs/G3_ANIMATIC.md`. — ("frankly the most
-  important stage ... more like an animated sketchbook", 2026-10-26).
-- **Every shot reads instantly with the sound off: literal beats clever.** Recognisable things (a laptop that looks like a
-  laptop, a plain labelled chart), the real mechanism, never a metaphor the facts don't support or that needs explaining;
-  a sound-off cold read before the owner sees any cut. **Words in the world (signs, notices, cards, screens) are few and
-  big: each one reads at phone size at a glance, or it is not drawn.** No small source lines, quotes or fine print in
-  the picture (sources go in the caption and the pinned comment), never the same words twice on screen at once, and
-  nothing passes in front of words while they are the beat. Before any cut goes out, check every on-screen word at 0.25
-  scale. — (v3 G3, 2026-10-26; v3, 2026-10-28: "this text is weird", the notice's 11-13 px source and Micron lines, a
-  one-bar chart and a crate crossing its labels).
-- **Drawn like a professional storyboard: monochrome, clarity first, and cinematic** (framing, angle, scale, coziness
-  decided in the board; clarity from composition, never icons on blank paper; every panel names its shot type). Spec:
-  `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
+- **The order: the story beats -> IDEAS -> KEY FRAMES made whole -> the shot plan (the VISUAL SCRIPT, written from the
+  key frames) -> the animatic (G3).** Before the ideas only the beats are written, so nothing restricts the ideas; the
+  shot plan, timed to the voice, says per shot what is on screen, the camera, the join and the sound cues, never the
+  rendering style (PIPELINE_V2, "THE LOOP NOW"); the owner may skip gates by name. — ("wouldn't the visual script
+  restrict the steps 3 and 4?", 2026-10-30.)
+- **One flowing story, never a bunch of shots stitched together:** every join carries the eye and the story into the
+  next shot; life and detail designed in from the start, never bolted on (CRAFT §a). — ("too busy, too incoherent; no
+  story, no clean transitions, just a bunch of shots put together", v3 G5b, 2026-10-27.)
+- **G3 is the most important gate, optimised for SIGNAL:** the animatic of the key frames on the voice, its moves and
+  joins PLAYED with real shape and timing, never polish (`docs/G3_ANIMATIC.md`, read under THE LOOP NOW). — ("frankly
+  the most important stage ... more like an animated sketchbook", 2026-10-26.)
+- **Every shot reads instantly with the sound off: literal beats clever.** The real mechanism, never a metaphor that
+  needs explaining; a sound-off cold read before the owner sees a cut. **Words in the world (signs, notices, cards,
+  screens) are few and big: each one reads at phone size at a glance, or it is not drawn:** sources go in the caption,
+  never the same words twice on screen at once, nothing passing in front of words while they are the beat. — ("this
+  text is weird", v3, 2026-10-28.)
+- **Drawn like a professional storyboard: monochrome, clarity first, and cinematic**
+  (`docs/look/STORYBOARD_STYLE.md`). — ("very simple, avoid colours for now", v3 G3, 2026-10-26.)
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Storyboard (G3) and flow
 
 ## Taste signals (general preferences from the owner's picks; the picks themselves are in each video's OWNER_NOTES.md)
 - **Topics: tech and AI news, and AI-ADJACENT news (science, health tech, space, robots, computers, energy: where AI is
-  part of the story or right next to it), is the channel's focus** ("no too narrow, lets research some more - expand it to
-  AI adjacent news", v4, 2026-10-28); the existing fuss (people already arguing about it) weighs as much as
-  a direct wallet hit,** and an everyday consequence beats a bigger, distant story. The city-poster brainstorm opened
-  this to any subject, and the owner came back to tech told through its views (Places on screen, below). — (v3 G0; v4 G0: "focus on tech and AI",
-  picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
+  part of the story or right next to it), is the channel's focus;** existing fuss counts, and an everyday consequence
+  beats a distant story. — ("expand it to AI adjacent news", v4, 2026-10-28.)
 - **Topics are picked in the owner's order: relevant (with buzz and surprise) first, then visually appealing in our
   look, then the mood the slate needs, then true enough (the core event real; exaggeration fine), then fresh (news from
-  about the last month), then shareable** (weights 6-5-4-3-2-1; a story whose core event didn't happen is out whatever
-  it scores). The list the editor scores on, and the owner sees:
-  `docs/TOPIC_CRITERIA.md`. — ("one important condition for the story pick is we should find a story that is going to
-  be possible to make visually appealing ... give me the list of criteria"; then "lets make it relevant first but
-  include buzz here too and surprise, then true and solid, then fresh, then visually appealing, then mood. Then
-  shareabliity potential"; "lets move the freshness lower and make it last month or so", v4, 2026-10-28). The
-  shortlist always comes with its column chart: for each story a column per criterion, the most important on the left
-  (`video/scripts/topic_chart.py`; "can you show me the visual next time we do research ... some bar chart"; "make the
-  visual into column chart", v4, 2026-10-28; then "Actually let's move truth down the list it's okay to exhagerste a bit like in this case so we don't have to be exactly precise like a law firm / Exaggerating and generalizing and making it bigger is fine", 2026-10-29).
-- **Topics: alternate the mood: a positive story after a negative one.** v2 (Google staff resigning), v3 (laptop
-  prices) and v4's first pick (AI songs and fake plays) were all bad news, so the next is a very recent, highly
-  relevant, genuinely POSITIVE AI story (e.g. AI helping find a medicine or beat a disease) with a hopeful outlook.
-  Positive never means hype: the same standards check applies (trial phase, peer review, "helped" vs "did", who
-  benefits and when). Every topic scout names the mood the next video needs. — ("we should alternate between positive
-  and more negative topics ... something very recent, extremely relevant yet very positive around AI ... a nice
-  positive outlook would be the right direction for a story", v4, 2026-10-28).
-- **Places on screen: the posters' views are a way of telling a story, not its subject.** Find the stories that can
-  be TOLD through such views (a layered world, one hero, something WAY far out for scale), the way Arcane's shots carry
-  stories that have nothing to do with a real city. **Neither extreme: not content ABOUT real cities, and not made-up
-  content (myths, fables, what-ifs as the story). The middle: true stories (real events, people, things) whose action
-  happens in a big world we can show** (streets, buildings, landscapes, the sky); a metaphor world only when a true
-  story needs it and the facts map one-to-one (v1's town of websites, the best performer so far). The owner's examples are v1 and v2
-  (the look they like; its story was the weak part). Which stories fit is studied in
-  `docs/studies/2026-10-28_city_posters/` (the content track; the live discussion is its `content_discussion.md`) before
-  it changes `docs/TOPIC_CRITERIA.md`. **The search is open to any subject, not only tech and AI: what people would
-  love to hear about** (the owner's seeds: history, news from cities, stories); **news from a real city is positive.**
-  **The owner then leaned back to tech topics told this way, researched as a general direction, not one topic:** one
-  possible umbrella is **tech in the cities** (interesting, weird, WOW cases where a city solves a problem with new
-  tech or AI); data centres (one building at a scale you can only show from far away, in surprising places) and
-  driverless taxis ("a good topic too") are kinds inside it. **Every pick needs a WOW**, a "wait, seriously?" fact or
-  picture (London's driverless taxis alone: "perhaps not as WOW"); **tech in a weird place is one** (a data centre in a
-  Cold War bunker, a supercomputer in a chapel, one heating a public pool: "those are interesting ones"), and an older
-  story can carry it if the WOW is strong and it gets a peg. Until the owner picks a direction, picks keep the tech/AI
-  focus above. — ("I want us to see which type of content would be best fit into videos where we have more of cities /
-  architectures / buildings / etc - so for example our very first video was the most successful so far and i
-  personally like the last video about google i think the story wasn't quite good, but visually it was nice to be
-  honest. Obviously still far away from what we could do to be very successful studio, but initial steps", 2026-10-28;
-  then "Don't be fixated on tech or AI, all goes, the best kind of content that fits into this and people would love
-  to hear about. Some of the ideas off the top of my head - some history videos? Some news that are happening in the
-  cities, but i want them to be possitive? Some stories? waht else ? Do proper brainstorm", 2026-10-28; then "okay so
-  in your content you are overfixating on the content around real cities, but im thinking more about what kind of
-  content would contain storytelling that is around these views. Like previously we discusesd arcane shots - they fit
-  within the same kind of category, its content and storytelling that is around these views but has nothing to do
-  wiht the actual cities", 2026-10-28; then, on the story shapes (myths, fables, metaphor worlds): "now i feel like you
-  went the other direction, like completely made up content like", 2026-10-28; then "okay so i kind of like the
-  direction of tech related topics here ... datacenters do fit pretty nice in here - like we have perhaps some wow
-  stories here like i've heard someone plans a datacenter in new your or like a datacenter in some weird places ...
-  the topic about waymos or driverless taxis in London would be good too, but perhaps not as WOW, we need some WOW
-  stories here"; then "no i mean research more - this is a general direction, datacenter is one, having waymo or
-  driverless taxis in citis is a good topic too btw but we need to find a way to generalize it like one POSSIBLE
-  direction is lets say generalizing it to tech in the cities. like some interesting, weird, wow like cases where
-  cities come up with the new solutions to problems, deploy some wow tech / ai / etc"; and on the weird-place data
-  centres: "those are interesting ones", 2026-10-28).
+  about the last month), then shareable** (`docs/TOPIC_CRITERIA.md`; the shortlist with its column chart,
+  `video/scripts/topic_chart.py`). — ("lets make it relevant first but include buzz here too and surprise", v4,
+  2026-10-28; "Actually let's move truth down the list", 2026-10-29.)
+- **Topics: alternate the mood: a positive story after a negative one;** positive never means hype; every topic scout
+  names the mood the next video needs. — ("we should alternate between positive and more negative topics", v4,
+  2026-10-28.)
+- **Places on screen: the posters' views are a way of telling a story, not its subject.** **Neither extreme: not
+  content ABOUT real cities, and not made-up content (myths, fables, what-ifs as the story). The middle: true stories
+  (real events, people, things) whose action happens in a big world we can show;** a metaphor world only when a true
+  story needs it. **The search is open to any subject, not only tech and AI: what people would love to hear about;**
+  **news from a real city is positive.** The owner leans back to tech told this way, as a direction (one umbrella:
+  **tech in the cities**); **every pick needs a WOW**, and tech in a weird place is one; until he picks a direction,
+  picks keep the tech/AI focus (the study's `content_discussion.md`). — ("its content and storytelling that is around
+  these views but has nothing to do wiht the actual cities"; "we need some WOW stories here", 2026-10-28.)
 - **A reference the owner rates "really good on both" story and script: one impossible object in frame 0, with a "why"
-  question as its title** (@civilext's "Why This Skyscraper Curves Back Down??", the Big Bend, a 2017 concept: a place,
-  a number and a name within 6 s; the twist past the title, "the strange part isn't how high"; a scale lineup; 11K
-  likes, 1,378 shares with no freshness at all). Our evaluation and its lessons: the study's `content_discussion.md`,
-  exchange 10. — ("I'm thinking it's actually really good on both", 2026-10-29).
-- **Every shortlist story shows what keeps people watching past its title:** its turn and its "oh" in a line or
-  two (the beats after the headline), never the headline alone; a story that is one beat gets said to be one beat. A
-  "top 3" or "weirdest places" idea is welcome, carried on one thread so it stays a story, not a list. — (on London's
-  hospital drones: "interesting too but I'm not sure what you can pack in it beyond the title? Why would the people
-  want to keep watching?"; "Maybe another story is the 'weirdest / coolest places where datacenters are built' like 3
-  weirdest places", 2026-10-29).
-- **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
-  frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
-- **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
-- **Palettes: the warm, everyday one for a money / everyday-life story** (#9 Autumn Ember; #7 Autumn Ochre read sick).
-  — (v3 G4).
-- **Palettes: the clean "news" one (Cream & Cobalt) for a serious story,** with a cold sister palette (Dusk) only for
-  the one scale beat. — (v2 G4; that cut was later restarted, and the restart's own judges, not the owner, chose
-  "10 Canal Mint").
+  question as its title** (the Big Bend reel). — ("I'm thinking it's actually really good on both", 2026-10-29.)
+- **A voice line the owner rates "directionally good": the El Niño explainer** (`docs/voice/refs/2026-10-29_el_nino/`):
+  stakes up front, the viewer's question said aloud, the plain words after a term, a brisk, lively read. — ("it sounds
+  directionally good to me", v4 G1, 2026-10-29.)
+- **Every shortlist story shows what keeps people watching past its title:** its turn and its "oh", never the
+  headline alone; a "top 3" or "weirdest places" idea is welcome, carried on one thread so it stays a story. — ("Why
+  would the people want to keep watching?", 2026-10-29.)
+- **Lines: plain, direct and personal over clever** (CLEAR TO A REGULAR PERSON ON ONE HEARING). — (v3 G0.5-G2; v4 G1,
+  2026-10-29.)
+- **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5.)
+- **Palettes: the warm, everyday one for a money / everyday-life story;** **the clean "news" one (Cream & Cobalt) for
+  a serious story.** — (v3 G4; v2 G4.)
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Taste signals
 
 ## Motion
-- **A reference move gives the SHAPE, never the speed.** Copy its path, framing, reveal order and easing shape, then
-  retime it to the reel: speed up (usually) or slow down where it feels right. Speed limits exist only to keep motion
-  readable and strobe-free (60 fps allows faster moves). — ("the speed of transition should not be the reference point
-  ... in a short reel we would speed it up", v3, 2026-10-26).
-- **Render at 60 fps from G5 to the final** ("smoother and more crispy"). Animate by time; drawn motion may stay stepped
-  (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
+- **A reference move gives the SHAPE, never the speed:** copy its path and easing, retime it to the reel. — ("in a
+  short reel we would speed it up", v3, 2026-10-26.)
+- **Render at 60 fps from G5 to the final** ("smoother and more crispy"), the animatic too. — (v3, 2026-10-26.)
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Motion
 
 ## Process and communication
-- **EFFORT IS ALWAYS MAX, for ALL delegated work:** every workflow and sub-workflow agent (`effort: 'max'` in each
-  `agent()` call), every subagent (the Agent tool's `effort: "max"`; only a "fork" inherits the session's effort), every
-  agent an agent starts (each brief says that anything its agent starts runs at max too) and every helper session (first
-  prompt exactly `/effort max`, ultracode on; check `effort_level: max` with get_session). The repo enforces it, so no
-  session has to remember: the PreToolUse hook in `.claude/settings.json` (`.claude/hooks/max_effort.py`) denies an
-  Agent call, a Workflow run or a helper session that isn't at max, and `python3 .claude/hooks/max_effort.py
-  --lint|--fix <workflow.js>` checks or repairs a script before it runs (every script in `context/workflows/` passes).
-  A scheduled task fires into an existing max-effort session (a fresh session per firing can't take `/effort max` first).
-  A lazy video from a low effort setting is our failure. — ("the key rule is we need to ensure the effort is MAX!", v2,
-  2026-10-27; "remember to use max effort in the subworkflows and agents work" and "persist this rule in general in our
-  repo - like all delegated work should be max effort", v4 G0.5, 2026-10-27).
-- **Parallelize as much as possible, inside the weekly and session limits (below): split independent work across helper
-  cloud sessions (each its own machine) and archive each one as soon as its work is pushed and checked;** a helper takes
-  one independent lane that needs its own machine, briefed fully, and its done-signal is a report file. On one machine,
-  run at most about 4 agents at once (this container runs about 2 render-heavy ones well; `docs/PIPELINE_V2.md` rule 5).
-  Boot a helper from a branch whose `.claude/settings.json` says `"ultracode": true` with the first prompt `/effort max`,
-  send the task as a message, check `effort_level: max` + `is_ultracode_active`. Every lane must PROVE it knows the
-  film's style: one STYLE.md per film, with the film's VALUES only (palette and colour jobs, the pen's constants, a light
-  rig per set, the tier map, people sizes, references, NEVERs), inside `docs/look/DIRECTION.md` and `CRAFT.md`, never
-  restating or overriding a rule (v2's STYLE.md predates DIRECTION and is not the template), and a graded style check
-  before it builds. — (v2/v3, 2026-10-27: "parallelize the work as much as you can, start more instances of cloud
-  machines if you have to, but clean them up after"; "spin up as many parallel work sessions as you need"; "do each
-  subsection understand ... the full stylistic direction?"; "Remember to parallelize the work where appropriate between
-  subagents but also the subthreads just clean them up afterwards", 2026-10-29).
-- **Playable video from the sketch animatic (G3) on, never only stills; before G3 text and audio only. One version: one
-  deliverable per gate (one script, one take, one animatic, one look clip), never several renders or takes of one gate
-  unless asked;** a choice the owner makes (the topic, the core line, the hook line) comes as up to 3 options on one
-  screen of text. **Lock the story before big commitments; polish late.** — (v1, 2026-10-25; "why are there multiple
-  versions and why is it needed at all at this point?", on three G2 MP4s of one take, v3, 2026-10-25).
-- **Progress: the gate deliverable is the update; between gates, a short text status on all active threads** (about
-  every 30 minutes in a long build), never a rendered status reel; lean prompts and docs. — ("every 30 mins share the
-  progress on all active ongoing threads", v1, 2026-10-24).
-- **Every cut sent to the owner says what stage it is and what the next stages add** (e.g. "G5: G3's plan in colour;
-  next: G6 easing, G7 sound, full res"), so a draft is never mistaken for the final. — ("let me know if this is just an
-  initial intermediate step", v3 G5, 2026-10-26).
-- **The weekly limit is the real budget: finishing the video comes first** (using up to 100 % of the week is fine if the
-  video is completed; with several films in flight they share it, and finishing them comes before starting a new one).
-  Track the spend hourly (`python3 video/scripts/ops/status.py --film vN`: the meter; a helper's get_session `cost_usd` is a
-  lower bound), budget every lane, finish before polishing. **Close to
-  a limit, drop the low-signal stages first and keep what changes the film** (owner, v3, 2026-10-28: "we are getting
-  close to our token limits can we drop some stages some redundant low signal work"): keep the fixes for problems already
-  found and the master; drop a separate verifier when the final assembler re-checks every fix at its time, extra
-  reviewers on a lens another already covers, full-film re-renders inside fix lanes (stills at the finding's time do),
-  and the minors (listed as deferred, never silently). Resume stopped lanes scoped to their blockers and majors. The
-  **5-hour session limit** is a hard wall shared by every session: watch both; before it hits, PAUSE in a controlled way
-  (every lane stops its agents, commits + pushes, writes its handover; schedule the resume after the reset), so nothing
-  is lost. **Commit progress periodically, so a limit that hits without warning costs minutes, not work:** every agent
-  writes its result into a file in the repo as it goes (never only as its final message: on 2026-10-28 a 5-hour limit
-  hit while three finished writers' lines existed only as messages), the orchestrator commits after every agent and at
-  the end of every turn, and a long unattended build runs `video/scripts/autocheckpoint.sh` on its own paths (a commit
-  and push every 10 minutes when they changed; a background job lives at most 2 hours, so it covers one build, not a
-  whole day). An agent stopped by a limit resumes from its transcript (SendMessage) once the limit resets, rather than
-  starting over (owner, v4, 2026-10-27: "make sure to commit the progress periodically if we get stopped on the usage
-  limits"). **The pick-up after a reset is automatic** (owner, 2026-10-29: "make sure to automatically detect when your
-  limits are reset and pick up from that"; on 2026-10-28/29 work sat four hours past a reset): while delegated work is
-  in flight, the session keeps an hourly self check-in armed (`create_trigger` into its own session; the session cannot
-  act while the limit holds, so it is armed before, not after); each firing resumes what a limit stopped once the limit
-  has reset, ends in one line when work runs normally, and deletes itself when nothing is in flight. Before any restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs they
-  link: other sessions change them) and integrate it into the film's one style page first. — (v2, 2026-10-27).
-- **The engine and the process serve the production; the films are the customer (owner, 2026-10-29: "Your main task
-  here is to work on the engine and the production process ... BUT THE PRODUCTION team is your main customer, we cannot
-  sacrifice the efforts and the quality and polish and attention of details that go into the final product. If anything
-  - any work that makes the quality and the polish better in the outcome at the expense of the process taking longer is
-  absolutely worth it").** Engine and process work is judged by the films: a speedup that costs any polish is rejected,
-  and work that adds polish is worth the extra time. An engine change is pixel-neutral (proven by frame diffs) or an
-  owner-approved improvement, keeps every command a production session uses working, and is announced to the production
-  sessions (`docs/retro/2026-10-28_streamline/CHANGES.md`).
-- **Spend on the film, never on overhead (owner, 2026-10-28: "evaluate if there is anything in the early stages ... that is
-  complete waste"; review `docs/retro/2026-10-28_v4_early_stage_cost.md`).** The early stages run lean: two scouts and one
-  editor for the topic (the owner picks the topic and its core line on one screen), one fact lock (later checks read it
-  and search only for a missing fact), a writer and a critic for the script; agents write files and return at most 3
-  lines; the orchestrator stays small (a fresh session per gate, batched steps, no big skill or doc loads for small
-  questions); check the session's rate limit before a fan-out. A session's budget may be its own: v4's session spends
-  only on v4 ("these tokens we have here are not shared with other videos"). Streamlining the production never costs the
-  film (owner, 2026-10-28: "we MUST not sacrifice the quality of the video, we MUST not sacrifice the details and overall
-  look and feel, but we need to brainstorm and find a way to streamline the process IF THERE is obvious ways"): cut the
-  process's rework, reading and re-rendering, never the look, the detail or a review (`docs/retro/2026-10-28_streamline/`).
-- **NO LIMIT ON TOKENS for creative output (inside the weekly limit); never trade quality for savings.** Ideas, scripts, judged competing ideas,
-  design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the quality needs (workflows larger than the default size guideline too), and the early selection stages (topic, core line, script) need few: a few strong agents with files and one fact check (the rule above); only true waste is cut (rework, lost work,
-  reviewing what will still change, early polish, a review loop that has stopped improving the shot: `docs/PIPELINE_V2.md`
-  rule 2, and checks that repeat another check). — (2026-10-25; owner, 2026-10-26; 2026-10-28).
-- **Locked means dropped:** rejected options go to `archive/`, never seen by later prompts; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
-- **New feedback is INTEGRATED, never just appended:** when a note changes the direction, rewrite or retire every rule and
-  doc it contradicts in the same pass, so the next agent never meets conflicting instructions. The current visual and
-  storytelling direction lives in one place, `docs/look/DIRECTION.md`. **Which doc wins:** owner's words (playbook;
-  vN/OWNER_NOTES) > DIRECTION > CRAFT > PIPELINE_V2 > G3_ANIMATIC, G5_BLOCKING > look/*.md > the film's STYLE.md (values
-  only) > v1-era docs (API and measurements, never style); the owner's words are what the owner said, never our
-  "-> what we did" log, and the newest owner note wins; the full order, with the topic docs and the tie-breaks, is
-  DIRECTION's intro. — ("evaluate this feedback and compact it with the overall
-  stylistic direction ... the next agent should not be confused with conflicting instructions", 2026-10-27).
-- **Find the PRO way and the pro tools for every effect, and never reinvent the wheel.** Before building a sky, depth,
-  light, particles or any visual effect, research how professional illustrators, motion designers and graphics
-  engineers do it and which proven tools exist (colour science such as OKLab interpolation, eased gradients, blue-noise
-  dithering, proven libraries, encoder settings); adopt the best, wrap it as a reusable lib + a QA check, never a
-  hand-rolled approximation. The same for ANY piece of functionality (geometry, colour, noise, clipping, layout, QA,
-  tooling): first search GitHub and npm for a library or existing code (small, maintained, permissively licensed,
-  deterministic, pinned) and use it only when it is genuinely better than building it ourselves (more correct, better
-  quality, less code to maintain); wrap it so the API stays ours, and record the choice, the alternatives and why with
-  the code. — ("research some libraries on GitHub"; "again find the pro way
-  and tools to do it the best way you can", v2 G4, 2026-10-27; "Search for any libraries or supporting code on GitHub if
-  you need for any piece of functionality - we don't necessarily want to be reinventing the wheels if something was
-  already built and available"; "But only if it's genuinely better than built yourself", 2026-10-29).
-- **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
-- **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
-  work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
-  creative freedom inside these principles; never patch the rejected cut. — ("No I don't like it, let's start from
-  scratch ... let's not do the sketch. Do the video right away, full creative freedom", v2 G5, 2026-10-27).
-- **Once the owner says "final", don't redo it (log ideas for the next video); deliver videos as a download too** (in-app previews may play muted). — (v1, 2026-10-25).
+- **A still must be cheap and fast to make:** one picture is minutes and a few dollars of work, never hours and a hundred;
+  a frame is composed from a reusable kit (world pieces, people, light, paint) rather than new engine code each time,
+  and every step has a time and cost budget that stops it and shows the owner what exists. — ("Okay that's ridiculous
+  it's been almost 2 hours to produce a single image and like 100 dollars of credits like wages going on", on process
+  test 01, 2026-10-31.)
+- **Before an iteration's stills go to the owner, the orchestrator looks at them beside the owner's references:** not
+  clearly at their level, iterate first; a quick look, never a panel. — (people rounds he called "incoherent" and
+  "garbage", 2026-10-30.)
+- **When the owner hands a call over, make it:** a pick by his three criteria (engagement, pleasantness, attention
+  retention), a call by the evidence and his references; say what and why in one line each, apply it the same turn,
+  show the RESULT, not the options. — ("Okay you pick your best option for maximum engagement and pleasantry and user
+  attention retention"; "Do what you think is right and make the videos better", 2026-10-30.)
+- **EFFORT IS ALWAYS MAX, for ALL delegated work:** every workflow agent, subagent, agent an agent starts and helper
+  session (first prompt exactly `/effort max`); the hook `.claude/hooks/max_effort.py` enforces it; a scheduled task
+  fires into an existing max-effort session. — ("all delegated work should be max effort", 2026-10-27.)
+- **Parallelize as much as possible, inside the weekly and session limits:** independent lanes on helper sessions,
+  briefed fully, archived once pushed; every lane proves it knows the film's style (one STYLE.md of values per film). —
+  ("start more instances of cloud machines if you have to, but clean them up after", 2026-10-27.)
+- **Playable video from the animatic (G3) on, never only stills;** before it, text, audio and the frames. **One
+  version: one deliverable per gate**, never several unless asked; an owner's choice comes as up to 3 options on one
+  screen. **Lock the story before big commitments; polish late.** — ("why are there multiple versions and why is it
+  needed at all at this point?", v3, 2026-10-25.)
+- **Progress: the gate deliverable is the update; between gates, a short text status on all active threads,** never
+  a rendered status reel. — ("every 30 mins share the progress on all active ongoing threads", v1, 2026-10-24.)
+- **Every cut sent to the owner says what stage it is and what the next stages add.** — ("let me know if this is just
+  an initial intermediate step", v3 G5, 2026-10-26.)
+- **The weekly limit is the real budget: finishing the video comes first;** films in flight share it and are finished
+  before a new one starts. **Close to a limit, drop the low-signal stages first and keep what changes the film** (the
+  minors listed as deferred, never dropped silently). The **5-hour session limit** is a hard wall: pause in a
+  controlled way before it. **Commit progress periodically, so a limit that hits without warning costs minutes, not
+  work:** agents write files as they go, the orchestrator commits after every agent and turn, a stopped agent resumes
+  from its transcript, **and the pick-up after a reset is automatic** (an hourly self check-in armed while delegated
+  work is in flight, deleted when nothing is); before any restart, re-read the current direction. The meter:
+  `video/scripts/ops/status.py --film vN`. — ("make sure to commit the progress periodically if we get stopped on the
+  usage limits", v4, 2026-10-27; "can we drop some stages some redundant low signal work", v3, 2026-10-28; "make sure to
+  automatically detect when your limits are reset and pick up from that", 2026-10-29.)
+- **The engine and the process serve the production; the films are the customer:** a speedup that costs any polish is
+  rejected; an engine change is pixel-neutral or owner-approved, and announced. — ("we cannot sacrifice the efforts and
+  the quality and polish and attention of details that go into the final product", 2026-10-29.)
+- **Spend on the film, never on overhead:** lean early stages (PIPELINE_V2, G0-G1), agents that write files and report
+  in 3 lines, a small orchestrator; only true waste is cut (rework, lost work, reviews of what will still change,
+  polish before the story lock), never the look. **NO LIMIT ON TOKENS for creative output (inside the weekly limit);
+  never trade quality for savings.** — ("we MUST not sacrifice the quality of the video, we MUST not sacrifice the
+  details and overall look and feel", 2026-10-28.)
+- **Locked means dropped:** rejected options go to `archive/`; unused topics to `docs/IDEAS_BANK.md`. — (v3,
+  2026-10-25.)
+- **New feedback is INTEGRATED, never just appended:** rewrite or retire every rule and doc it contradicts in the same
+  pass. **Which doc wins:** the owner's words, the newest first; then DIRECTION's order. — ("the next agent should not
+  be confused with conflicting instructions", 2026-10-27.)
+- **Find the PRO way and the pro tools for every effect, and never reinvent the wheel:** research how professionals
+  do it; use a proven library only when genuinely better than our own, wrapped, the choice recorded. — ("again find the
+  pro way and tools to do it the best way you can", v2 G4, 2026-10-27; "But only if it's genuinely better than built
+  yourself", 2026-10-29.)
+- **The forest before the trees: when a reference is far from our picture, rebuild the frame from the ground up; never
+  tune details on the old one:** the viewpoint, the big shapes and values first, then colour, detail, texture last;
+  every change visible at phone size; a reference teaches principles, never a style to move into. — ("missed the
+  forest for the trees", 2026-10-29.)
+- **The owner's references are the SPINE of a distillation; ours come second, labelled:** organised around his items,
+  in their order and names, every item accounted for (used, adapted or rejected); then ranked into a library with
+  guidelines. — ("I didn’t get once again why you ignored all my references and came up with yours?", 2026-10-30.)
+- **Research the recipe before building a look element:** study the reference, research how professionals do it, write
+  a concrete recipe, prove it on a swatch beside the reference, then build (`docs/look/PAINT_RECIPES.md`). — ("Seems
+  like you should be able to really clearly define a recipe", 2026-10-29.)
+- **Never ask the owner to choose between options they can't tell apart at phone size:** a smaller difference is ours
+  to decide, and we note the call. — ("I don’t really see the difference between a snd b", 2026-10-30.)
+- **Two modes: PRODUCTION and ITERATION.** Production: a film through the gates, full checks. Iteration: a quick
+  experiment for the owner to judge, one or two agents, no panels or QA suites, stills first, shown at once (there,
+  speed of feedback is the quality); only what he picks enters production. Ask "is this a film or a question?" first.
+  — ("we have 'iteration' process that needs to be more lightweight", 2026-10-29.)
+- **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we
+  gradually get better", v3, 2026-10-26.)
+- **A rejected cut restarts clean:** archive the old work, skip the gates he names, make the film fresh; never patch
+  it. — ("No I don't like it, let's start from scratch", v2 G5, 2026-10-27.)
+- **Once the owner says "final", don't redo it (log ideas for the next video); deliver videos as a download too.** —
+  (v1, 2026-10-25.)
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Process and communication
 
 ## Platforms and posting
-- **Accounts: Instagram `what.the.fuss.is.about`** (Creator, Education); TikTok and YouTube Shorts under the same name,
-  handle and avatar. Posting texts per video: `docs/POSTING_KIT.md`. — (2026-10-25).
-- **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`). — (2026-10-25).
-- **AI label ON everywhere; no paid boost until 3-5 posts exist,** then boost the best organic performer. — (2026-10-25).
+- **Accounts: Instagram `what.the.fuss.is.about`** (Creator, Education); TikTok and YouTube Shorts under the same name
+  (`docs/POSTING_KIT.md`). — (2026-10-25.)
+- **The studio logo is a modern, premium symbol: one idea in a few bold shapes, usable everywhere; no text, no
+  elephant, no scene full of details;** FINAL: The Peel (`docs/brand/LOGO.md`). — ("I like the peel yes"; "Logo is
+  done", 2026-10-29.)
+- **Upload at the highest quality and natively on each platform** (`docs/POSTING_KIT.md`). — (2026-10-25.)
+- **AI label ON everywhere; no paid boost until 3-5 posts exist,** then boost the best organic performer. —
+  (2026-10-25.)
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Platforms and posting
 
 ## Performance log (one line per video and check)
 - v1 "PHP bug", IG after 45 min: 155 views, avg 21 s of 55 s, likes 3.9 %; ~80 % gone by 3 s. — 2026-10-25.
@@ -560,36 +522,31 @@ Maintenance at the end).
   price tag and "Add to cart") -> the never-baity rule in Audience and goal. Screenshots:
   `context/uploads/inline/2026-10-28_v3_insights_*`. — 2026-10-28.
 
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Performance log
+
 ## Retired rules
-- ~~Topics in the order relevant, TRUE, visual, mood ...; a story that isn't true is out whatever it scores; never
-  misleading~~ → truth moved down (relevant, visual, mood, true enough, fresh, shareable); exaggeration fine; only a
-  made-up core event is out (2026-10-29).
-- ~~The owner records the voice in ElevenLabs (we hand over the paste text)~~ → generated through the API with the owner's voice (2026-10-26).
-- ~~G3: animate only where timing is the question~~ → the animated sketchbook plays every move and transition (2026-10-26).
-- ~~v1's ink line as the film's line (overshoot, open contours, offset fills, weight by depth)~~ → the clean pen, lines
-  by story role (v3 G5b, 2026-10-27).
-- ~~The core line as a title over the captions from frame 0 (`frame0`)~~ → the captions in the voice's order, the
-  payoff by ~2 s; the core line as a title only on the cover (v3, 2026-10-28).
-- ~~Frame 0 as the whole scene in bare ink lines~~ → frame 0 drawn on in the clean pen, shown to the owner at the next
-  G4 look clip (2026-10-27).
-- ~~Something new every few frames from any element~~ → from the story's own build, one focus at a time (v3 G5b, 2026-10-27).
-- ~~Cuts locked to the beat~~ → joins on the beat, each carrying something (v3 G5b, 2026-10-27).
-- ~~Density and life added after the sketch ("blocking: staging only; next: density, life, polish")~~ → designed into
-  G3 with their tiers; G5 fills G3's plan (v3 G5b, 2026-10-27).
-- ~~A face for the protagonist's emotion beat (v3's waist-up "you" facing us)~~ → people have no faces, like reference
-  1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27).
-- ~~The G4 look as stills made in parallel with G3~~ → a playable look clip after the G3 lock, approved before G5
-  (the approved pipeline, 2026-10-27).
-- ~~Pip at tier B in every shot and on both sides of every join~~ → Pip stays, hidden on purpose (2026-10-28).
-- ~~The main thing's outline in its own deep shade (our reading of "black outlines, VERY subtle, in key places") and
-  the mascot's thin same-hue line, with one gentle shade step on every volume~~ → no outlines: edges from light and
-  shade, the subject's shade face deeper; thin lines only on small things, 2 px where they float (2026-10-29).
-- ~~A few real darks (one tinted dark anchor, about 5 % of the frame)~~ → real darks in many small pieces, 6-10 %
-  (2026-10-29).
+- ~~Grey placeholders at G3, a designed sketch, a separate look clip, density filled in later~~ -> key frames made
+  whole first (2026-10-30).
+- ~~A visual script before the ideas~~ -> only the story beats before the ideas (2026-10-30).
+- ~~Patrick Hand captions in one fixed band; a brush for landing words~~ -> the type guide (2026-10-30).
+- ~~Truth high in the topic order~~ -> exaggeration fine; only a made-up core event is out (2026-10-29).
+- ~~The owner records the voice~~ -> the API with his voice (2026-10-26).
+- ~~v1's rough ink line; outlines in the subject's shade~~ -> the clean pen, no outlines (2026-10-27; 2026-10-29).
+- ~~The core line as a title over the captions~~ -> the core line on the cover (2026-10-28).
+- ~~People without faces; closed eyes for all~~ -> open eyes looking away (2026-10-30).
+- ~~Pip in every shot~~ -> Pip hidden on purpose (2026-10-28).
+- ~~Darks as a set share or arrangement of the frame, the references' low key in every scene~~ -> how dark follows
+  each scene's mood (owner, 2026-10-31: "we lost the feeling").
+- ~~No size budget for this file~~ -> coherent, clear and SMALL (2026-10-31).
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Retired rules
 
 ## Maintenance (keep this file coherent and clear)
-No size budget (owner, 2026-10-27: "let's not focus on the playbook being a certain size; keep it as coherent and clear as
-we can"). Review it **whenever a note changes the direction** (in the same turn) and at the start of a session if it has
+Coherent, clear and SMALL: an agent must be able to read what it is told to read (owner, 2026-10-31: "170k words of
+guides is absolutely bananas"; the step-by-step plan: `docs/process/PLAN.md`). Every note is captured as the owner's
+words, the feeling and the tools that create it, never as a number or a placement ("A number is never a target");
+integrating a note means rewriting or retiring what it changes, never only adding. (Retired: "No size budget", owner,
+2026-10-27: "let's not focus on the playbook being a certain size; keep it as coherent and clear as we can".) Review it **whenever a note changes the direction** (in the same turn) and at the start of a session if it has
 been 7+ days since "Last reviewed" and entries were added since. The orchestrator:
 1. Integrates: rewrites or retires every rule the new note contradicts, here, in `docs/look/DIRECTION.md` and in the
    docs the rules link to, so no two instructions conflict; the newest owner direction wins, and the old rule moves to
@@ -598,3 +555,5 @@ been 7+ days since "Last reviewed" and entries were added since. The orchestrato
 3. Turns rules that several videos confirmed into short principles; drops wording that only mattered for one video.
 4. Performance log: keeps the last ~5 raw lines and folds older ones into a "Trends" paragraph.
 5. Updates "Last reviewed", then commits "Review owner playbook".
+
+Full history: docs/archive/OWNER_PLAYBOOK_full_2026-10-31.md, section Maintenance

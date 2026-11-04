@@ -1,0 +1,6 @@
+{
+  "thread": {"name": "computers", "rivals": ["chips", "cabinet", "rack", "servers", "machines"]},
+  "trade":  {"heat pump": ["machine", "machines"], "district heating": ["pipes under the streets"]},
+  "allow":  {"radiator": "everyday in Helsinki and in the picture"},
+  "unique": ["harbour", "cathedral"]
+}

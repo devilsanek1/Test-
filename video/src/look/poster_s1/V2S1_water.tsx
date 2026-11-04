@@ -324,7 +324,11 @@ const ensure = (): WaterSpec => {
   const key = paletteKey();
   let spec = SPECS.get(key);
   if (!spec) {
-    spec = key === '10b' ? {...S1_WATER, body: CM10B.water, sky: S1_EVENING_10B} : S1_WATER;
+    // (fix pass 1, REVIEW.md SHOULD 2) lib/water caches each reflection bar's trough under its colour, row, gapMix and
+    // seed, never the open water's colour, so with v2's gapMix the 10b spec drew v2's lighter troughs whenever a render
+    // tab had drawn v2's half first (the clip's Before part). A gapMix 1e-7 off gives 10b its own troughs (the seed,
+    // and so the ripples, kept); lib/water's owner: key TROUGHS on the open water's colour too.
+    spec = key === '10b' ? {...S1_WATER, body: CM10B.water, sky: S1_EVENING_10B, grid: {...S1_WATER.grid, gapMix: 0.4000001}} : S1_WATER;
     spec.sources = s1Sources();
     SPECS.set(key, spec);
   }

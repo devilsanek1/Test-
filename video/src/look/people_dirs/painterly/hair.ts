@@ -1,0 +1,403 @@
+// people_dirs/painterly: hair (dir_painterly.md "Hair"; design_research.md §7, fashion.md §5). Hair is ONE designed mass
+// over the skull, built as a shell (the skull's surface pushed out by the hair's volume), open where the face is: the
+// face window follows the hairline (a centre part, curtain bangs, a fringe). Long hair continues below the head as a
+// curtain behind the shoulders, ending in rounded, bouncy ends; a ponytail is its own tapering tube; curls are a cloud
+// of unequal lobes (the light gives each lobe its own sheen); a crop is a close cap with a lighter taper at the nape.
+// The light's anisotropic sheen (mesh.ts) draws the one band that says "healthy, groomed hair".
+import {type Skeleton, headPoint, rowsFor, tube, fx, fy, fz} from './body';
+import {type V3, add, bump, clamp, lerp, mix, nrm, scl, smooth, spline, sub, toWorld, cross, dot} from './math';
+import type {Surface} from './mesh';
+import type {Decal, DecalFn} from './paint';
+import {project} from './mesh';
+import {smoothD} from './paint';
+
+const PLAIN = {nose: 0, lips: 0, jaw: 1, chin: 0, cheek: 0, brow: 0};
+
+/** A point on the skull (h units, head-local) pushed out radially by `vol` (h units). */
+function shellPoint(u: number, phi: number, vol: number): V3 {
+  const p = headPoint(u, phi, PLAIN, true);
+  const c: V3 = [0, 0.05, -0.04];
+  const r = nrm(sub(p, c));
+  return add(p, scl(r, vol));
+}
+const angOf = (phi: number) => Math.atan2(Math.sin(phi), Math.cos(phi));
+/** Long hair below the skull's widest line does not follow the skull in (to the nape, under the jaw): it HANGS straight
+ *  down from the widest line, so the silhouette is an oval crown over two falling curtains (never a bowl). */
+function hangPoint(u: number, phi: number, vol: number): V3 {
+  const p = shellPoint(u, phi, vol);
+  const uw = 0.56;
+  if (u >= uw) return p;
+  const q = shellPoint(uw, phi, vol);
+  const w = smooth(uw, uw - 0.22, u) * smooth(1.05, 1.85, Math.abs(angOf(phi)));
+  const rp = Math.hypot(p[0], p[2]);
+  const rq = Math.hypot(q[0], q[2]);
+  if (rq <= rp) return p;
+  const k = mix(1, rq / Math.max(1e-6, rp), w);
+  return [p[0] * k, p[1], p[2] * k];
+}
+
+export type HairLong = {
+  kind: 'long';
+  /** The ends' height at the back (world units), the face-framing layer's end (front sides). */
+  endBack: number;
+  endFront: number;
+  /** Volume at the crown and the sides (h units). */
+  vol: number;
+  /** The part's angle (rad from the front; 0 = centre). */
+  part: number;
+  /** Curtain bangs: how far they come down the face (0 = none). */
+  bangs: number;
+  /** The curtain below the jaw (chest frame): half-width at the jaw and at the ends, depth behind the back, the centre's
+   *  offset behind the chest's centre, how fast it widens (units below the jaw), the ends' lobes and their flip. */
+  curtain?: {halfW?: [number, number]; back?: [number, number]; front?: number; zOff?: number; ramp?: number; lobes?: number; lobeAmp?: number; flip?: number; window?: number};
+};
+export type HairPony = {kind: 'pony'; length: number; part?: number};
+export type HairCurls = {kind: 'curls'; vol: number; seed: number};
+export type HairCrop = {kind: 'crop'; top: number; seed: number; curls?: boolean};
+export type HairSpec = HairLong | HairPony | HairCurls | HairCrop;
+
+type Built = {surfaces: Surface[]; decals: DecalFn[]};
+
+// ---------------------------------------------------------------- the skull's shell, generic
+
+function skullShell(
+  sk: Skeleton,
+  key: string,
+  mat: string,
+  opt: {uTop?: number; uLow: number; vol: (u: number, ang: number) => number; window: (u: number, ang: number) => number; rows: number; cols: number; res: number; look?: Surface['look']; bias?: number},
+): Surface {
+  const h = sk.b.head;
+  const rows = rowsFor(opt.rows, opt.res, 10);
+  const cols = rowsFor(opt.cols, opt.res, 18);
+  const grid: V3[][] = [];
+  const axis: V3[] = [];
+  const top = opt.uTop ?? 1;
+  for (let i = 0; i < rows; i++) {
+    const u = mix(top, opt.uLow, i / (rows - 1));
+    const row: V3[] = [];
+    for (let k = 0; k < cols; k++) {
+      const phi = (k / cols) * Math.PI * 2;
+      const ang = angOf(phi);
+      row.push(toWorld(sk.head, scl(shellPoint(u, phi, opt.vol(u, ang)), h)));
+    }
+    grid.push(row);
+    axis.push(toWorld(sk.head, [0, (u - 0.42) * h * 0.6, -0.04 * h]));
+  }
+  const mask = (i: number, j: number) => {
+    const u = mix(top, opt.uLow, i / (rows - 1));
+    const ang = angOf((j / cols) * Math.PI * 2);
+    return opt.window(u, ang);
+  };
+  return {key, mat, grid, axis, wrap: true, open: true, mask, look: opt.look, bias: opt.bias ?? 40, covers: ['head', 'ear']};
+}
+
+// ---------------------------------------------------------------- long hair: the skull's shell + the curtain
+
+function longHair(sk: Skeleton, hs: HairLong, res: number): Built {
+  const b = sk.b;
+  const h = b.head;
+  const cols = rowsFor(80, res, 22);
+  const rowsS = rowsFor(30, res, 10);
+  const rowsC = rowsFor(34, res, 9);
+  const uJaw = 0.16;
+  // the face window by height on the skull (rad from the front): the part at the top, curtain bangs opening around
+  // the eyes and framing the cheekbones, then beside the jaw
+  const bang = hs.bangs;
+  const wF: [number, number][] = [
+    [0.0, 1.05],
+    [0.16, 1.02],
+    [0.3, 0.96],
+    [0.42, 0.86 - 0.08 * bang],
+    [0.55, 0.64 - 0.12 * bang],
+    [0.66, 0.42 - 0.12 * bang],
+    [0.76, 0.2],
+    [0.83, 0.02],
+    [0.86, -0.2],
+  ];
+  const vol = (u: number, ang: number) => {
+    const a = Math.abs(ang);
+    let v = hs.vol * (0.75 + 0.35 * smooth(0.95, 0.75, u)) + 0.012 * smooth(0.5, 0.2, u);
+    // the bangs stand a little off the forehead; the part pinches the volume
+    v += 0.012 * bang * smooth(0.45, 0.6, u) * (1 - smooth(0.5, 1.0, a));
+    v -= 0.018 * bump(ang, hs.part, 0.06) * smooth(0.72, 0.9, u);
+    // soft clumps: the strands gather in a few vertical lobes (deeper through the lengths)
+    v += 0.009 * Math.sin(ang * 8 + 0.7 + 1.5 * u) * smooth(0.85, 0.45, u);
+    return Math.max(0.005, v);
+  };
+  // the curtain below the head, in the chest's frame
+  const ch = sk.chest;
+  const c0 = hs.curtain ?? {};
+  const cu = {
+    halfW: c0.halfW ?? [56, 68],
+    back: c0.back ?? [54, 46],
+    front: c0.front ?? 32,
+    zOff: c0.zOff ?? 36,
+    ramp: c0.ramp ?? 80,
+    lobes: c0.lobes ?? 3.1,
+    lobeAmp: c0.lobeAmp ?? 15,
+    flip: c0.flip ?? 7,
+    window: c0.window ?? 1.42,
+  };
+  const endAt = (ang: number) => {
+    const a = Math.abs(ang); // 0 front .. pi back
+    // the layers: face-framing pieces end higher (at the collarbone), the back longest
+    const k = smooth(1.2, 2.3, a);
+    let y = mix(hs.endFront, hs.endBack, k);
+    // bouncy ends: a few round lobes hanging down, small notches between them (never a zigzag)
+    y += cu.lobeAmp * (1 - Math.pow(Math.abs(Math.cos(cu.lobes * ang + 0.5)), 0.55)) - 4 * Math.sin(ang * 1.7);
+    return y;
+  };
+  const jawY = toWorld(sk.head, [0, (uJaw - 0.42) * h, 0])[1];
+  const grid: V3[][] = [];
+  const total = rowsS + rowsC;
+  const uOf = (i: number) => mix(1, uJaw, i / (rowsS - 1));
+  for (let i = 0; i < total; i++) {
+    const row: V3[] = [];
+    for (let k = 0; k < cols; k++) {
+      const phi = (k / cols) * Math.PI * 2;
+      const ang = angOf(phi);
+      let p: V3;
+      if (i < rowsS) {
+        const u = uOf(i);
+        p = toWorld(sk.head, scl(hangPoint(u, phi, vol(u, ang)), h));
+      } else {
+        const t = (i - rowsS + 1) / rowsC;
+        const yEnd = endAt(ang);
+        const y = mix(jawY, yEnd, t);
+        const p0 = toWorld(sk.head, scl(hangPoint(uJaw, phi, vol(uJaw, ang)), h));
+        const sh = smooth(jawY, jawY - cu.ramp, y); // 0 at the jaw -> 1 at the shoulders
+        // the curtain lies ON the upper back (a hair's depth behind it) and falls behind the shoulders
+        const halfW = mix(cu.halfW[0], cu.halfW[1], sh) + 5 * smooth(jawY - 60, yEnd, y);
+        const back = mix(cu.back[0], cu.back[1], sh);
+        const front = cu.front;
+        const c = Math.cos(phi);
+        const s = Math.sin(phi);
+        const zz = c >= 0 ? c * front : c * back;
+        const xx = s * halfW;
+        // bouncy ends: the last ~40 units swell outward, then round under
+        // clumps: a few long vertical ribbons through the curtain, then the bouncy ends
+        const clump = 3.2 * Math.sin(ang * 8 + 0.7 + 1.5 * uJaw) * (0.6 + 0.4 * Math.sin(ang * 3 + 1.1)) * sh;
+        const flip = clump + cu.flip * smooth(yEnd + 46, yEnd + 12, y) - cu.flip * smooth(yEnd + 12, yEnd, y);
+        const l = Math.hypot(xx, zz) || 1;
+        const target = toWorld(ch, [xx + (xx / l) * flip, 0, zz + (zz / l) * flip - cu.zOff]);
+        p = lerp([p0[0], y, p0[2]], [target[0], y, target[2]], sh);
+      }
+      row.push(p);
+    }
+    grid.push(row);
+  }
+  const maskAt = (i: number, j: number) => {
+    const ang = angOf((j / cols) * Math.PI * 2);
+    const a = Math.abs(ang);
+    if (i < rowsS) return (a - spline(wF, uOf(i))) * 2;
+    const t = (i - rowsS + 1) / rowsC;
+    // below the jaw the hair falls behind the shoulders: the front window widens
+    const w = mix(1.05, cu.window, smooth(0, 0.35, t));
+    return (a - w) * 2;
+  };
+  // two surfaces sharing a few rows: the skull's shell (it encloses the head) and the curtain (depth-sorted on its own:
+  // behind the shoulders from the front, over the back from behind)
+  const cut = (r0: number, r1: number, key: string, covers?: string[], bias = 26): Surface => {
+    const g = grid.slice(r0, r1 + 1);
+    const ax: V3[] = g.map((row, ii) => {
+      const i = r0 + ii;
+      if (i < rowsS) return toWorld(sk.head, [0, (uOf(i) - 0.42) * h * 0.6, -0.04 * h]);
+      let a: V3 = [0, 0, 0];
+      for (const p of row) a = add(a, p);
+      a = scl(a, 1 / row.length);
+      return [a[0], a[1], a[2] + 10];
+    });
+    return {key, mat: 'hair', grid: g, axis: ax, wrap: true, open: true, mask: (i, j) => maskAt(r0 + i, j), bias, covers, look: {sheen: {t: 0.5, p: 5}, blur: 4.5, rim: 0.45}};
+  };
+  // one surface (no seam at the jaw): it encloses the head; the depth sort puts it behind the shoulders from the front
+  const shell = cut(0, total - 1, 'hair', ['head', 'ear']);
+  // the part: a fine line of the hair's deep tone from the hairline back over the crown
+  const partDecal: DecalFn = (cam) => {
+    const pts = [] as [number, number][];
+    for (let k = 0; k <= 8; k++) {
+      const u = mix(0.86, 0.99, k / 8);
+      const p = toWorld(sk.head, scl(shellPoint(u, hs.part, vol(u, hs.part) + 0.002), h));
+      pts.push(project(cam, p));
+    }
+    return [{key: 'part', target: 'hair', d: smoothD(pts, false), stroke: '#2A1A18', sw: 1.6, blur: 1.2, opacity: 0.55}];
+  };
+  return {surfaces: [shell], decals: [partDecal]};
+}
+
+// ---------------------------------------------------------------- a ponytail (under a cap) and the hair tight to the skull
+
+function ponyHair(sk: Skeleton, hs: HairPony, res: number): Built {
+  const h = sk.b.head;
+  const wF: [number, number][] = [
+    [0.0, 3.4],
+    [0.22, 3.4],
+    [0.26, 1.7],
+    [0.35, 1.2],
+    [0.5, 1.12],
+    [0.62, 1.0],
+    [0.72, 0.78],
+    [0.79, 0.3],
+    [0.81, -0.3],
+  ];
+  const cap = skullShell(sk, 'hair', 'hair', {
+    uLow: 0.2,
+    vol: (u, ang) => 0.016 + 0.01 * smooth(0.6, 0.3, u) * smooth(1.2, 2.4, Math.abs(ang)),
+    window: (u, ang) => (Math.abs(ang) - spline(wF, u)) * 2,
+    rows: 34,
+    cols: 72,
+    res,
+    look: {sheen: {t: 0.5, p: 5}, blur: 4, rim: 0.45},
+    bias: 20,
+  });
+  // the tail: from the cap's back opening, out and down, swinging a little to the figure's left
+  const root = toWorld(sk.head, [0, 0.12 * h, -0.47 * h]);
+  const a1 = toWorld(sk.head, [0.02 * h, -0.08 * h, -0.66 * h]);
+  const len = hs.length;
+  const a2: V3 = add(a1, [6, -len * 0.45, -10]);
+  const a3: V3 = add(a2, [10, -len * 0.42, 6]);
+  const tail = tube(
+    [root, a1, a2, a3],
+    rowsFor(30, res, 10),
+    rowsFor(22, res, 10),
+    (t) => {
+      const r = h * spline(
+        [
+          [0, 0.085],
+          [0.08, 0.11],
+          [0.3, 0.15],
+          [0.6, 0.13],
+          [0.85, 0.075],
+          [1, 0.012],
+        ],
+        t,
+      );
+      return {f: r * 0.85, b: r * 0.85, p: r, m: r};
+    },
+    () => fx(sk.chest),
+    {capEnd: true, disp: (t, phi) => 1.6 * Math.sin(phi * 5 + t * 9) * smooth(0.1, 0.4, t)},
+  );
+  const tailS: Surface = {key: 'pony', mat: 'hair', grid: tail.grid, axis: tail.axis, wrap: true, bias: 22, look: {sheen: {t: 0.45, p: 4}, blur: 4, rim: 0.45}};
+  // the hair tie: a small dark band at the root
+  const tie = tube(
+    [toWorld(sk.head, [0, 0.13 * h, -0.45 * h]), toWorld(sk.head, [0, 0.08 * h, -0.53 * h])],
+    rowsFor(5, res, 3),
+    rowsFor(16, res, 8),
+    () => ({f: 0.1 * h, b: 0.1 * h, p: 0.105 * h, m: 0.105 * h}),
+    () => fx(sk.chest),
+  );
+  const tieS: Surface = {key: 'tie', mat: 'tie', grid: tie.grid, axis: tie.axis, wrap: true, bias: 23, noRim: true};
+  return {surfaces: [cap, tailS, tieS], decals: []};
+}
+
+// ---------------------------------------------------------------- curls: a cloud of unequal lobes
+
+function curlHair(sk: Skeleton, hs: HairCurls, res: number): Built {
+  const sd = hs.seed;
+  const wF: [number, number][] = [
+    [0.0, 1.12],
+    [0.12, 1.08],
+    [0.3, 0.98],
+    [0.45, 0.9],
+    [0.58, 0.75],
+    [0.7, 0.52],
+    [0.78, 0.22],
+    [0.82, -0.2],
+  ];
+  const lobes = (u: number, ang: number) =>
+    0.55 * Math.sin(ang * 7 + u * 9.5 + sd) + 0.3 * Math.sin(ang * 12 - u * 15 + sd * 2.3) + 0.15 * Math.sin(ang * 19 + u * 23 + sd * 0.7);
+  const vol = (u: number, ang: number) => {
+    const a = Math.abs(ang);
+    // fuller at the sides and the back, longer at the back (to the jaw), softer at the hairline
+    let v = hs.vol * (0.78 + 0.22 * smooth(0.4, 1.8, a)) * (0.6 + 0.4 * smooth(0.0, 0.35, u));
+    v *= 1 - 0.35 * smooth(0.95, 1.0, u) * 0;
+    v += 0.06 * lobes(u, ang) * smooth(0.0, 0.25, u);
+    // close to the face at the hairline the cloud thins
+    v *= 0.55 + 0.45 * smooth(0.0, 0.5, a - spline(wF, u) + 0.2);
+    return Math.max(0.03, v);
+  };
+  const cloud = skullShell(sk, 'hair', 'hair', {
+    uLow: 0.02,
+    vol,
+    window: (u, ang) => (Math.abs(ang) - spline(wF, u)) * 2,
+    rows: 64,
+    cols: 108,
+    res,
+    look: {hi: 0.62, blur: 3.2, rim: 0.42, shade: 0.12},
+    bias: 30,
+  });
+  return {surfaces: [cloud], decals: []};
+}
+
+// ---------------------------------------------------------------- the crop: a textured top over a low taper
+
+function cropHair(sk: Skeleton, hs: HairCrop, res: number): Built {
+  const sd = hs.seed;
+  // the hairline: the fringe's notched edge across the forehead, above the ears, down to the nape
+  const front = (ang: number) => 0.765 + 0.022 * Math.abs(Math.sin(ang * 13 + sd)) + 0.02 * smooth(0.25, 0.7, Math.abs(ang));
+  const hairline = (u: number, ang: number) => {
+    const a = Math.abs(ang);
+    if (a < 0.95) return (u - front(ang)) * 6; // the forehead
+    if (a < 1.25) return (u - mix(front(ang), 0.5, smooth(0.95, 1.25, a))) * 6; // the temples
+    if (a < 1.75) return (u - 0.6 + 0.05 * Math.cos((a - 1.25) * 6)) * 6; // over the ear: an arc above it
+    return (u - mix(0.36, 0.24, smooth(1.75, 2.6, a))) * 6; // behind the ear to the nape
+  };
+  const taperTop = (ang: number) => mix(0.62, 0.48, smooth(1.4, 2.8, Math.abs(ang)));
+  const top = (u: number, ang: number) => {
+    const a = Math.abs(ang);
+    let v = 0.016 + hs.top * smooth(0.6, 0.9, u) * (1 - 0.35 * smooth(0.6, 2.6, a));
+    // the fringe falls forward: more at the front-top
+    v += 0.02 * smooth(0.82, 0.92, u) * (1 - smooth(0.2, 1.2, a));
+    if (hs.curls) {
+      // curls or coils on top: a cloud of small, unequal round lobes (each catches the key on its own top)
+      const lob = 0.5 + 0.5 * Math.sin(ang * 11 + sd) * Math.sin(u * 30 + 1.3 * sd) + 0.25 * Math.sin(ang * 17 - u * 19 + sd * 2);
+      v += hs.top * 0.42 * Math.pow(Math.max(0, lob), 1.4) * smooth(0.6, 0.8, u);
+      v -= 0.02 * smooth(0.82, 0.92, u) * (1 - smooth(0.2, 1.2, Math.abs(ang)));
+    } else {
+      // texture: a few soft tufts
+      v += 0.012 * Math.sin(ang * 9 + u * 21 + sd) * smooth(0.72, 0.95, u);
+    }
+    return v;
+  };
+  const main = skullShell(sk, 'hair', 'hair', {
+    uLow: 0.2,
+    vol: top,
+    window: (u, ang) => Math.min(hairline(u, ang), (u - taperTop(ang)) * 8 + 0.02),
+    rows: hs.curls ? 64 : 40,
+    cols: hs.curls ? 132 : 84,
+    res,
+    look: hs.curls ? {hi: 0.74, shade: 0.1, blur: 2.2, rim: 0.42} : {sheen: {t: 0.48, p: 4}, blur: 3.2, rim: 0.45},
+    bias: 30,
+  });
+  const taper = skullShell(sk, 'taper', 'taper', {
+    uLow: 0.2,
+    vol: () => 0.008,
+    window: (u, ang) => Math.min(hairline(u, ang), (taperTop(ang) + 0.03 - u) * 8),
+    rows: 26,
+    cols: 84,
+    res,
+    look: {blur: 3, rim: 0.5},
+    bias: 29,
+  });
+  return {surfaces: [taper, main], decals: []};
+}
+
+export function hairOf(sk: Skeleton, hs: HairSpec, res: number): Built {
+  switch (hs.kind) {
+    case 'long':
+      return longHair(sk, hs, res);
+    case 'pony':
+      return ponyHair(sk, hs, res);
+    case 'curls':
+      return curlHair(sk, hs, res);
+    case 'crop':
+      return cropHair(sk, hs, res);
+  }
+}
+
+export {shellPoint, angOf, hangPoint};
+export type {Decal};
+void fy;
+void fz;
+void cross;
+void dot;
+void clamp;

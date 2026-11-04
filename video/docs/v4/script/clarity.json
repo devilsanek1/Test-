@@ -1,0 +1,10 @@
+{
+  "thread": {"name": "computers", "rivals": ["chips", "chip", "cabinet", "cabinets", "rack", "racks", "servers", "server", "processors", "GPUs"]},
+  "trade": {
+    "data center": ["buildings called data centers", "buildings full of these computers"],
+    "heat pump": ["machines called heat pumps"],
+    "district heating": ["pipes under the streets"]
+  },
+  "allow": {},
+  "unique": []
+}

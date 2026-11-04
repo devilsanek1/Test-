@@ -1,5 +1,10 @@
 # Sound plan: php2shell explainer (55.37 s loop)
 
+> **v1 history (banner, 2026-10-30).** Keep it for video 1's measurements, tools, beds and mix chain. Which sound lands
+> on which picture, when and how often is `docs/look/SOUND_SYNC.md` (distilled from the owner's two sound reels); where
+> this file differs (the ±100 ms nudge, the film-wide beat-lock, a sound for every visual event), that page wins. Never
+> brief a lane's sync from this file.
+
 Owner: sound stream. Lane: `audio/**`, `docs/sound_plan.md`, `docs/sound_credits.md`.
 Sources and licences: `docs/sound_credits.md`. This version follows the brief's **CINEMATIC DIRECTION** and its
 **BALANCE NOTE**: a warm, modern explainer at the core, with a touch of space, and nothing trailer-like.
@@ -22,6 +27,8 @@ Everything below this section is history. Where it conflicts with this section, 
     `audio/tools/beatlock.py` re-solves that segment so S07 lands exactly on the half-beat (the "&" of bar 10, beat 1).
   - Result (`python3 scripts/qa/beatsync.py --midi audio/music_cinematic_retimed.mid`): 10 of 11 cuts at 0 ms off-beat, and S07 at +304 ms off-beat but 0 ms off the half-beat.
     With `--grid half`, all 11 are at 0 ms. Tempo is 90.9-103.0 BPM, with at most 3.3 % change per beat (`audio/tempo_map_beatlocked.json`).
+  - (2026-10-30) A film-wide lock is retired: lock only the moments the music is heard in the clear (the hook's end, the
+    turn, the release, the close): `docs/look/SOUND_SYNC.md` O8, X4. The tools stay.
 - **Placements after the bend** (all still land):
 
   | Moment | Time |
@@ -401,6 +408,8 @@ the level of the piano pulse, the sub accents (felt on earbuds, nearly absent on
 1. **The voice is the show.** The VO is nearly continuous: 28 pauses, most of them 120-480 ms. Put SFX in pauses, on the onsets of stressed numbers and on
    visual events. Never on the middle of a key word.
 2. **One sound per idea, at most about one every 2-3 s.** If two things happen at once, sound only the one the eye goes to.
+   Now a checked budget: `docs/look/SOUND_SYNC.md` §3c (~8-12 hard sync points in a 40 s film, most in the hook; every
+   one-shot cue under ~0.5 a second).
 3. **Make the sound as small as the gesture.** A label pops: `pop_high`. A building lands: `pop_low`. A line draws: a pencil at -18 to -22 dB.
 4. **Scale is a seasoning.** Two soft accents (in the bed), one hush (the suspension), one breath. Ambiences (`city_bed`, `air_bed`) only under a
    real vista, 20-25 dB under the voice, and never under the whole film. Shimmer only where light visibly changes.
@@ -413,7 +422,10 @@ the level of the piano pulse, the sub accents (felt on earbuds, nearly absent on
 
 ### Curated cue sheet (`audio/cues.json`, used in `audio/mix.wav`)
 
-Times come from `timing.json`. **Nudge each cue to its visual event** once scenes exist (usually within ±100 ms).
+Times come from `timing.json`. **Put each cue on its visual event** once scenes exist: a sharp sound's transient on the
+event's first visible frame or up to 2 f (33 ms) after it, never before; a soft sound's onset or crest from 3 f before to
+6 f after; measured from the transient, never the file start (`docs/look/SOUND_SYNC.md` §1c; the old "within ±100 ms"
+was a soft sound's tolerance).
 A = core (13), B = optional (15). `--prio A` renders the minimal version.
 
 | t (s) | sfx | gain dB | pan | prio | why |

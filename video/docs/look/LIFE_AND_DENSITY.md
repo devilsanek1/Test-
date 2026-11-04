@@ -1,11 +1,12 @@
 # Life and density: every frame full and alive (generic, every video)
 
 **The owner's rule** (OWNER_PLAYBOOK, Visual style; v3 G5, 2026-10-26: "way too empty ... those feel a lot more alive"):
-every frame feels ALIVE at the level of reference 1 (France, `assets/ref/reference.mp4`) and v1 (PHP,
-`deliverables/v1/php2shell_final.mp4`): a dense, specific world, people near and far, layered depth, a recurring living
+every frame feels ALIVE at the level of reference 1 (France, `assets/ref/reference.mp4`): a dense, specific world, people near and far, layered depth, a recurring living
 character and ambient life that never stops. Feeling alive is the goal; the numbers are a warning signal, never a quota.
-A big empty field (nothing in it; flat colour itself is right, `CRAFT.md` §c), or an object alone on a blank wall, is a
-failure even in a draft. Sources (measurements only, never style): style bible §5-8, motion_spec §5, 6, 9,
+A big empty field (nothing in it; a quiet field of colour patterned in value is right: §0, `CRAFT.md` §c), or an
+object alone on a blank wall, is a failure even in a draft. Full is never busy (owner, 2026-10-30, SCENE COMPOSITION:
+"our scene is very busy"; `ORGANIC.md` §4.4): big quiet areas, one place to look, and the many things as texture
+inside the masses, never as many named objects. Sources (measurements only, never style): style bible §5-8, motion_spec §5, 6, 9,
 `look/research/density_numbers.md`; v3's `docs/v3/density_plan_g5b.md` is history (its cut was judged "too busy").
 How things are drawn: `CRAFT.md` §b-§c, inside `DIRECTION.md`. For cozy holds
 the bar is the owner's cozy references (a street seen from a balcony, a riverside: `COZY_AND_SCALE.md` 3b), the fullest and
@@ -32,19 +33,21 @@ scene needs. Every rule below works inside those tiers.
   - **The meter's fullness:** the profile's row below (DENSE-CALM or STORY-LED), from density.py's default table:
     information until it is re-measured on a G4 look clip (it reads lines, and the clean pen keeps the props but drops
     their lines).
-  - **No hole bigger than the caption band:** outside the caption band and the one quiet field, no empty patch over ~200 px
-    across (largest empty disc: C3 393 px, the sky; v3 G5 910 px). The quiet field is ONE band touching the top or bottom
-    edge (sky, water, floor), and it is still patterned.
+  - **No hole bigger than the caption band:** outside the caption band and the quiet fields, no empty patch over ~200 px
+    across (largest empty disc: C3 393 px, the sky; v3 G5 910 px). Up to two quiet fields (playbook SCENE
+    COMPOSITION, owner, 2026-10-30: big quiet areas; `ORGANIC.md` §4.4 R5): one touching the top edge (the sky, with the caption band)
+    and one touching the bottom (the near ground, water or a floor), the things loaded into the belt between; each is
+    patterned (+-4-6 L* of painted variation, dapples, joints, tone-on-tone things), so it is never a hole.
   - **A field MADE of things, never things ON a field:** the biggest single flat region <= 20 % of the frame apart from the
-    quiet field (C3 8-15 %, v3 G5 23-45 %).
+    quiet fields (C3 8-15 %, v3 G5 23-45 %).
   - **The paused frame at phone size beside the reference** (a cozy hold beside C3 or C2, a story-led shot beside
-    reference 1 and v1) reads as full as it does. The hole and field checks are not in density.py yet (the void, TO
+    reference 1) reads as full as it does. The hole and field checks are not in density.py yet (the void, TO
     BUILD: the craft tooling lane, `PIPELINE_V2.md`): the paused-frame look decides them.
 - **What fills a frame** (how the references get there; examples for the eye, never targets; their counts per frame are in
   the `COZY_AND_SCALE.md` References log):
   - many small things, each size step down holding more (C3 ~3x per step);
   - stacked, not spread: depth by overlap, a new surface every few dozen px down a column (C3 42 px, v1 90, v3 G5 143),
-    drawn detail in most 240 px bands (C3 7 of 8, v3 G5 0-3);
+    drawn detail in most of the belt's 240 px bands, the quiet fields patterned instead (C3 7 of 8 bands, v3 G5 0-3);
   - local colour variety: several colours in every small patch (per 96 px: C3 4.25, v1 2.41, v3 G5 1.77), and repeats
     vary in colour (each house, awning, shirt);
   - things that ARE lines, the cheapest fullness: wires, poles, antennas, rails, mullions, as hairlines within dL* 15 of
@@ -84,21 +87,26 @@ lined frames). Cozy holds (DENSE-CALM) are judged by §0's row and `density.py -
 1.0-1.2 ev/s and a 2.4 s gap (FAR) with a moving figure in every frame.
 
 What the references hold in one frame (examples to calibrate the eye at phone size, never counts to hit: the owner
-asked for "less prescriptive on the amount of objects"):
+asked for "less prescriptive on the amount of objects"). The props are counted as the world's TEXTURE: since
+2026-10-30 (SCENE COMPOSITION) they sit inside the belt's masses, tone-on-tone, with no silhouette of their own at a
+squint, and at phone size at most 6 things read as named objects in any shot (the subject, one big secondary mass, 1-3
+supporting things: `ORGANIC.md` §4.4 R6; the painted models 4-6, v6 about 40):
 
-| shot | quiet field | distinct props besides the subject | depth planes | people |
+| shot | quiet fields | distinct props besides the subject (texture) | depth planes | people |
 |---|---|---|---|---|
-| wide / exterior | sky gap or ground, 15-35 % | 12+ | 3-4 | 10 to 300+ (far crowds count) |
-| medium / interior | the wall or sky behind the captions | 8+ | 2-3 | 2+ (a silhouette in a window counts) |
+| wide / exterior | the sky with the caption band (>= 30 %) at the top and the near ground (>= 15 %) at the bottom, ~65 % quiet at a squint in all (R5; the painted models 67-91 %) | 12+, inside the belt's masses | 3-4 | 10 to 300+ (far crowds count, as texture) |
+| medium / interior | the wall or sky behind the captions (and a floor or desk front at the bottom) | 8+, inside the masses | 2-3 | 2+ (a silhouette in a window counts) |
 | close / insert | the subject's own backing | 5+, cut by the frame edges | 2 | the "you" or the character (never a row of strangers' backs: `CRAFT.md` §a.3) |
-| cozy wide (balcony, riverside) | ONE band at a frame edge: a jagged sky ~8-15 % above y 290, or a bounded floor up to 50-60 % (`COZY_AND_SCALE.md` 3b.1) | a field made of things (§0's DENSE-CALM row), lived-in infrastructure (wires, poles, antennas, railings) | overlapping, stacked upward (C3 6) | about half at rest (C2 / C3 held 5-8) |
+| cozy wide (balcony, riverside) | one or two bands at the frame edges: a jagged sky ~8-15 % above y 290, a bounded floor up to 50-60 %, the water below the bank (`COZY_AND_SCALE.md` 3b.1-3b.2) | a field made of things (§0's DENSE-CALM row), lived-in infrastructure (wires, poles, antennas, railings) | overlapping, stacked upward (C3 6) | about half at rest (C2 / C3 held 5-8) |
 
 ## 2. Composition: where the density goes
-- **One quiet field, the rest loaded.** In thirds (y 0-640, 640-1280, 1280-1920) the quiet field (in 9:16 usually the
-  wall or sky behind the caption band) takes at most one; every other third holds things at several depths (the
-  references: 3+ distinct props at 3 depths; an example, never a count to hit). Finer:
-  drawn detail in most 240 px bands (§0), and calm sits only at a frame edge, round the subject or behind the captions,
-  never as a slab mid-frame (§0; `COZY_AND_SCALE.md` 3b.3: detailed edges and far side, calm centre or floor).
+- **Up to two quiet fields, the belt loaded** (owner, 2026-10-30, SCENE COMPOSITION; `ORGANIC.md` §4.4 R5). The sky
+  (or the wall) with the caption band takes the top of the frame, and the near ground (or water, or a floor) may take
+  the bottom, each quiet but patterned (§0); the belt between them holds the things at several depths (the
+  references: 3+ distinct props at 3 depths, as texture inside its masses; an example, never a count to hit). Finer:
+  drawn detail in most of the belt's 240 px bands (§0), and calm sits only at a frame edge (the quiet fields), round the
+  subject or behind the captions, never as a slab mid-frame (§0; `COZY_AND_SCALE.md` 3b.3: detailed edges and far
+  side, calm centre or floor).
 - **Hierarchy keeps the read.** The subject keeps the strongest value contrast, the hero colour and a calm ring (30-60 px
   of one value) round its silhouette; dressing sits one value step off its ground, its line and contrast set by its tier,
   never by depth (`CRAFT.md` §b-c: no outlines on dressing, far planes fill only), its colour, size and simplicity by its
@@ -129,10 +137,13 @@ How each piece is drawn: `CRAFT.md` §b-§c (tier C: flat shapes, no outline; st
 ## 4. People (the film's own people kit, drawn new in its design and shared by every lane; never hand-drawn per lane)
 The kit is new for each film (playbook: no reusable assets); `lib/kit` `Person` / `Crowd` and `lib/cine` `TinyCrowd` are
 references and primitives, never the film's people.
-- **Back view always** (or rear 3/4): the head in the hair colour, a neck, a tombstone torso and one accessory each
-  (beanie, hood, headphones, scarf, backpack, bag, raised phone); neighbours never share both hair and coat colour.
-  No faces (playbook: people act with their pose, like reference 1's); only the mascot has one. Extras are smaller and
-  in mid colours, never mistaken for the protagonist.
+- **Drawn in the one people design** (owner, 2026-10-30: direction C with the LASH face, `PEOPLE_DESIGN.md`; "very old
+  style and frankly ugly" was the pictogram person): about 7.8 heads, rounded polygons in two flat tones, crisp, no
+  outlines, styled like today's 20-30-year-olds (clothes and hair carry them: one roomy piece and one detail per look,
+  one accent per person, the hero colour only on the "you"); seen mostly from behind, in rear 3/4, in profile or turned
+  away; neighbours never share both hair and coat colour, and never a clone. Faces are generic by design: the LASH face
+  where one is seen, only the contour under ~200 px tall (so the mid and far ground show none), never looking at the
+  camera; people act with their pose. Extras are smaller and in mid colours, never mistaken for the protagonist.
 - **Sizes by depth (1080 x 1920 canvas; size names, never the attention tiers A-C of `CRAFT.md`):** in the foreground
   only the film's one "you" (head 90-140 px, playbook: near heads <= ~140; cut by the bottom edge, its body may run
   under the bottom UI, its head stays above it: head top y <= ~1380, `LAYOUT.md` §1) or the mascot, never a row of strangers' backs (they read as "you": `CRAFT.md` §a.3); a passer-by at the
@@ -145,15 +156,19 @@ references and primitives, never the film's people.
 - **Rest counts; cozy life passes through.** In a wide about half the people are at rest (sitting on an edge, leaning,
   chatting, waiting) next to the moving ones. In a cozy hold the movers cross sideways at real-world speeds (walk 0.7-1.1
   body heights/s, bike 1-3), 1-5 at once, and nothing comes at the viewer (`COZY_AND_SCALE.md` 3b.4). Seated figures that
-  face the viewer across water stay featureless, in side or 3/4 view (3b.2 RIVERSIDE).
+  face the viewer across water stay featureless (under ~200 px tall the face is the contour only), in side or 3/4
+  view (3b.2 RIVERSIDE).
 
 ## 5. The recurring living character
 - **One, hidden on purpose** (owner, 2026-10-28: "keep it, but not as obvious ... hide it deliberately in the
   video"; reference 1's cat and v1's Pip were in every shot, which is no longer the rule). Default: the channel's mascot **Pip**
   (another character only if the story asks for it, named in the W1 world bible and seen by the owner at G3),
   drawn new in the film's design (playbook: no reusable assets; `src/lib/mascot` and `docs/mascot.md` are the reference
-  and the API), in a colourway for the video's palette that stays its own hue (ΔE76 >= 20 from
-  every ground it sits on, never the hero or the pop colour) and in tier B (`CRAFT.md` §b: C* <= 25, no outline: its
+  and the API), in a colourway for the video's palette that stays its own hue (never the hero or the pop colour; ONE
+  rule with `ORGANIC.md` R12: ΔE76 >= 20 from the field it is seen against, so a second look finds it, while its value
+  stays close to the seat it sits in, so at a squint it joins that mass and makes no call; video 4: lavender, L* 56,
+  on its balcony's snow, L* 60, ΔE ~15, seen against the slate facade, ΔE ~39: `docs/v4/WORLD_BIBLE.md` §1.1, §7)
+  and in tier B (`CRAFT.md` §b: C* <= 25, no outline: its
   lit and shade faces part its shapes, as on everything since 2026-10-29) unless the line is about it. A non-character anchor may join it (snow, the weather; the sun is light, never a
   character: `CRAFT.md` §d.1).
 - **Jobs (since 2026-10-28: hidden, not a guide):** (1) hide in a spot that belongs to the world (in a window, on a
@@ -217,8 +232,8 @@ references and primitives, never the film's people.
   no ink, roof tops, heads or props.
 - **Platform UI zones** (the one definition: `LAYOUT.md` §1): dressing yes (kerbs, the edges of things; no strangers' backs in front), key
   information no.
-- **The quiet field** (15-35 %; a bounded floor seen from a balcony up to 50-60 %, `COZY_AND_SCALE.md` 3b.1) and **the
-  subject's ring**. **One breath beat per film** (at most 2.5 s, usually after
+- **The quiet fields** (up to two: the sky with the band, >= 30 %, and the near ground, >= 15 %: §0, `ORGANIC.md` R5; a
+  bounded floor seen from a balcony up to 50-60 %, `COZY_AND_SCALE.md` 3b.1) and **the subject's ring**. **One breath beat per film** (at most 2.5 s, usually after
   the heaviest line): the story pauses, the idle layer stays on, never a frozen frame.
 - **Cozy holds** (DENSE-CALM, §0): little motion is fine, emptiness never: the fullness bar rises, the motion bar becomes
   `density.py --cozy` (§9).
@@ -229,7 +244,7 @@ python3 -I scripts/qa/density.py <cut.mp4> --scenes src/vN/film/scenes.json [--o
 python3 -I scripts/qa/gate_check.py ... --density     # WARN per shot; its film-average FAIL counts as a WARN (§0)
 ```
 - Measure renders at half scale or more (fullness reads edges at 540 px wide); keep the default `--rate 30`. Look as
-  well as measure: a side-by-side sheet at phone size (row 1 reference 1 from `assets/ref/`, row 2 v1, row 3 the cut) and
+  well as measure: a side-by-side sheet at phone size (row 1 reference 1 from `assets/ref/`, row 2 the cut) and
   the sound-off cold read (density must never bury the subject).
 - The owner's cut renders at full size (1080 x 1920): at 0.5 scale the fine dressing lines blur (v3 G5's 540 x 960
   render added to "the quality and smoothness is not there").
@@ -253,7 +268,7 @@ python3 -I scripts/qa/gate_check.py ... --density     # WARN per shot; its film-
 | gate | what |
 |---|---|
 | G3 board | signal only, but designed: the camera plan gets a "world" note per panel (the place, who watches, the character's spot) and every life item its tier and `life:` entry, so density is designed in with its hierarchy, never bolted on; the home set's density key is the film's bar (`G3_ANIMATIC.md` §3) |
-| G4 look | the 6-8 s look clip (`PIPELINE_V2.md` G4): the home set dressed at final density and at its tiers, judged beside reference 1 and v1 (a cozy frame also against §0's DENSE-CALM row and `COZY_AND_SCALE.md` 3b.8) |
+| G4 look | the 6-8 s look clip (`PIPELINE_V2.md` G4): the home set dressed at final density and at its tiers, judged beside reference 1 (a cozy frame also against §0's DENSE-CALM row and `COZY_AND_SCALE.md` 3b.8) |
 | kit (before the G5 lanes) | the film's own dressing for its settings, its people kit and the character's colourway, drawn new; every piece on the kit sheet at each size a panel uses, checked at 0.25 scale |
 | G5 blocking | fills G3's plan: every placeholder and `life:` item made real at its tier, people placed, the character in every shot with key poses, no new movers, places or tier promotions; each set judged paused first (§0); density.py before the owner sees it (information), cozy holds by `--cozy` (§9) with a locked or floating camera |
 | G6 polish | motion life refined inside the tiers, on movers that exist: secondary motion, reactions on the voice's words, the attention check (`CRAFT.md` §b; cozy holds: `--cozy`, §9); then edges (if the G4 clip approved them) and the optional halftone |

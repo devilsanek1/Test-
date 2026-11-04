@@ -48,16 +48,22 @@ const LIGHT_AT = floodAt(B.x, BASE);
 /** EARS-COVER, strengthened for a back view at phone size (the kit's pose reads small from behind). */
 const EARS_COVER = {...POSES.earsCover, hunch: 0.72, headDrop: 8.5, earDroopA: 72, earDroopB: 72, earSwingA: 150, earSwingB: 150, earFoldA: 0.5, earFoldB: 0.5, trunkCurl: 1.55, scarfLift: 0.4};
 
+/** The bollard's contact strip and cast shadow on the landing. (the look test) They fall on the seated slot's group
+ *  (the landing), so S1World draws them in the pip group's `under` (outside its mottle: a mottled group is isolated);
+ *  the same place in the drawing order as v2's (first in the pip group). */
+export const S1PipShadows: React.FC = () => (
+  <ShadowLayer>
+    <ContactShadow x={B.x} y={BASE} w={B.w * 0.84} at={LIGHT_AT} />
+    <CastShadow x={B.x} y={BASE} w={B.w * 0.8} h={B.h} at={LIGHT_AT} />
+  </ShadowLayer>
+);
+
 const Bollard: React.FC = () => {
   // (the look test's darks) the cast-iron bollard dark iron
   const {darks} = useSwitches();
   const iron = darks ? dark('iron') : CM.coatSlate;
   return (
     <>
-      <ShadowLayer>
-        <ContactShadow x={B.x} y={BASE} w={B.w * 0.84} at={LIGHT_AT} />
-        <CastShadow x={B.x} y={BASE} w={B.w * 0.8} h={B.h} at={LIGHT_AT} />
-      </ShadowLayer>
       <Tier tier="environment">
         <Fill d={BODY} color={iron} seed="s1pipBollardBody" />
         <Fill d={CAP} color={iron} seed="s1pipBollardCap" />
@@ -111,11 +117,11 @@ export const S1Pip: React.FC = () => {
  *  Facing back: it watches her across the water. The same beats as on the bollard (drawn with the flood, ears-cover on
  *  "life", sits at 5.55). Drawn by V2S1_fore's planter between the lobes. */
 export const S1_PIP_TREE = {seat: [184, 1446] as [number, number], size: 100} as const;
-export const S1PipInTree: React.FC = () => {
+export const S1PipInTree: React.FC<{seat?: [number, number]}> = ({seat = S1_PIP_TREE.seat}) => {
   const t = useTime();
   const sw = useSwitches();
   if (t < S1_PIP.from) return null;
-  const [x, y] = S1_PIP_TREE.seat;
+  const [x, y] = seat;
   return (
     <Look ink={!sw.lineOff}>
       <PipTrack

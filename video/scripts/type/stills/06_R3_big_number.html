@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_NIGHT}}') center/cover no-repeat}</style></head>
+<body><div id="stage"></div>
+<script>
+// R3 the big number as THE LIT HAND (PLEASANT.md): "70,000" pops 2.300 s (frame 138), "homes?" builds 3.383 s (frame 203),
+// both on to 4.233 s. The hand's Bold 250 px (figures ~130 px tall) in the windows' honey light with the golden glow; the
+// hand's comma sits loose, so "70", the comma tucked in, "000", centred near x 466; "homes?" in the hand, edge x 930.
+window.__ready = TYPE.run(() => {
+  const S = TYPE.stage(), tone = 'night', f = {role: 'hand', size: 250, track: -0.02, tone, stress: true};
+  const m1 = TYPE.measure('70', f), mc = TYPE.measure(',', f), m2 = TYPE.measure('000', f);
+  const g1 = 0.02 * f.size, g2 = 0.05 * f.size;
+  const x0 = 466 - ((m1.right - m1.left) + g1 + (mc.right - mc.left) + g2 + (m2.right - m2.left)) / 2;
+  const a = TYPE.text(S, {...f, t: '70', x: x0, y: 482});
+  const c = TYPE.text(S, {...f, t: ',', x: a.x1 + g1, y: 482});
+  TYPE.text(S, {...f, t: '000', x: c.x1 + g2, y: 482});
+  TYPE.text(S, {t: 'homes?', x: 930, y: 578, anchor: 'end', role: 'hand', size: 116, tone});
+});
+</script></body></html>

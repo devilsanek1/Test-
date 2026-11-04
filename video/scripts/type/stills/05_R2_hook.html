@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><script src="../lib/type.js"></script>
+<style>html,body{margin:0;padding:0}#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:url('{{BG_NIGHT}}') center/cover no-repeat}
+.lab{position:absolute;font-family:'Jost';font-weight:400;font-size:30px;letter-spacing:0.04em;color:rgba(255,240,222,0.78)}</style></head>
+<body><div id="stage"></div>
+<script>
+// "Did you know" on screen at frame 0; "Helsinki" builds at 0.600 s (frame 36, 2 frames before 0.64 s)
+window.__ready = TYPE.run(() => {
+  const S = TYPE.stage(), tone = 'night';
+  TYPE.text(S, {t: 'Did you know', x: 120, y: 395, role: 'hand', size: 136, tone});
+  TYPE.text(S, {t: 'Helsinki', x: 400, y: 525, role: 'hand', size: 136, tone});
+});
+</script></body></html>

@@ -1,0 +1,70 @@
+<!doctype html><html><head><meta charset="utf-8"><title>How an agent uses the repo</title>
+<style>
+:root{--ink:#2b2433;--muted:#6b6275;--bg:#f6f1ea;--card:#fff;--warm:#e8774a;--warm2:#fbe3d6;--cool:#5b6fa8;--cool2:#e1e6f5;--green:#3f8f6b;--green2:#dcefe5;--grey2:#ece7e1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:20px/1.35 -apple-system,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);width:1080px;padding:44px 40px 40px}
+h1{font-size:44px;margin:0 0 6px}.sub{color:var(--muted);font-size:22px;margin-bottom:26px}
+.box{background:var(--card);border-radius:18px;padding:18px 22px;box-shadow:0 1px 0 rgba(0,0,0,.06);margin:0}
+.tag{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 10px;border-radius:999px;margin-bottom:8px}
+.always{border:3px solid var(--warm)}.always .tag{background:var(--warm);color:#fff}
+.guard{display:flex;gap:12px;margin:12px 0 0}.guard div{flex:1;background:var(--warm2);border-radius:12px;padding:10px 14px;font-size:17px}
+.arrow{text-align:center;font-size:30px;color:var(--muted);margin:6px 0;line-height:1}
+.step{display:flex;gap:16px;align-items:flex-start}.n{flex:0 0 46px;height:46px;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;font-size:24px;display:flex;align-items:center;justify-content:center}
+.step b{font-size:23px}.step p{margin:4px 0 0;color:var(--muted);font-size:18px}
+.row{display:flex;gap:14px}.row>.box,.row>div{flex:1}
+.tool{background:var(--cool2);border-radius:12px;padding:9px 12px;font-size:17px;margin-top:8px}.tool b{font-size:18px}
+.loop{border:3px solid var(--green)}.loop .tag{background:var(--green);color:#fff}
+.v{display:flex;gap:10px;margin-top:10px}.v div{flex:1;border-radius:12px;padding:10px 12px;font-size:17px;background:var(--green2)}
+.side{background:var(--grey2)}.foot{display:flex;gap:12px;margin-top:22px}.foot div{flex:1;background:var(--card);border-radius:14px;padding:12px 14px;text-align:center}
+.foot .big{font-size:34px;font-weight:800}.foot .lbl{font-size:16px;color:var(--muted)}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.88em;background:#f1ece6;padding:1px 6px;border-radius:6px}
+</style></head><body>
+<h1>How an agent uses the repo</h1>
+<div class="sub">Feeling first. Read one page, plan on one card, browse the toolbox for inspiration, judge by the feeling.</div>
+
+<div class="box always"><span class="tag">Every agent, automatically</span>
+<div class="step"><div class="n">0</div><div><b><code>CLAUDE.md</code>: the one page (~1,000 words)</b>
+<p>The rules above all (worth pausing on; readable ideas; frames made whole; start from the feeling, never a number; one film) · how a film is made · the only hard constraints · where the tools are.</p></div></div>
+<div class="guard"><div><b>Guard:</b> every agent at max effort (hook)</div><div><b>Guard:</b> a brief that hands over a look number as a target is stopped (hook)</div></div></div>
+<div class="arrow">↓</div>
+
+<div class="box"><div class="step"><div class="n">1</div><div><b>The brief: the beat and its FEELING, in words</b>
+<p>What happens, what the viewer should feel, where the life and action are. No percentages, no positions.</p></div></div></div>
+<div class="arrow">↓</div>
+
+<div class="box"><div class="step"><div class="n">2</div><div><b>Plan on the frame card</b> <code>docs/look/FRAME_CARD.md</code>
+<p>Questions, feeling first: the moment · the idea · life and action · the eye · space and scale · light and why · shapes and paint · words · motion and sound · the hand-off · the test.</p></div></div></div>
+<div class="arrow">↓</div>
+
+<div class="box"><div class="step"><div class="n">3</div><div><b>Imagine the frame WHOLE</b>
+<p>The idea, the world, the light, the people, the words as one picture, invented for this story.</p></div></div></div>
+<div class="arrow">↓</div>
+
+<div class="box" style="border:3px solid var(--cool)"><div class="step"><div class="n" style="background:var(--cool)">4</div><div><b>Then browse the toolbox for inspiration</b> via <code>DESIGN_LANGUAGE.md</code>
+<p>"Oh yeah, we could do it like this." Tools and recipes, never templates; their numbers are examples of what worked once.</p></div></div>
+<div class="row" style="margin-top:6px">
+<div><div class="tool"><b>Composition library</b><br>relationships, the owner's reel ideas first</div><div class="tool"><b>Paint recipes</b><br>the painted look, brushwork</div><div class="tool"><b>Light &amp; palette</b><br>one story light, one colour key</div></div>
+<div><div class="tool"><b>People &amp; type</b><br>the people in use, the words on screen</div><div class="tool"><b>Sound sync</b><br>where a sound meets the picture</div><div class="tool"><b>References</b><br>take their craft, leave their mood</div></div>
+</div></div>
+<div class="arrow">↓</div>
+
+<div class="box"><div class="step"><div class="n">5</div><div><b>Build it with the engine</b> <code>video/src</code> · <code>video/scripts</code>
+<p>Remotion scenes, the painter, the light solve, the people, captions.</p></div></div></div>
+<div class="arrow">↓</div>
+
+<div class="box loop"><span class="tag">The frame loop</span>
+<div class="step"><div class="n" style="background:var(--green)">6</div><div><b>A fresh evaluator writes "The feeling it gives: …" first</b>
+<p>Compared with the beat's feeling, at phone size. Numbers only explain a gap the eye found.</p></div></div>
+<div class="v"><div><b>THERE</b><br>move on</div><div><b>ALMOST</b><br>adjust, at most twice</div><div><b>NOT THERE</b><br>rework the idea once, then options to the owner</div></div></div>
+<div class="arrow">↓</div>
+
+<div class="row">
+<div class="box side"><b>Checks catch mistakes only</b><p style="margin:4px 0 0;color:var(--muted);font-size:17px">captions readable and in their band, app buttons clear, voice in sync, no banding. Look numbers are reported, never fail.</p></div>
+<div class="box side"><b>The owner's eye decides</b><p style="margin:4px 0 0;color:var(--muted);font-size:17px">his notes are captured as the FEELING and the tools, in his words (playbook / OWNER_NOTES), never as a number.</p></div>
+</div>
+
+<div class="foot">
+<div><div class="big">~1k</div><div class="lbl">words every agent reads</div></div>
+<div><div class="big">~16k</div><div class="lbl">for frame work (card, design language, DIRECTION, playbook)</div></div>
+<div><div class="big">~152k</div><div class="lbl">the whole toolbox: consulted, never pre-loaded (shrinking, PLAN step 7)</div></div>
+</div>
+</body></html>

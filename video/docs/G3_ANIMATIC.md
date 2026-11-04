@@ -31,7 +31,8 @@ one grey shadow value). The reel is staged in one world space (the home place an
 board's PEN is thrown away: the film is drawn with the clean pen (`CRAFT.md` §c), never the sketch pen.
 
 G3 **IS NOT**: colour, final line, texture, easing micro-tuning, overshoot/settle/secondary motion, faces (people have
-none at any gate, playbook: the pose acts; the mascot's face is part of its drawing), real detail anywhere (windows, signage, crowds are marks, never drawings — identity-critical elements
+none on the board: the pose acts; the film's generic LASH face comes with the kit from G4, `docs/look/PEOPLE_DESIGN.md`,
+owner 2026-10-30; the mascot's face is part of its drawing), real detail anywhere (windows, signage, crowds are marks, never drawings — identity-critical elements
 excepted, §3). Loose in precision, dense in
 suggestion: the backbone (big shapes, framing, timing, counts) is exact; the skin is scribble (`animatic_sketchlook.md` §0).
 
@@ -59,6 +60,7 @@ edit, never silently inside a build (`animatic_mograph.md`).
 | Scale + cozy moments | near-final composition | home-base room tone, the one big move, the scale ladder, haze-band/shrinking-rows as grey dress | STORYBOARD_STYLE §7 checks |
 | Hook / frame 0 | near-final | frame 0 = the scene being drawn: the subject's lines draw on (B's mid-grey lines with them), then the tones land (C as pale flat tone), the captions in the voice's order (the payoff in words by ~2 s; no title over them), voice from the first frames (the first word at ~0.12 s), expectation-then-reality played through the subject's own build | first-3s watch; playbook Hook rules; `DIRECTION.md` rule 9 |
 | Captions / timing | final | locked VO, pop captions, word-anchored cuts; reel at full runtime, 60 fps | gate check; full-reel watch |
+| Sound sync | near-final (FROZEN) | the sync plan PLAYED with placeholder sounds: the hook's count (three sounded changes, a fourth a little late), the trigger in the first second, the hold and the release in its written pause, the thread's sound; each board `sfx` cue with a `type` and its event, on the event's first visible frame (`look/SOUND_SYNC.md`) | the sync check list (`look/SOUND_SYNC.md` §4); the sound-on read at 1x, on a phone's own speaker |
 | Colour, texture, final line, easing feel | ABSENT | — | deferred to G4/G5/G6 by design; the hand-off says so |
 
 ## 3. Placeholder vocabulary: loose never means empty
@@ -116,13 +118,14 @@ G5 adds no new motion — only colour, line, easing polish, secondary motion (`a
   frames (snap()/pops exempt). Both end frames pass the STORYBOARD_STYLE §5 checklist as stills.
 - **Drawn actions are a pose test, not tweens**: 2-4 held key poses per shot, popping on their words (held 0.3-1.5 s),
   stepped — never an eased body slide. A fast transit is ONE smear drawing (silhouette stretched along the path) held
-  2-3 frames between the keys. People carry no faces (playbook: like reference 1's, the pose acts); mitten hands
+  2-3 frames between the keys. People carry no face marks on the board (the pose acts; the film's generic LASH face
+  comes with the kit: `docs/look/PEOPLE_DESIGN.md`, owner 2026-10-30); mitten hands
   always, dropped in motion poses. No volume lint (precision the owner waived): the cold read checks that the subject stays
   the same size and on its ground line across a shot's poses unless the change is the idea.
 - **Ambient life**: every set panel carries 2-3 ambient micro-moves (`loop: true`: weather, a cloud, steam, a window
   lighting, a bird; at most one of them a periodic prop such as a swinging sign, `LIFE_AND_DENSITY.md` §6), placed and
-  scaled from a **shared kit of 3-5 presets** (cloud drift, steam, window-light switch, bird tick) — never authored fresh per panel (building
-  the kit is the `loop: true` item in §7). Zero ambient elements on a set panel is a lint FAIL (§2 freezes 2-3 as contract).
+  scaled from a **shared kit of 3-5 presets** (cloud drift, steam, window-light switch, bird tick) — never authored fresh per panel (built
+  2026-10-30: `src/lib/g3/ambient.tsx`, snow, steam, window lights, cloud, water in a pipe, birds). Zero ambient elements on a set panel is a lint FAIL (§2 freezes 2-3 as contract).
   They are supporting life at their tier and at FINAL size and speed (B near the story, C for weather and far life:
   `CRAFT.md` §b), so the mover budget (§2) shows on the board; they take turns (~0.6 entries/s), and none enters in the
   0.4 s around a cut (what already moves keeps its pace).
@@ -156,18 +159,21 @@ only as a declared exception for time passing (0.2-0.4 s, up to 1-2 s), named in
 | wipe (object-wipe) | the wiping element already exists in panel A, with its travel direction |
 | dissolve / dip / flash (a declared exception, never a carrier) | the relationship named ("time passes"); duration per the rule above |
 
-## 5. Build order and time budget (first full animatic ~3 h, ASSUMING §7 tier-1 tooling is built: not yet on 2026-10-27; rounds 30 min)
+## 5. Build order and time budget (first full animatic ~3 h, ASSUMING §7 tier-1 tooling is built: built 2026-10-30 as the shared kit `src/lib/g3/`; rounds 30 min)
 
-With script + voice locked (word timings = the clock), the through-line card approved with the script and the W1 world
-bible written (`PIPELINE_V2.md`); per-step budgets sum to the ~3 h (was 2; the hour goes to tiers, carriers and the
+With script + voice locked (word timings = the clock), the through-line card approved with the script, the W1 world
+bible written and the visual script locked (G2.5, `PIPELINE_V2.md`; method `docs/v4/visual/METHOD.md`); per-step budgets sum to the ~3 h (was 2; the hour goes to tiers, carriers and the
 light marks):
-1. **Story/beat pass** (~10 min, orchestrator): starts from the through-line card (the thread and its home spot, the
-   home place, the one "you", the mascot rule, a carrier per join). One sentence per panel, cut words chosen in the VO's
-   breaths, metaphor per scene locked in text BEFORE drawing (a dozen script drafts is normal, a dozen re-boards is
-   not). Vary cut rhythm: fast around the conflict, one breathing shot after the payoff; three near-equal durations in a
+1. **From the visual script** (~10 min, orchestrator): one panel per locked block of the visual script (G2.5), with
+   its cut words, key actions, moves, joins, carriers and each scene's picture already locked in text (each block
+   carrying its composition-and-motion pass: the frame device, the move within and the join by their
+   `COMPOSITION_SHOTS.md` codes, `docs/vN/visual/COMPOSITION_PASS.md`; and its sync points, `SOUND_SYNC.md` §4); a change
+   reopens the visual script (starred, dated). Before G2.5 existed this was the story/beat pass from the through-line
+   card: one sentence per panel, cut words in the VO's breaths, metaphor per scene locked in text BEFORE drawing (a
+   dozen script drafts is normal, a dozen re-boards is not). Vary cut rhythm: fast around the conflict, one breathing shot after the payoff; three near-equal durations in a
    row is a pacing smell; shots average >= 3.5 s (`CRAFT.md` §a timing).
-2. **Camera plan** (~30 min; `docs/vN/camera_plan_g3.md`, one row per panel): shot type, framing, cozy/scale, move with
-   its five values, transition device and its carrier, the tier map (what is A, B and C), the set's rig (key side,
+2. **Camera plan** (~30 min; `docs/vN/camera_plan_g3.md`, one row per visual-script block, adding only the numbers:
+   offsets, scale %, px): shot type, framing, cozy/scale, move with its five values, transition device and its carrier, the tier map (what is A, B and C), the set's rig (key side,
    pools: from the world bible), `life:` list, promise line. This is the contract draft.
 3. **Thumbnails** (~30 min): 3 variants per beat at 270x480 on one contact sheet, picked by checklist (two-pass:
    scribble for energy, volume pass only on survivors — discard at pass 1), plus one drawn midpoint frame per join.
@@ -199,7 +205,9 @@ contract column (cuts, framing, moves, transitions and carriers, the thread, tie
   this place feel inhabited — what's missing from the room?" and "is your eye still on the subject — what competes
   with it?" (fullness never at the subject's expense: `CRAFT.md` §b).
 - **Motion check, sound on, at 1x**: every move readable (no strobe; this pass resolves the §4 speed WARNs), every cut
-  lands on its word, cuts judged in PAIRS with their neighbours, pacing varies. The reader also answers "where is your
+  lands on its word, cuts judged in PAIRS with their neighbours, pacing varies; every sync point lands on its event and
+  is heard, the hook's count reads as three and a late fourth, the release is felt (`look/SOUND_SYNC.md` §4). The reader
+  also answers "where is your
   eye, every 2 s?" (it is on that beat's tier-A subject) and "what carried you across each cut?" (the declared carrier;
   `CRAFT.md` §a-b). Each pass runs ONCE, then one batched fix round (§5 step 7); remaining ambers ship named in the
   hand-off, never a second internal loop.
@@ -222,9 +230,10 @@ contract column (cuts, framing, moves, transitions and carriers, the thread, tie
 **Already exists**: 7 transition types played; element moves + eases; one camera segment; 9 poses; draw-on/fillIn; notes
 strip; red marks; box/band/count/zoom lint; contact sheets; g5 scaffold; **`{t:'scribble'}` masses (built 2026-10-27,
 owner-approved texture)**. Scribble masses, flat mid-grey rects + figure rows cover the first reel's placeholders (§3). **Tier 1 is a ONE-TIME checkpointed tooling lane, landed before the next video's G3
-and outside the gate budget (not built yet on 2026-10-27: SketchReel, `board_lint.py` and `g5_scaffold.py` have no
-dress, loop, life, carrier, tier, rig or thread handling; who and when: `PIPELINE_V2.md` "Craft tooling lane"); the §5
-~3 h first cut assumes only tier 1 exists. Tier 2 is built lazily, the first time a
+and outside the gate budget (BUILT 2026-10-30 for video 4 as the SHARED kit: `src/lib/g3/` (the reel, its schema
+`types.ts`, the ambient kit) + `scripts/g3/board_lint.py` + `scripts/g3/g3kit.py`, how-to `src/lib/g3/README.md`, every
+row below but two, still to build: `g5_scaffold.py`'s carry-through and the eye-jump / colour-shift measures; who and
+when: `PIPELINE_V2.md` "Craft tooling lane"); the §5 ~3 h first cut assumes only tier 1 exists. Tier 2 is built lazily, the first time a
 reel needs it — never ahead of a reel.** Nobody builds tooling before drawing panels the existing kit can draw.
 
 | Tier 1 — required before the next G3 (all fix the v3 failure directly) | Where | Effort |
@@ -248,7 +257,7 @@ reel needs it — never ahead of a reel.** Nobody builds tooling before drawing 
 | Tier 2 — build when a reel first needs it | Where | Effort |
 |---|---|---|
 | `crowd-row` / `facade-row` / `window-ticks` / `foliage-blob` when a reel's density key demands them (`scribble-mass`: BUILT 2026-10-27, owner yes) | SketchReel | M |
-| `camera.keys?: Cam[]` (multi-key camera) + board-mode parallax behind `shot.parallax: true` | SketchReel | M |
+| `camera.keys?: Cam[]` (multi-key camera: BUILT 2026-10-30 with each segment's peak and pivot, video 4's moves having starts, peaks and landings) + board-mode parallax behind `shot.parallax: true` | SketchReel | M |
 | Per-device transition checks (§4 table), one device at a time, when a camera plan first uses it (a 10-12-shot reel uses 2-4 of the 8) | board_lint | S each |
 
 **Dropped**: the volume/contact lint (polices precision the owner waived; the cold read covers it, §4). **Line boil**:

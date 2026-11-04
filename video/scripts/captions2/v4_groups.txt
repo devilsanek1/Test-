@@ -1,0 +1,76 @@
+# Video 4's words on screen (docs/look/TYPE_GUIDE.md, PICKED 2026-10-30): the grouping, the recipes, the stress.
+#   python3 scripts/captions2/build_captions.py scripts/captions2/v4_groups.txt      ->  public/v4/captions2.json
+# The recipes the guide's examples name for video 4: R2 the hook at frame 0, R3 the numbers (70,000; 40), R4 "wants"
+# (the turn), R5 "hot." (the quiet lift), R6 "That's a lot / of tea.", R7 the "2027" tag (a world word, on the plan's
+# wall), R8 through the big move (S6, seat C), R9 the payoff ("heat"); every other group R1, its seat walking (auto).
+# Shots, their starts and each block's caption line: docs/v4/visual/VISUAL_SCRIPT.md (v3, locked for G3); the cut on
+# "But" at frame 1402 (its sound plan: "H 23.37 (f1402)"). Syntax: build_captions.py's docstring.
+# Calls made here (each flagged by the builder; the G3 watch judges them): S4 and S8 keep the stagger only as wide as
+# the frame allows (34-44 px: their second lines are 804-813 px); S8 merges "The city has a plan" + "to use it," as the
+# guide's section f.5 and v3 say (8 words on screen: the 2-group alternative runs 23.8 cps and 0.73 s); S11 sets the
+# hand's own spacing (track 0, an exception) so v3's "Then pipes / under the streets" fits (863 px at +0.02 em; the
+# frame holds 848); S7's lockup pops on the cut (f1402), as v3 asks ("within 2 frames of the cut"); S9 keeps "So how
+# would / that work?" (v3 wrote "So how / would that work?": its second line is 852 px, over the 830 max);
+# S10 and S11 break "out of / its computers" and "into / people's homes." (Netflix: never a determiner from its noun);
+# S6 keeps the guide's "to blow that / heat outside." (the only break that fits that group).
+@film v4
+@words public/v4/voice_words.json
+@out public/v4/captions2.json
+@tone dark
+@key heat
+@cover Your chatbot / could *heat* / an apartment / in Helsinki.
+@world R7 2027 at=next until=how width=280 object="a paper tag pinned to the plan's front wall (S8)"
+
+@shot S1 0.00 WIDE
+R2 x=120,400         | Did you know / +Helsinki
+R2 seat=R            | wants AI / to heat
+R3                   | [70,000](seventy thousand) / +homes?
+
+@shot S2 4.28 WIDE-MEDIUM
+R1 seat=C            | AI actually runs
+R1 seat=L            | on giant / computers,
+R1 seat=R            | in buildings / called
+R1 seat=C            | data centers.
+
+@shot S3 8.76 CLOSE
+R5 seat=C            | Those computers / +get +really +*hot.*
+
+@shot S4 10.96 MEDIUM
+R1 seat=auto         | To put it / +into perspective,
+R1 seat=auto         | just one of / these computers
+R1 seat=auto         | makes as much / heat as
+R3                   | [40](FORTY) / +kettles,
+R1 seat=auto         | boiling / non-stop.
+
+@shot S5 17.76 CLOSE
+R6                   | That's a lot / +of +tea.
+
+@shot S6 19.26 CLOSE-EXTREME-WIDE
+R8                   | Normally, / +data centers
+R8                   | just use / big fans
+R8                   | to blow that / heat outside.
+
+@shot S7 23.46 WIDE
+R4 pop=f1402         | But Helsinki / +*wants* / +that heat.
+
+@shot S8 25.54 MEDIUM
+R1 seat=auto         | The city has / a plan +to use it,
+R1 seat=C            | starting / next year.
+
+@shot S9 28.34 CLOSE
+R1 seat=auto         | So how would / that work?
+
+@shot S10 29.56 CLOSE
+R1 seat=auto         | A big new / data center
+R1 seat=auto         | would take / the heat
+R1 seat=auto         | out of / its computers
+R1 seat=auto         | with water / in pipes.
+
+@shot S11 34.46 MEDIUM
+R1 seat=auto track=0 | Then +pipes / +under the streets
+R1 seat=auto         | carry that heat
+R1 seat=auto         | into / people's homes.
+
+@shot S12 38.48 WIDE-POV
+R9                   | So your chatbot / +could soon +*heat*
+R9.last              | an apartment / in Helsinki.

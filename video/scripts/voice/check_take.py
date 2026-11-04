@@ -27,12 +27,13 @@ def num_words(n):
     return str(n)
 
 
-def tokens(text):
-    """normalised word tokens: lowercase, digits and % spelled out, punctuation dropped"""
-    text = re.sub(r'(?<=[a-z])(?=\d)', ' ', text.lower())
-    text = text.replace('%', ' percent').replace('u.s.', 'us')
-    text = re.sub(r'\d+', lambda m: num_words(int(m.group())), text)
-    return re.findall(r"[a-z']+", text.replace("'s", "s").replace("’s", "s"))
+def tokens(text, expected=None):
+    """normalised word tokens (textnorm.py): lowercase, punctuation dropped, numbers spelled out the way the script
+    says them ("70 000" -> "seventy thousand", "2010" -> "twenty ten"); before 2026-10-29 "70 000" became
+    "seventy zero" here"""
+    sys.path.insert(0, str(Path(__file__).parent))
+    from textnorm import tokens as _tokens
+    return _tokens(text, expected)
 
 
 def whisper_window(take, a, b):
@@ -59,13 +60,13 @@ def main():
     subprocess.run([sys.executable, '-I', str(here / 'transcribe.py'), take, model, str(words_path)], check=True, capture_output=True)
     tw = json.loads(words_path.read_text())
     # each transcript word may expand to several tokens ("10%" -> ten percent); keep its time on every token
-    tt, tt_time = [], []
-    for w in tw['words']:
-        for tok in tokens(w['w']):
-            tt.append(tok)
-            tt_time.append((w['s'], w['e']))
     script = re.sub(r'\[[^\]]*\]', ' ', open(paste, encoding='utf-8').read())
     st = tokens(script)
+    tt, tt_time = [], []
+    for w in tw['words']:
+        for tok in tokens(w['w'], st):   # a number takes the script's reading ("heat70,000" -> heat seventy thousand)
+            tt.append(tok)
+            tt_time.append((w['s'], w['e']))
     ops = difflib.SequenceMatcher(a=st, b=tt, autojunk=False).get_opcodes()
     extras, missing = [], []
     for op, a0, a1, b0, b1 in ops:

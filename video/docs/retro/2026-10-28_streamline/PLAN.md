@@ -25,6 +25,9 @@ or an MD5 against the delivered v2r master (a re-render of it is byte-identical,
 - **The meter itself over-counts about 2.4x** (usage repeated per transcript line): v1's "12.5 B tokens" is about 5 B. Fixed in Phase 1 (spend.py v2).
 
 ## Phase 1: safe now (no pixel changes; each checked by an MD5 or a 0-pixel diff)
+**DONE 2026-10-29 to 11-04** (approved 2026-10-29: "okay proceed yes"): items 1-8 as below, except item 6's resumable
+workflow steps and image budget and item 7's per-gate onboarding, which stayed rules in PIPELINE_V2 (no code); what
+changed for production: `CHANGES.md`; the proofs: `phase1_*.md`. The delivered v2r master re-renders byte for byte.
 1. **Fix the spend meter** (dedupe per API call; per gate and per role), so every saving below is measured. (S)
 2. **Gate videos through `render-media.mjs`, never the bare CLI; drop `swangle`.** CLI cuts go from hours to minutes
    and match the master's pixels. (S)

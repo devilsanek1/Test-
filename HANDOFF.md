@@ -1,5 +1,18 @@
 # HANDOFF: start here if you are a new agent picking up this project
 
+> **NEWEST, 2026-10-31: the studio moved to a new repo, `fuss-studio` (the owner's GitHub account), organized from
+> scratch as a studio (vision, two departments, one card per role). This repo is now the ARCHIVE: pull a piece over only
+> when a role in the new repo needs it.**
+
+> **NEWEST, 2026-10-31 ~01:00 UTC: the guides go feeling first and get SMALL, step by step: `video/docs/process/PLAN.md`**
+> (owner: "170k words of guides is absolutely bananas / ... make sure we have this plan captured so that I can delegate it to
+> the next agent"). Step 1 is done; start at step 2. Why: `video/docs/process/EVALUATION.md`. The look study's last
+> state (painter v7, the composition library, sound sync): `video/docs/studies/2026-10-28_city_posters/HANDOVER.md`.
+> How an agent is expected to use the repo, in one picture: `video/docs/process/how_agents_use_the_repo.png`.
+
+> **NEWEST, 2026-10-30 ~22:45 UTC (video 4, Helsinki heat, under the new loop): read `context/RESUME_2026-10-30.md`
+> first**: what the owner decided today, the two rounds that were running and how to resume them, and what is next.
+
 > **Status 2026-10-28 19:55 UTC (video 2, "One Small Window"):** the G7 master v1 (`video/deliverables/v2/v2r_G7_master_v1.mp4`), the
 > cover and `video/docs/v2/POSTING_KIT.md` are done and with the owner; the week's budget is at ~97 %. The story of how it got here:
 > `video/docs/v2/PROGRESS.md` (newest first), the owner's notes `video/docs/v2/OWNER_NOTES.md`, open items `video/docs/v2/ASSEMBLY_TODO.md`.
@@ -93,7 +106,10 @@ scratch.
   `video/docs/v1/script/sources.md` / `fact_sheet.md`, and the timing is in `video/docs/v1/timing.md`.
 - **The film:** **`video/deliverables/v1/php2shell_final.mp4`** (1080x1920, 30 fps, 55.37 s, loops seamlessly, -14 LUFS).
   The cover is `video/deliverables/cover.png`, the posting texts are in `video/docs/POSTING_KIT.md`, and the profile
-  pictures (mascot Pip) are in `video/deliverables/profile/` (the avatar in use is `pip_power_button.png`).
+  pictures (mascot Pip) are in `video/deliverables/profile/` (the avatar in use is `pip_power_button.png`). **The studio logo is FINAL (owner, 2026-10-29: "Logo is done"): The Peel** (a speech bubble with its corner peeled back,
+  coral and ink, no text, no elephant): the pack to upload is `video/deliverables/brand/peel/` (`peel_avatar_1080.png`
+  replaces the Pip avatar), the sheet `video/deliverables/brand/logo_final.png`, the SVGs and generator
+  `video/brand/logo/`, the spec and every round's verdict `video/docs/brand/LOGO.md`.
 - **Built from:**
   - Remotion composition `Main`, entry `src/entry-film.ts`, scenes S01-S12 in `src/scenes/` (archived 2026-10-29:
     `video/archive/v1/src/`, in place at the `v1-final` commit (`76c166c1`)), notes per scene in `video/docs/v1/scenes/`.
@@ -188,11 +204,17 @@ scratch.
   conclusions into the main repo": this study is merged into `video-production` as it goes, and its conclusions are
   integrated into the main docs when the synthesis lands.
 - **Decided (2026-10-29 ~04:20 UTC, the owner: "Go with your suggestions"):** every open call of the study: no outlines
-  (edges from light and shade, the subject's shade face the deepest), real darks 6-10 % in many small pieces, the
+  (edges from light and shade, the subject's shade face the deepest), real darks 6-10 % in many small pieces (superseded 2026-10-30 by the references' low key, built in painter
+  v7: `docs/look/DIRECTION.md` rule 6), the
   "low poly" patchwork as tier C's build, the designed view in two frames a film, a quiet "find Pip", the sun toned,
   2 px lines on floating layers; `docs/look/LAYOUT.md` is the one layout guide (DIRECTION, CRAFT, LAYOUT, the playbook;
   `INTEGRATION.md` §2). All are first judged in the 7 s look test of v2's canal opening, built in four parallel lanes
   (the study's `HANDOVER.md`).
+- **The look test v1 (2026-10-29 ~17:00 UTC), sent to the owner:** `video/deliverables/tests/poster_look_test_v1.mp4`
+  (Before: v2's S1; After: every decision) + `test/ab_switches.jpg` (each switch alone; the 10b palette as the one
+  proposal), after an independent review panel (FIX_FIRST, one fix pass: `test/REVIEW.md`, `test/REPORT.md` §8-9).
+  Still short: the copies' row separation without outlines (~8 L* vs 15: the owner's call). New opt-in engine pieces
+  for the production sessions: `video/docs/studies/2026-10-28_city_posters/test/FOR_PRODUCTION.md`.
 - **Then (2026-10-28 ~22:30 UTC):** "our look is evolving - we are finding out style i don't think we can overfixate on
   this" (ONE LOOK, ONE BRAND is a direction, not a freeze) and Pip "would be good to keep it, but ... way more subtle
   perhaps hide it deliberately in the video": Pip stays, hidden on purpose, no longer on both sides of every join
@@ -206,6 +228,45 @@ scratch.
   in another session"). Both films are at G1, nothing written yet: start from `video/docs/v4/script/WRITER_BRIEF.md` and
   `video/docs/v5/script/WRITER_BRIEF.md` (one writer each, then a critic and a fix pass). All of it is on branch
   `claude/compassionate-hopper-5iqguj`, not yet merged into `video-production`.
+
+- **2026-10-29 ~10:05 UTC: video 4 is produced by session https://claude.ai/code/session_01VwsUCnkJXFuq3YwEYFUg7o** (owner: "lets
+  work on the video 4 - pick up where its been left off"), branch `claude/kind-pascal-lvgsza`. 2026-10-30: G1 and G2 locked
+  (the voice: the owner's own ElevenLabs read, pauses shaped); the new G2.5 VISUAL SCRIPT (owner: "brainstorm a story and
+  like a visual script with what happens on the screen and camera movements"; `video/docs/v4/visual/`, method
+  `METHOD.md`) sent to the owner; next G3. New tools: `scripts/voice/{textnorm,shape_take,measure_take,take_page,
+  check_clarity}.py`. Live state: `video/docs/v4/README.md`. Video 5 still waits at G1 (`video/docs/v5/script/WRITER_BRIEF.md`).
+  2026-10-30: video-production merged into the branch (the painted look, the production/iteration modes); the style
+  adjustments to the visual script (`video/docs/v4/visual/STYLE_ADJUSTMENTS.md`) wait to be folded in before G3. **The
+  words on screen** (owner, 2026-10-30: fonts and caption placement "premium, more interesting, dynamic and more
+  engaging"): an iteration (research, the guide `video/docs/look/TYPE_GUIDE.md` DRAFT with 10 recipes, 14 stills in
+  `video/docs/look/type/stills/`, tooling `video/scripts/type/`), sent on https://claude.ai/artifact/1magumGxnA4TGdeEQPc1Hv;
+  after the owner's "blood message on the wall" note the stress became the lit hand (`type/PLEASANT.md`); the owner
+  handed the pick over ("you pick your best option for maximum engagement and pleasantry and user attention
+  retention"): **PICKED and applied** (TYPE_GUIDE status; LAYOUT, DIRECTION rule 10, G5_BLOCKING, the playbook). Still to
+  do: the code (font.ts, theme.ts, Captions.tsx, capcheck: LAYOUT "The code must match") with the tooling lane before
+  v4's G3; the motion judged in v4's G4 look clip. **People, iteration 2** (owner: hair "never really static or like
+  one firm ... a little messy, unstructured wavy", better proportions and stature): research, `RECIPE.md` and stills in
+  `video/docs/look/people_design/hair_v2/`, code `video/src/look/people_dirs/hair_v2/` + `src/entry-look-people-hair.tsx`,
+  sent on https://claude.ai/artifact/1Xerf8RzpVF8WnH2PYEN8b; waiting on the owner (the mess, the cuts, the stance) and
+  more hair references; on a yes, fold RECIPE.md into PEOPLE_DESIGN §5.1/§5.4/§5.9, then a hair motion clip.
+  Then the owner rejected v2/v3 ("incoherent", "garbage"): the evaluation `people_design/EVALUATION.md`, the overhaul v4
+  (hair as authored shapes on a spring rig `src/look/people_dirs/hair_v4/`, faces redrawn `people_v4/`, assembled
+  `entry-look-people-v4.tsx`; stills `people_design/hair_v4/final/`) sent on the same page (version 3) with the bodies
+  marked not done; the bodies round runs (`people_design/bodies_v4/`). Waiting on the owner: hair on track? LASH or
+  open eyes? Then PEOPLE_DESIGN gets the picked system. **Picked (2026-10-30):** hair v4 kept, open eyes, the bodies
+  round kept ("let's go with that for now"): PEOPLE_DESIGN's status block names the code; wiring it into the film
+  engine is the tooling lane's, before v4's G3 draws its person.
+- **2026-10-30 ~20:55 UTC: one state for video 4's production** (owner: "Make sure to commit all your changes so that we
+  can start working on production video 4 in parallel while you are showing the results"). The study session merged
+  video 4's branch with its own work; `claude/kind-pascal-lvgsza`, `claude/compassionate-hopper-5iqguj` and
+  `video-production` carry the same docs (typecheck clean). What video 4's G3 picks up from the study:
+  the ranked composition library `video/docs/look/COMPOSITION_SHOTS.md` (Part 0 tiers, 0b guidelines and the motion and
+  transition grammar; its critic's fix pass still runs, so re-pull before G3 locks); `video/docs/look/SOUND_SYNC.md`
+  (the sync plan written at G1/G2, played at G3; wired into PIPELINE_V2 and the gates); the Helsinki
+  composition-and-motion pass `video/docs/v4/visual/COMPOSITION_PASS.md` (a FIRST DRAFT: its critic and fix pass run in
+  the study session and land on this branch); `STYLE_ADJUSTMENTS.md`; the look's first integrated still (painter v7,
+  scene 1 of the Google film: `video/docs/studies/2026-10-28_city_posters/paint_test/`, v7a done, v7 running), which
+  sets G4's look; the dark key is T3 (ORGANIC.md §8 end, decided under the owner's hand-over).
 
 ### Earlier: video 5 as the heat story
 - **Video 5 is produced by session https://claude.ai/code/session_01YGLGMrgF1Cfg5gMAND1VNt since 2026-10-29 ~07:55 UTC**
@@ -319,6 +380,12 @@ scratch.
    - Our SFX are synthesized in `video/audio/tools/make_sfx.py`, so there are no licence issues. Design a "like pop /
      notification ding / message-sent swoosh" family that evokes those sounds, rather than copying Apple's or
      Instagram's actual sounds.
+   - **DONE 2026-10-30, where and how often (owner: "be more intentional and educated about this effect and where it
+     make sense to use"):** `video/docs/look/SOUND_SYNC.md` (the owner's two sound reels measured as the spine; the craft
+     and our audit in `video/docs/look/sound_sync/`), wired into the playbook, PIPELINE_V2, G3/G5 and the sound docs. Decided
+     under the owner's hand-over ("Do what you think is right and make the videos better"): "more effects" = more
+     NOTICEABLE story sounds, not more cues; "joins on the beat" = the voice's beat (playbook); the A/B comparisons are
+     played in Helsinki's G3 sound pass.
 6. **Tooling (PIPELINE_V2, "Tooling planned before video 2" and "Craft tooling lane"):** the draft flag, the SketchReel
    comp and the scripted gate check exist; `npm run preview` and the hook segment were never built. The G3 tier-1
    tooling (item 6 there) and the craft tooling lane are part of the pipeline the owner approved on 2026-10-27 ("Yes"):
@@ -382,15 +449,17 @@ scratch.
   - Node 22: `cd video && npm ci` (Remotion 4.0.538, React 18).
   - `video/remotion.config.ts` hard-codes
     `Config.setBrowserExecutable('/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell')`
-    and the `swangle` GL renderer. Point it at the container's headless Chromium if the path differs.
+    (no GL override since 2026-10-29: the CLI renders the scripts' pixels). Point it at the container's headless
+    Chromium if the path differs, here and in `video/scripts/render/lib.mjs` (`BROWSER_EXECUTABLE`, both render scripts).
   - Python 3.13 with numpy, scipy, librosa, soundfile, pyloudnorm, pedalboard, soxr, pretty_midi, mido,
     opencv-python-headless, pillow and matplotlib. Word timings used sherpa-onnx with the NVIDIA Parakeet model;
     `video/scripts/voice/transcribe.py` shows how (setup in its header; `check_take.py` wraps it).
   - ffmpeg 6, ImageMagick, and the Inter fonts (the project also ships fonts in `video/public/fonts`).
 - **Commands for a current film (vN, 60 fps; from `video/`):** the scaffold, one-panel previews, the owner's gate render
   and the scripted gate check are in `video/docs/G5_BLOCKING.md` §1, §4 and §7 (template: v3's `src/entry-v3-film.tsx`,
-  compositions `FilmN`, `FilmN-<ID>`); the owner's cut from G5 on renders at full size, chunked per panel (§8b there);
-  the G3 reel renders at 540p60; finals render in one step with `scripts/render-media.mjs --master` (`video/docs/PIPELINE_V2.md`
+  compositions `FilmN`, `FilmN-<ID>`); the owner's cut from G5 on renders at full size in one command,
+  `node scripts/render-media.mjs FilmN <out> --entry=<entry> --master --parallel` (§4 there); the G3 reel at 540p60
+  (`render-media.mjs ... --scale=0.5`); finals render in one step with `scripts/render-media.mjs --master` (`video/docs/PIPELINE_V2.md`
   "Master encode": lossless frames, one BT.709 encode; the TV-range pass below is v1's only, it relabelled BT.601 as BT.709).
 - **v1's commands (30 fps `Main`; v1 is archived since 2026-10-29: run them at the `v1-final` commit (`76c166c1`), e.g.
   `git worktree add --detach /tmp/v1 76c166c1 && cd /tmp/v1/video && npm ci`):**
