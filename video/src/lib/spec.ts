@@ -1,4 +1,4 @@
-// spec.ts — motion constants measured on the reference (docs/motion_spec.md section 10), in SECONDS.
+// spec.ts — motion constants measured on the reference (docs/v1/motion_spec.md section 10), in SECONDS.
 // Use these instead of inventing timings. Everything is fps-independent.
 //
 //   import {MOTION, bez, strokeDur} from '../lib';

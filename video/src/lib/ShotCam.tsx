@@ -38,7 +38,7 @@ export type ShotPush = {
 export type ShotCamProps = {
   /** Gentle per-shot dolly push (true = 1.06 over 2 s from t 0). Ignored when `keys` is given. */
   push?: ShotPush | boolean;
-  /** Full CineCamera keys (see docs/CINE.md). */
+  /** Full CineCamera keys (see docs/CINE_KIT.md). */
   keys?: CamKey[];
   handheld?: number;
   seed?: Seed;

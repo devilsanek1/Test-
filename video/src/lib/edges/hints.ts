@@ -33,7 +33,7 @@ const S01_HINTS: EdgeHints = {
 };
 
 export const EDGE_HINTS: Record<string, EdgeHints> = {
-  // EdgeLab shots (src/dev/EdgeLab.tsx), measured on review/edges/loose/final/stills/clean_*.png (+ the street clip)
+  // EdgeLab shots (archive/v1/src/dev/EdgeLab.tsx), measured on review/edges/loose/final/stills/clean_*.png (+ the street clip)
   'edgelab/street': {
     ink: {tl: 0.92, tr: 1, br: 0.02, bl: 0.39, left: 1, right: 1, bottom: 0.11},
     keep: [

@@ -2,7 +2,8 @@
 
 For whoever makes the next film, here or in the new studio repo. The owner's condition held throughout: "we MUST not
 sacrifice the quality of the video, we MUST not sacrifice the details and overall look and feel". No frame changed:
-the delivered v2r G7 master re-renders **byte for byte** with the new scripts (MD5 `cfe247ee...`). The proofs: `phase1_render.md`, `phase1_codebase.md`, `phase1_meter.md`, `phase1_docs.md` (this folder).
+the delivered v2r G7 master re-renders **byte for byte** with the new scripts (MD5 `cfe247ee...`), also on the tree
+merged with the other sessions' work (2026-11-04). The proofs: `phase1_render.md`, `phase1_codebase.md`, `phase1_meter.md`, `phase1_docs.md` (this folder).
 
 ## Do differently
 - **Gate videos (the G4 clip, the G5-G7 cuts) in one command, never the bare CLI:**

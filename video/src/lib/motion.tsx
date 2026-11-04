@@ -1,7 +1,7 @@
 // motion.tsx — SVG motion wrappers (all render <XG>, i.e. <g transform> + transform context; compose freely;
 // times in scene seconds). Children are authored at their FINAL (rest) position; motion props are offsets.
 //
-// Calibrated to docs/motion_spec.md: NOTHING animates opacity. Things pop, scale, wipe, slide or rise.
+// Calibrated to docs/v1/motion_spec.md: NOTHING animates opacity. Things pop, scale, wipe, slide or rise.
 //   <Pop at={1.2} x={300} y={800}> ... </Pop>                  // scale-in about (x,y), 7% overshoot; hidden before `at`
 //   <Rise at={1} dist={140}> <Person .../> </Rise>             // rises ~its own height from below: out(exp) 0.33 s
 //   <Sink at={6} dist={160}> ... </Sink>                       // exits by sinking (0.2 s ease-in), then gone

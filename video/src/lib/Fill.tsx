@@ -1,6 +1,6 @@
 // Fill.tsx — flat colour fills, slightly MISREGISTERED from the linework (offset a few px, like a misaligned print),
 // optionally CLIPPED TO THE PANEL (card layout; full-bleed <World> scenes are unclipped), projected inside a <Plane>,
-// with the measured entrance modes and the un-build recipe (docs/motion_spec.md). NOTHING FADES.
+// with the measured entrance modes and the un-build recipe (docs/v1/motion_spec.md). NOTHING FADES.
 //
 //   <Fill d={rectPath(100, 200, 300, 180)} color={palette.peach} at={1.4} />              // grows 20% -> 100% in 0.12 s
 //   <Fill rect={[100, 200, 300, 180]} color={palette.teal} at={2} mode="wipe" dir="up" />  // base wipe, 0.12 s linear

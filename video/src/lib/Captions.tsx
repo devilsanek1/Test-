@@ -43,7 +43,7 @@ export type CaptionsProps = {
   highlightColor?: string;
 };
 
-// measured curves (docs/motion_evidence/measurements.json)
+// measured curves (docs/v1/motion_evidence/measurements.json)
 const PAGE_RISE = 112; // new block starts this far below its rest position
 const LINE_RISE = 88; // a later line starts this far below
 const RISE_DUR = 0.4;
@@ -168,7 +168,7 @@ export const Captions: React.FC<CaptionsProps> = ({beats, range, carry = true, i
 };
 
 // =====================================================================================================================
-// SkyCaptions (v2, full-bleed): captions in the SKY, screen space, calibrated to docs/motion_spec.md section 4.
+// SkyCaptions (v2, full-bleed): captions in the SKY, screen space, calibrated to docs/v1/motion_spec.md section 4.
 //  - Patrick Hand theme skyCaption.size (98 px) centred on skyCaption.cx; baselines skyCaption.line1 / line2 (387 / 510);
 //    a one-line page sits at skyCaption.oneLine; lines wider than skyCaption.maxWidth shrink the page's font.
 //  - PAGE CHANGE: the whole stack scrolls up by (clip height + 20) in 0.45 s, cubic-bezier(0, 0.7, 0.12, 1); the old
@@ -183,7 +183,7 @@ export const Captions: React.FC<CaptionsProps> = ({beats, range, carry = true, i
 //  - No opacity, no scale, no blur. Before the first page starts, the first page shows settled (the hook frame).
 //  - capcheck: with input prop {capcheck: 'mask'} it draws a black frame with code colours (dark-tone text #FF0000,
 //    light-tone text #00FF00, highlight boxes #0000FF) for scripts/capcheck.mjs; {capcheck: 'bg'} hides captions.
-// Data times are WORD STARTS (src/data/captions.json, generated from assets/timing.json); the leads are applied here.
+// Data times are WORD STARTS (archive/v1/src/data/captions.json, generated from assets/timing.json); the leads are applied here.
 //
 //   <SkyCaptions beats={captions} tone={(T) => (T > 50 ? 'light' : 'dark')} loopAt={70.4} />
 //   <SkyCaptions beats={captions} split={{x: (T) => wipeEdge(T), left: 'light', right: 'dark'}} />

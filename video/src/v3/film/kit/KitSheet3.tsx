@@ -92,7 +92,7 @@ const S13Frame: React.FC = () => (
   </>
 );
 
-// S9's S5 pull-back at its two ends, every piece at its board size (scenes/S9.tsx moves them on the plane maps)
+// S9's S5 pull-back at its two ends, every piece at its board size (archive/v3/src/v3/film/scenes/S9.tsx moves them on the plane maps)
 const S9StartFrame: React.FC = () => (
   <>
     <NightSky bandY={790} horizon={900} />

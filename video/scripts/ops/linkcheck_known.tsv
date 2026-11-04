@@ -30,15 +30,3 @@ video/scripts/render-frames.mjs	video/src/index.ts	keep	lane R's render tools na
 video/scripts/render-frames.mjs	video/src/dev/registry.ts	keep	lane R's render tools name v1's old entries on purpose: --entry=full and its error, the history of --entry=auto
 video/scripts/render-frames.mjs	video/src/entry-film.ts	keep	lane R's render tools name v1's old entries on purpose: --entry=full and its error, the history of --entry=auto
 video/scripts/render/lib.mjs	video/src/index.ts	keep	lane R's render tools name v1's old entries on purpose: --entry=full and its error, the history of --entry=auto
-video/src/lib/*	video/docs/motion_spec.md	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
-video/src/lib/*	video/docs/motion_evidence	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
-video/src/lib/*	video/docs/style_bible.md	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
-video/src/lib/*	video/docs/style_bible_ref2.md	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
-video/src/lib/*	video/docs/theme_proposal.json	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
-video/src/lib/*	video/docs/BRIEF.md	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
-video/src/lib/*	video/docs/CINE.md	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
-video/src/lib/*	video/src/data	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
-video/src/lib/*	video/src/dev	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
-video/src/lib/*	video/scripts/engine-numbers.mjs	todo	video/src/lib is frozen in Phase 1 (the city-poster study): after it lands, apply phase1_codebase.md "Code comments and defaults" (no pixel change) and remove these lines
-video/src/v3/film/*	video/src/v3/film/scenes/g5b_panels.tsx	todo	outside the Phase 1 docs lane (video/src): add "archived in archive/v3/src/v3/film/scenes/" (phase1_codebase.md) and remove these lines
-video/src/v3/film/*	video/src/v3/film/scenes/S9.tsx	todo	outside the Phase 1 docs lane (video/src): add "archived in archive/v3/src/v3/film/scenes/" (phase1_codebase.md) and remove these lines

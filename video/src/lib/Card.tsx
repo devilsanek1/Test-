@@ -8,7 +8,7 @@
 //     </Card>
 //   </Page>
 //
-// Transition math (measured on the reference, docs/motion_evidence) lives here too:
+// Transition math (measured on the reference, docs/v1/motion_evidence) lives here too:
 // flipOut/flipIn, swipeOut/swipeIn, pushOut/pushIn return CardXf for a time / progress value.
 
 import React, {createContext, useContext} from 'react';

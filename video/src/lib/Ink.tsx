@@ -8,7 +8,7 @@
 //   <Ink d={path} />                                                // no `at` -> already drawn
 //   <InkGroup paths={[a, b, c]} at={1} stagger={0.08} />            // several drawings, staggered
 //
-// Pacing (docs/motion_spec.md #4, pace="spec", the default): a path with several subpaths ("M" commands) is drawn as
+// Pacing (docs/v1/motion_spec.md #4, pace="spec", the default): a path with several subpaths ("M" commands) is drawn as
 // separate pen strokes; each stroke takes 0.10-0.20 s WHATEVER ITS LENGTH (len / 3000 px/s, clamped) and successive
 // strokes start 1 frame apart, so 3-6 strokes are in flight at once. `dur`, if given, is the time budget over which
 // the stroke STARTS are spread (it never slows a stroke down). pace="free" = the old behaviour (dur = total time,

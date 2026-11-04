@@ -126,7 +126,7 @@ export function pulse(t: number, start: number, end: number, inDur = 0.25, outDu
 
 export type SpringCfg = {stiffness?: number; damping?: number; mass?: number; from?: number; to?: number};
 
-/** Presets. Calibrated to docs/motion_spec.md: `pop` = 7% overshoot peaking at ~0.2 s (the sun's arrival), `rise` =
+/** Presets. Calibrated to docs/v1/motion_spec.md: `pop` = 7% overshoot peaking at ~0.2 s (the sun's arrival), `rise` =
  *  ~3% (people / placards rising in). `soft` ~2%; `snappy` ~9% (fast); `wobbly` ~25% (use sparingly); `gentle` slow. */
 export const springs = {
   pop: {stiffness: 430, damping: 27, mass: 1},

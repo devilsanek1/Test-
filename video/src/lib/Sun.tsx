@@ -1,4 +1,4 @@
-// Sun.tsx — the orange disc, the video's anchor AND a character (docs/motion_spec.md 5, #19-#24). Render it inside
+// Sun.tsx — the orange disc, the video's anchor AND a character (docs/v1/motion_spec.md 5, #19-#24). Render it inside
 // your scene where you want it in the z-order (before a wall/skyline so it can set behind it).
 //
 //   <Sun />                                                   // static: card slot (card) / sunWorld (in a <World>)

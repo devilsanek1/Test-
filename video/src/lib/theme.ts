@@ -68,7 +68,7 @@ export const type = {
 /** Fill misregistration: fills sit offset from their linework like a slightly misaligned print. */
 export const misreg = {dx: 1.5, dy: 1, jitter: 3} as const;
 
-/** Default motion timings (seconds), calibrated to docs/motion_spec.md (see also lib/spec.ts MOTION). */
+/** Default motion timings (seconds), calibrated to docs/v1/motion_spec.md (see also lib/spec.ts MOTION). */
 export const timing = {
   fillDelay: 0.18, // a fill lands 0.13-0.27 s after its OUTLINE STARTS (ink-first mode)
   fillDur: 0.12, // grow 20% -> 100% over 3-4 frames (or a 1-frame pop)
@@ -77,7 +77,7 @@ export const timing = {
   highlightWipe: 0.19, // + 0.3 ms per px of box width
 } as const;
 
-// ---- style-bible additions (docs/style_bible.md, docs/theme_proposal.json)
+// ---- style-bible additions (docs/v1/style_bible.md, docs/v1/theme_proposal.json)
 
 /** Caption highlight box geometry, in em of the caption font size. One box spans a multi-word phrase; trailing punctuation stays outside. */
 export const highlightBox = {padLeftEm: 0.02, padRightEm: 0.11, topEm: 0.671, bottomEm: 0.305, radiusEm: 0.035} as const;
@@ -88,14 +88,14 @@ export const cardSurface = {grain: false, shadow: false} as const;
 /** How far ink may run past the panel block (px). */
 export const overshoot = {maxSide: 60, maxTop: 80, maxBottom: 50, structural: [30, 62], medium: [6, 15], small: [3, 8]} as const;
 
-// ---- engine v2: FULL-BLEED world (docs/BRIEF.md "CINEMATIC DIRECTION"). New keys only.
+// ---- engine v2: FULL-BLEED world (docs/v1/BRIEF.md "CINEMATIC DIRECTION"). New keys only.
 
 /** The full-bleed world: world coordinates = canvas pixels at camera rest (0..1080 x 0..1920). */
 export const world = {
   w: 1080,
   h: 1920,
   /** Default eye-level horizon (y). Low camera: towers rise into the sky above it. */
-  horizon: 768, // reference 2 median 0.40 H (docs/style_bible_ref2.md); peaks go lower (0.58-0.70 H)
+  horizon: 768, // reference 2 median 0.40 H (docs/v1/style_bible_ref2.md); peaks go lower (0.58-0.70 H)
   /** Default vanishing point. */
   vp: [540, 768] as [number, number],
   /** Author scenes this far past every frame edge (camera-continuous / push transitions zoom out by up to ~12%). */
@@ -126,8 +126,8 @@ export const skyCaption = {
   /** Roll window: text outside [clipTop, clipBottom] is hidden (lines rise into it; pages scroll out of it). */
   clipTop: 280,
   clipBottom: 570,
-  /** 'scroll' = reference 1's measured page scroll / line-2 rise / highlight wipe (docs/motion_spec.md 4).
-   *  'pop' = reference 2's grammar (docs/style_bible_ref2.md 3): pages, lines and highlight boxes pop in 1 frame. */
+  /** 'scroll' = reference 1's measured page scroll / line-2 rise / highlight wipe (docs/v1/motion_spec.md 4).
+   *  'pop' = reference 2's grammar (docs/v1/style_bible_ref2.md 3): pages, lines and highlight boxes pop in 1 frame. */
   motion: 'scroll' as 'scroll' | 'pop',
 } as const;
 
@@ -265,7 +265,7 @@ export const deltaE = (a: string, b: string) => {
  *  fields that commonly meet the sky: facades, walkways and fences on the horizon, white clouds and signs. */
 const SKY_FACING: Partial<Record<TodRole, PaletteKey[]>> = {base: ['white', 'cream', 'sand', 'mintPale', 'tan'], framing: ['teal', 'tealDark', 'sage'], far: ['sage', 'teal', 'mintPale', 'cream'], cloud: ['white', 'mintPale']};
 
-/** Relight table check (scripts/engine-numbers.mjs --check runs it): every fill the table relights, and every
+/** Relight table check (archive/v1/scripts/engine-numbers.mjs --check runs it): every fill the table relights, and every
  *  sky-facing colour of each role (base facades / walkways / whites included), must stay distinct from the sky of its
  *  time of day: at least one palette step of contrast (RELIGHT_MIN_STEP) or a clear hue difference (RELIGHT_MIN_DE).
  *  Also checks the bulb halo against its sky. Returns human-readable problems (empty = OK). */

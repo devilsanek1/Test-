@@ -1,7 +1,7 @@
 // Town — the far-town layer of reference 2's street shots (f_1, f_33, f_42): palms, fronds (also as foreground
 // framing from the top corners), a water tower, a parked car seen from behind, rolling hills. Ink + flat fills, so
 // they relight with the time of day (<Tod role="far"> for the far ones, role="framing" for corner fronds).
-// (Rolling hills: a Fill with smooth() bumps under <Tod role="far">, see src/dev/KitDemo.tsx; the cine `Hills` is the
+// (Rolling hills: a Fill with smooth() bumps under <Tod role="far">, see archive/v1/src/dev/KitDemo.tsx; the cine `Hills` is the
 // raw-SVG version that takes `tod`.)
 //
 //   <Palm x={760} y={900} h={220} at={1} seed="p1" />                       // trunk draws, fronds pop out

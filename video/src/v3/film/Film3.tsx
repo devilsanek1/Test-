@@ -6,7 +6,7 @@
 //                  wins: the placeholders export their old panels')
 //   captions.json  pop captions from public/v3/voice_words.json (scripts/film_captions.py + captions_pages.txt)
 //   scenes/        one file per sequence (each starts as a placeholder playing the G5b panels it replaces:
-//                  scenes/g5b_panels.tsx; lanes replace them; scenes/index.ts registers them)
+//                  archive/v3/src/v3/film/scenes/g5b_panels.tsx; lanes replace them; scenes/index.ts registers them)
 //   voice          public/v3/voice.wav; sound cues = the locked board's (public/v3/animatic.json "sfx") plus the
 //                  payoff's thoom at 36.98 (PAYOFF_THOOM: the hook's 4.04 beat rhymed in sound too)
 //   frame 0        the core line in words until 3.37 s (and from the loop roll on), spoken captions under it

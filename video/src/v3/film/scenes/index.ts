@@ -2,7 +2,7 @@
 // §2: SQA ... SQF), each in its own file scenes/<SQ>.tsx. A sequence module default-exports its scene (React.FC, no
 // props) and may export `Wiper` (WiperComponent, for a foreground-wipe OUT of it) and `captionTone` (ToneKey[],
 // sequence-local t: overrides its scenes.json captionTone, so a lane sets its own caption tone without touching a shared
-// file). Each starts as a placeholder that plays the G5b panels it replaces (scenes/g5b_panels.tsx); the old panel
+// file). Each starts as a placeholder that plays the G5b panels it replaces (archive/v3/src/v3/film/scenes/g5b_panels.tsx); the old panel
 // files (O1, S4 ... S16 and their helpers) are no longer scenes, only sets the sequence builders reuse. How a sequence
 // owns its camera and its joins: docs/G5_BLOCKING.md §2b.
 import type React from 'react';

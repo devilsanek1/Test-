@@ -233,6 +233,9 @@ it runs there, never a path swap (archived code does not run in place).
   `studies/2026-10-28_city_posters/test/ENGINE_PT.md` 317.
 
 **Code comments and defaults** (no pixel changes; `src/lib/` is frozen for Phase 1, so batch these after the study)
+- **Done 2026-11-04 for `video/src/`** (the study had landed): the 29 comment paths in `src/lib/` and `src/v3/film/` point
+  at `docs/v1/`, `docs/CINE_KIT.md` and `archive/`; 5 frames (Film2R x3, Film3 x2) byte-equal before and after on a
+  fresh bundle; the 12 `todo` rules left `scripts/ops/linkcheck_known.tsv` (linkcheck: 0 stale, 0 deferred).
 - `video/src/lib/`: `Captions.tsx` 46 (`docs/motion_evidence/measurements.json` -> `docs/v1/motion_evidence/...`), 171
   (`docs/motion_spec.md` -> `docs/v1/motion_spec.md`), 186 (`src/data/captions.json`: v1's, archived); `Card.tsx` 11
   (`docs/motion_evidence` -> `docs/v1/motion_evidence`); `Fill.tsx` 3, `Ink.tsx` 11, `Sun.tsx` 1, `exit.tsx` 2, `motion.tsx` 4,

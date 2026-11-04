@@ -1,4 +1,4 @@
-// Cinematic-scale kit (cine lane). Full-bleed, canvas coordinates (1080 x 1920). See docs/CINE.md.
+// Cinematic-scale kit (cine lane). Full-bleed, canvas coordinates (1080 x 1920). See docs/CINE_KIT.md.
 //   import {CineCamera, Layer, Sky, BigSun, EndlessCity, Tower, Monument, WallOfWindows, ...} from '../lib/cine';
 export * from './util';
 export * from './camera';

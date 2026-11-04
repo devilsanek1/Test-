@@ -1,7 +1,7 @@
 // Film.tsx — the v2 sequencer: full-bleed scenes on the VO timeline, cinematic transitions, sky captions, audio.
 // Main renders <Film scenes={scenes.json} components={sceneComponents} captions={captions.json} />.
 //
-// src/data/scenes.json: [{id, start, end, transitionIn?: {type, dur?, ...}, transitionOut?: {type: 'unbuild', ...},
+// archive/v1/src/data/scenes.json: [{id, start, end, transitionIn?: {type, dur?, ...}, transitionOut?: {type: 'unbuild', ...},
 //                         captionTone?: [{t, tone}], note?}]
 //   start = the CUT (VO seconds) where this scene takes over; transitions are centred on / anchored to it.
 //   captionTone: t is SCENE-LOCAL seconds; tone 'dark' (ink, light skies) | 'light' (white, dusk/night skies). The

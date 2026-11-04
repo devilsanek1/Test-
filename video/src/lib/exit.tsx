@@ -1,5 +1,5 @@
 // exit.tsx — "un-build" support. A SceneExit value e (0..1) flows down the tree; every <Ink> and <Fill> reads it and
-// dismantles itself with the measured recipe (docs/motion_spec.md T6, MOTION.unbuild), all ease-in, NO fades:
+// dismantles itself with the measured recipe (docs/v1/motion_spec.md T6, MOTION.unbuild), all ease-in, NO fades:
 //   1. e 0.00-0.20  lines go LOOSE: every stroke extends past its corners (+~25%) and skews a hair
 //   2. e 0.10-0.65  fills SHRINK to their centres (small first, seeded order)
 //   3. e 0.36-0.70  ink RETRACTS (strokes undraw)

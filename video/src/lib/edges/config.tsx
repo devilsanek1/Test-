@@ -14,7 +14,7 @@ import {EDGE_HINTS} from './hints';
 
 export type EdgeConfig = Omit<EdgeTreatmentProps, 'children'>;
 
-/** House default for the film: 'paint-subtle', the user's pick (docs/BRIEF.md, EDGE TREATMENT). Film applies it to the full
+/** House default for the film: 'paint-subtle', the user's pick (docs/v1/BRIEF.md, EDGE TREATMENT). Film applies it to the full
  *  film only; single-scene previews stay 'clean'. Override per render with --props='{"edges":"paint-medium"}'. */
 export const FILM_EDGES: EdgeConfig = {variant: 'paint-subtle', seed: 'film', amount: 1};
 

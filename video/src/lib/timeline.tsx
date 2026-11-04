@@ -2,7 +2,7 @@
 // Sequences scenes on the VO timeline inside the polaroid card, runs the
 // transitions, renders captions inside the card (so they flip with it) and plays the VO.
 //
-// Data (src/data/scenes.json):  [{id, start, end, transitionIn?: Transition, transitionOut?: Transition}]
+// Data (archive/v1/src/data/scenes.json):  [{id, start, end, transitionIn?: Transition, transitionOut?: Transition}]
 //   start = the CUT time (VO seconds) where this scene takes over. Transitions are placed around the cut c:
 //   cut / match : hard switch at c (match = same, but you keep persistent objects in the same place)
 //   flip        : NEW CARD. Quick 1.5 deg pre-tilt, the card turns edge-on AT c (outgoing visible before,
